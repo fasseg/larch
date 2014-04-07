@@ -24,7 +24,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -32,48 +33,51 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Component
-public class WeedFsMaster {
-    private static final Logger log = LoggerFactory.getLogger(WeedFsMaster.class);
+public class WeedFSVolume {
+    private static final Logger log = LoggerFactory.getLogger(WeedFSVolume.class);
 
     @Autowired
     Environment env;
-    private Process masterProcess;
+    private Process volumeProcess;
     private InputStreamLoggerTask loggerTask;
 
     @Async
-    public void runMaster() {
+    public void runVolume() {
         /* check if the master dir exists and create if neccessary */
-        final File dir = new File(env.getProperty("weedfs.master.dir"));
+        final File dir = new File(env.getProperty("weedfs.volume.dir"));
         if (!dir.exists()) {
-            log.info("creating WeedFS master directory at " + dir.getAbsolutePath());
+            log.info("creating WeedFS volume directory at " + dir.getAbsolutePath());
             if (!dir.mkdir()) {
-                throw new IllegalArgumentException("Unable to create master directory. Please check the configuration");
+                throw new IllegalArgumentException("Unable to create volume directory. Please check the configuration");
             }
         }
         if (!dir.canRead() || !dir.canWrite()) {
-            log.error("Unable to create master directory. The application was not initialiazed correctly");
-            throw new IllegalArgumentException("Unable to use master directory. Please check the configuration");
+            log.error("Unable to create volume directory. The application was not initialiazed correctly");
+            throw new IllegalArgumentException("Unable to use volume directory. Please check the configuration");
         }
         try {
-            log.info("starting WeedFS master");
+            log.info("starting WeedFS volume");
 
-            final List<String> command = Arrays.asList(
+            /* start weedfs volume server */
+            String[] args = new String[]{
                     env.getProperty("weedfs.binary"),
-                    "master",
-                    "-mdir=" + env.getProperty("weedfs.master.dir"),
-                    "-port=" + env.getProperty("weedfs.master.port")
-            );
-            masterProcess = new ProcessBuilder(command)
+                    "volume",
+                    "-ip=0.0.0.0",
+                    "-dir=" + env.getProperty("weedfs.volume.dir"),
+                    "-mserver=" + env.getProperty("weedfs.master.host") + ":" + env.getProperty("weedfs.volume.port"),
+                    "-port=" + env.getProperty("weedfs.volume.port")
+            };
+            volumeProcess = new ProcessBuilder(args)
                     .redirectErrorStream(true)
                     .redirectInput(ProcessBuilder.Redirect.PIPE)
                     .start();
 
             final ExecutorService executorService = Executors.newSingleThreadExecutor();
-            if (!masterProcess.isAlive()) {
-                throw new IOException("WeedFS Master could not be started! Exitcode " + masterProcess.exitValue());
+            if (!volumeProcess.isAlive()) {
+                throw new IOException("WeedFS volume could not be started! Exitcode " + volumeProcess.exitValue());
             } else {
-                log.info("WeedFs master is running");
-                executorService.submit(new InputStreamLoggerTask(masterProcess.getInputStream())).get();
+                log.info("WeedFs volume is running");
+                executorService.submit(new InputStreamLoggerTask(volumeProcess.getInputStream())).get();
             }
         } catch (IOException | InterruptedException | ExecutionException e) {
             e.printStackTrace();
@@ -81,11 +85,11 @@ public class WeedFsMaster {
     }
 
     public boolean isAlive() {
-        return (masterProcess != null) && masterProcess.isAlive();
+        return (volumeProcess != null) && volumeProcess.isAlive();
     }
 
     public void shutdown() {
-        log.info("shutting down WeedFS master");
-        this.masterProcess.destroy();
+        log.info("shutting down WeedFS volume");
+        this.volumeProcess.destroy();
     }
- }
+}
