@@ -15,9 +15,14 @@
 */
 package net.objecthunter.larch.integration;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.LarchServerConfiguration;
 import net.objecthunter.larch.net.objecthunter.weedfs.WeedFSVolume;
 import net.objecthunter.larch.net.objecthunter.weedfs.WeedFsMaster;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.fluent.Request;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,15 +31,13 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = LarchServerConfiguration.class)
 @IntegrationTest
 @WebAppConfiguration
-public class WeedFSTest {
+public class WeedFsIT {
 
     @Autowired
     private WeedFsMaster master;
@@ -42,13 +45,19 @@ public class WeedFSTest {
     @Autowired
     private WeedFSVolume volume;
 
+    @After
+    public void cleanup() {
+        master.shutdown();
+        volume.shutdown();
+    }
+
     @Test
-    public void testStartStopMasterAndVolume() throws Exception {
+    public void testStartStop() throws Exception {
         master.runMaster();
         // wait at most 500ms until the master is up then throw an exception
         long time = System.currentTimeMillis();
         while (!master.isAlive()) {
-            if (System.currentTimeMillis() > time + 500) {
+            if (System.currentTimeMillis() > time + 1500) {
                 fail("WeedFS master not alive after 500ms");
             }
         }
@@ -58,11 +67,28 @@ public class WeedFSTest {
         volume.runVolume();
         time = System.currentTimeMillis();
         while (!volume.isAlive()) {
-            if (System.currentTimeMillis() > time + 500) {
+            if (System.currentTimeMillis() > time + 1500) {
                 fail("WeedFS volume not alive after 500ms");
             }
         }
         assertTrue(volume.isAlive());
+
+        time = System.currentTimeMillis();
+
+        // retrieve a fid from WeedFs
+        int count = 0;
+        boolean fidFetched = false;
+        while (count++ < 50 && !fidFetched) {
+            final HttpResponse resp = Request.Get("http://localhost:9333/dir/assign")
+                    .execute()
+                    .returnResponse();
+            final JsonNode node = new ObjectMapper().readTree(resp.getEntity().getContent());
+            fidFetched = node.get("fid") != null;
+            if (!fidFetched) {
+                Thread.sleep(100);
+            }
+        }
+        assertTrue(fidFetched);
 
         // stop the volume node
         volume.shutdown();
@@ -74,7 +100,6 @@ public class WeedFSTest {
             }
         }
         assertFalse(volume.isAlive());
-
 
         master.shutdown();
         // wait at most 500ms until the master is down then throw an exception

@@ -27,18 +27,11 @@ public class LarchServer {
                 .showBanner(false)
                 .web(true)
                 .sources(LarchServerConfiguration.class)
-                .listeners(createWeedFsInitListener())
+                .listeners((ContextRefreshedEvent event) -> {
+                    System.out.println("Context refreshed");
+                    final WeedFsMaster master = event.getApplicationContext().getBean(WeedFsMaster.class);
+                    master.runMaster();
+                })
                 .run();
     }
-
-    private static ApplicationListener<ContextRefreshedEvent> createWeedFsInitListener() {
-        return new ApplicationListener<ContextRefreshedEvent>() {
-            @Override
-            public void onApplicationEvent(ContextRefreshedEvent event) {
-                final WeedFsMaster master = event.getApplicationContext().getBean(WeedFsMaster.class);
-                master.runMaster();
-            }
-        };
-    }
-
 }
