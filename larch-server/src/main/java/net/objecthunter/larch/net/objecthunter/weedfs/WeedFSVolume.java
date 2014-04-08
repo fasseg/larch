@@ -84,6 +84,10 @@ public class WeedFSVolume {
             e.printStackTrace();
         }
     }
+    public boolean isAvailable() {
+        final File binary = new File(env.getProperty("weedfs.binary"));
+        return binary.exists() && binary.canExecute();
+    }
 
     public boolean isAlive() {
         return (volumeProcess != null) && volumeProcess.isAlive();
@@ -91,6 +95,8 @@ public class WeedFSVolume {
 
     public void shutdown() {
         log.info("shutting down WeedFS volume");
-        this.volumeProcess.destroy();
+        if (this.volumeProcess != null && this.volumeProcess.isAlive()) {
+            this.volumeProcess.destroy();
+        }
     }
 }

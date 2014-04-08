@@ -80,12 +80,19 @@ public class WeedFsMaster {
         }
     }
 
+    public boolean isAvailable() {
+        final File binary = new File(env.getProperty("weedfs.binary"));
+        return binary.exists() && binary.canExecute();
+    }
+
     public boolean isAlive() {
         return (masterProcess != null) && masterProcess.isAlive();
     }
 
     public void shutdown() {
         log.info("shutting down WeedFS master");
-        this.masterProcess.destroy();
+        if (this.masterProcess != null && this.masterProcess.isAlive()) {
+            this.masterProcess.destroy();
+        }
     }
  }
