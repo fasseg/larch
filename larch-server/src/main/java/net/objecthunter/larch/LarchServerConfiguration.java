@@ -15,12 +15,15 @@
 */
 package net.objecthunter.larch;
 
+import net.objecthunter.larch.fs.FilesystemBlobstoreService;
+import net.objecthunter.larch.weedfs.WeedFSBlobstoreService;
 import net.objecthunter.larch.weedfs.WeedFsVolume;
 import net.objecthunter.larch.weedfs.WeedFsMaster;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -31,5 +34,29 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableWebMvc
 @EnableAsync
 public class LarchServerConfiguration {
+    @Bean
+    @Profile("fs")
+    public FilesystemBlobstoreService filesystemBlobstoreService() {
+        return new FilesystemBlobstoreService();
+    }
 
+    @Bean
+    @Profile("weedfs")
+    @Order(40)
+    public WeedFsMaster weedFsMaster() {
+        return new WeedFsMaster();
+    }
+
+    @Bean
+    @Profile("weedfs")
+    @Order(50)
+    public WeedFsVolume weedfsVolume() {
+        return new WeedFsVolume();
+    }
+
+    @Bean
+    @Profile("weedfs")
+    public WeedFSBlobstoreService weedFSBlobstoreService() {
+        return new WeedFSBlobstoreService();
+    }
 }

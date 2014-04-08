@@ -36,8 +36,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Component
-@Order(40)
 public class WeedFsMaster{
     private static final Logger log = LoggerFactory.getLogger(WeedFsMaster.class);
 

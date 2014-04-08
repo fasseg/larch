@@ -36,14 +36,8 @@ public class WeedFsIT extends AbstractLarchIT{
     @Autowired
     private WeedFsVolume volume;
 
-    @After
-    public void cleanup() {
-        master.shutdown();
-        volume.shutdown();
-    }
-
     @Test
-    public void testStartStop() throws Exception {
+    public void testGetFid() throws Exception {
         // retrieve a fid from WeedFs
         int count = 0;
         boolean fidFetched = false;
@@ -60,4 +54,20 @@ public class WeedFsIT extends AbstractLarchIT{
         assertTrue(fidFetched);
     }
 
+    @Test
+    public void testGetStatus() throws Exception {
+        int count = 0;
+        boolean statusFetched = false;
+        while (count++ < 50 && !statusFetched) {
+            final HttpResponse resp = Request.Get("http://localhost:9333/dir/status")
+                    .execute()
+                    .returnResponse();
+            final JsonNode node = new ObjectMapper().readTree(resp.getEntity().getContent());
+            statusFetched = node.get("Topology") != null;
+            if (!statusFetched) {
+                Thread.sleep(100);
+            }
+        }
+        assertTrue(statusFetched);
+    }
 }
