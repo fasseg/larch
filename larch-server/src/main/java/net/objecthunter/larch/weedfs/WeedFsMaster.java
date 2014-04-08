@@ -13,26 +13,32 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.net.objecthunter.weedfs;
+package net.objecthunter.larch.weedfs;
 
 import net.objecthunter.larch.helpers.InputStreamLoggerTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Component
-public class WeedFsMaster {
+@Order(40)
+public class WeedFsMaster{
     private static final Logger log = LoggerFactory.getLogger(WeedFsMaster.class);
 
     @Autowired
@@ -40,7 +46,7 @@ public class WeedFsMaster {
     private Process masterProcess;
     private InputStreamLoggerTask loggerTask;
 
-    @Async
+    @PostConstruct
     public void runMaster() {
         /* check if the master dir exists and create if neccessary */
         final File dir = new File(env.getProperty("weedfs.master.dir"));
@@ -68,14 +74,14 @@ public class WeedFsMaster {
                     .redirectInput(ProcessBuilder.Redirect.PIPE)
                     .start();
 
-            final ExecutorService executorService = Executors.newSingleThreadExecutor();
+            final Executor executor= Executors.newSingleThreadExecutor();
             if (!masterProcess.isAlive()) {
                 throw new IOException("WeedFS Master could not be started! Exitcode " + masterProcess.exitValue());
             } else {
                 log.info("WeedFs master is running");
-                executorService.submit(new InputStreamLoggerTask(masterProcess.getInputStream())).get();
+                executor.execute(new InputStreamLoggerTask(masterProcess.getInputStream()));
             }
-        } catch (IOException | InterruptedException | ExecutionException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -89,10 +95,11 @@ public class WeedFsMaster {
         return (masterProcess != null) && masterProcess.isAlive();
     }
 
+    @PreDestroy
     public void shutdown() {
         log.info("shutting down WeedFS master");
         if (this.masterProcess != null && this.masterProcess.isAlive()) {
             this.masterProcess.destroy();
         }
     }
- }
+}

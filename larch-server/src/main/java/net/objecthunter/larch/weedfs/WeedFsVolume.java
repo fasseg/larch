@@ -13,35 +13,37 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.net.objecthunter.weedfs;
+package net.objecthunter.larch.weedfs;
 
 import net.objecthunter.larch.helpers.InputStreamLoggerTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Component
-public class WeedFSVolume {
-    private static final Logger log = LoggerFactory.getLogger(WeedFSVolume.class);
+@Order(50)
+public class WeedFsVolume {
+    private static final Logger log = LoggerFactory.getLogger(WeedFsVolume.class);
 
     @Autowired
     Environment env;
     private Process volumeProcess;
     private InputStreamLoggerTask loggerTask;
 
-    @Async
+    @PostConstruct
     public void runVolume() {
         /* check if the master dir exists and create if neccessary */
         final File dir = new File(env.getProperty("weedfs.volume.dir"));
@@ -73,14 +75,14 @@ public class WeedFSVolume {
                     .redirectInput(ProcessBuilder.Redirect.PIPE)
                     .start();
 
-            final ExecutorService executorService = Executors.newSingleThreadExecutor();
+            final Executor executor = Executors.newSingleThreadExecutor();
             if (!volumeProcess.isAlive()) {
                 throw new IOException("WeedFS volume could not be started! Exitcode " + volumeProcess.exitValue());
             } else {
                 log.info("WeedFs volume is running");
-                executorService.submit(new InputStreamLoggerTask(volumeProcess.getInputStream())).get();
+                executor.execute(new InputStreamLoggerTask(volumeProcess.getInputStream()));
             }
-        } catch (IOException | InterruptedException | ExecutionException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -93,6 +95,7 @@ public class WeedFSVolume {
         return (volumeProcess != null) && volumeProcess.isAlive();
     }
 
+    @PreDestroy
     public void shutdown() {
         log.info("shutting down WeedFS volume");
         if (this.volumeProcess != null && this.volumeProcess.isAlive()) {

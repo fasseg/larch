@@ -33,7 +33,7 @@ public class DescribeController {
     @ResponseBody
     public Describe describe() throws IOException {
         return new Describe.Builder()
-                .larchVersion("vaersion")
+                .larchVersion("version")
                 .build();
     }
 }

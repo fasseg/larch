@@ -1,4 +1,4 @@
-/*
+/* 
 * Copyright 2014 Frank Asseg
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,21 +11,23 @@
 * distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
-* limitations under the License.
+* limitations under the License. 
 */
-package net.objecthunter.larch;
+package net.objecthunter.larch.integration;
 
-import net.objecthunter.larch.weedfs.WeedFsMaster;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.event.ContextRefreshedEvent;
+import net.objecthunter.larch.elasticsearch.ElasticSearchNode;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class LarchServer {
+import static org.junit.Assert.assertTrue;
 
-    public static void main(String[] args) {
-        new SpringApplicationBuilder()
-                .showBanner(false)
-                .web(true)
-                .sources(LarchServerConfiguration.class)
-                .run();
+public class ElasticSearchNodeIT extends AbstractLarchIT {
+
+    @Autowired
+    ElasticSearchNode node;
+
+    @Test
+    public void testElasticSearchNodeAlive() {
+        assertTrue(node.isAlive());
     }
 }

@@ -20,9 +20,11 @@ import java.util.*;
 public class Entity {
     private final String id;
     private final String label;
+    private final String type;
     private final List<String> tags;
     private final String parentId;
     private final Map<String, Metadata> metadata;
+    private final Map<String, Binary> binaries;
 
     private Entity(Builder b) {
         this.id = b.id;
@@ -30,13 +32,17 @@ public class Entity {
         this.tags = b.tags;
         this.parentId = b.parentId;
         this.metadata = b.metadata;
+        this.type = b.type;
+        this.binaries = b.binaries;
     }
     private Entity() {
+        this.binaries = null;
         this.id = null;
         this.label = null;
         this.tags = null;
         this.parentId = null;
         this.metadata = null;
+        this.type = null;
     }
 
     public String getId() {
@@ -59,15 +65,36 @@ public class Entity {
         return metadata;
     }
 
+    public String getType() {
+        return type;
+    }
+
     public static class Builder  {
         private final String id;
         private String label;
+        private String type;
         private List<String> tags = new ArrayList<>();
         private String parentId;
         private Map<String, Metadata> metadata = new HashMap<>();
+        public Map<String,Binary> binaries = new HashMap<>();
 
         public Builder(String id) {
             this.id = id;
+        }
+
+        public Builder binaries(Map<String, Binary> binaries) {
+            this.binaries.putAll(binaries);
+            return this;
+        }
+
+        public Builder binary(Binary binary) {
+            this.binaries.put(binary.getName(), binary);
+            return this;
+        }
+
+        public Builder type(String type) {
+            this.type = type;
+            return this;
         }
 
         public Builder label(String label) {

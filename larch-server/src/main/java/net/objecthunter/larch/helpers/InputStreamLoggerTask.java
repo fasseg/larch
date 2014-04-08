@@ -19,11 +19,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.concurrent.Callable;
 
-public class InputStreamLoggerTask implements Callable<Void> {
+public class InputStreamLoggerTask implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(InputStreamLoggerTask.class);
 
     private final BufferedReader reader;
@@ -33,13 +34,17 @@ public class InputStreamLoggerTask implements Callable<Void> {
     }
 
     @Override
-    public Void call() throws Exception {
+    public void run() {
         String line = null;
         while (true) {
-            if (this.reader.ready() && (line = this.reader.readLine()) != null) {
-                log.info(line);
-            } else {
-                Thread.yield();
+            try {
+                if (this.reader.ready() && (line = this.reader.readLine()) != null) {
+                    log.info(line);
+                } else {
+                    Thread.yield();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }

@@ -17,19 +17,13 @@ package net.objecthunter.larch.integration;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.objecthunter.larch.LarchServerConfiguration;
-import net.objecthunter.larch.net.objecthunter.weedfs.WeedFSVolume;
-import net.objecthunter.larch.net.objecthunter.weedfs.WeedFsMaster;
+import net.objecthunter.larch.weedfs.WeedFsVolume;
+import net.objecthunter.larch.weedfs.WeedFsMaster;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.junit.After;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
@@ -40,7 +34,7 @@ public class WeedFsIT extends AbstractLarchIT{
     private WeedFsMaster master;
 
     @Autowired
-    private WeedFSVolume volume;
+    private WeedFsVolume volume;
 
     @After
     public void cleanup() {
@@ -50,30 +44,6 @@ public class WeedFsIT extends AbstractLarchIT{
 
     @Test
     public void testStartStop() throws Exception {
-        assumeTrue(master.isAvailable());
-        assumeTrue(volume.isAvailable());
-        master.runMaster();
-        // wait at most 500ms until the master is up then throw an exception
-        long time = System.currentTimeMillis();
-        while (!master.isAlive()) {
-            if (System.currentTimeMillis() > time + 3000) {
-                fail("WeedFS master not alive after 1500ms");
-            }
-        }
-        assertTrue(master.isAlive());
-
-        //Start the volume node
-        volume.runVolume();
-        time = System.currentTimeMillis();
-        while (!volume.isAlive()) {
-            if (System.currentTimeMillis() > time + 3000) {
-                fail("WeedFS volume not alive after 1500ms");
-            }
-        }
-        assertTrue(volume.isAlive());
-
-        time = System.currentTimeMillis();
-
         // retrieve a fid from WeedFs
         int count = 0;
         boolean fidFetched = false;
@@ -88,27 +58,6 @@ public class WeedFsIT extends AbstractLarchIT{
             }
         }
         assertTrue(fidFetched);
-
-        // stop the volume node
-        volume.shutdown();
-        // wait at most 500ms until the master is down then throw an exception
-        time = System.currentTimeMillis();
-        while (volume.isAlive()) {
-            if (System.currentTimeMillis() > time + 500) {
-                fail("WeedFS master alive 500ms after shutdown");
-            }
-        }
-        assertFalse(volume.isAlive());
-
-        master.shutdown();
-        // wait at most 500ms until the master is down then throw an exception
-        time = System.currentTimeMillis();
-        while (master.isAlive()) {
-            if (System.currentTimeMillis() > time + 500) {
-                fail("WeedFS master alive 500ms after shutdown");
-            }
-        }
-        assertFalse(master.isAlive());
     }
 
 }

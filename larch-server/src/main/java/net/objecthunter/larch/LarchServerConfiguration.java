@@ -15,16 +15,21 @@
 */
 package net.objecthunter.larch;
 
+import net.objecthunter.larch.weedfs.WeedFsVolume;
+import net.objecthunter.larch.weedfs.WeedFsMaster;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @EnableAutoConfiguration
-@ComponentScan
+@ComponentScan(basePackages = "net.objecthunter.larch")
 @Configuration
 @EnableWebMvc
 @EnableAsync
 public class LarchServerConfiguration {
+
 }
