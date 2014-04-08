@@ -15,36 +15,30 @@
 */
 package net.objecthunter.larch.model;
 
+public class Metadata {
 
-public class Describe {
-    private final String larchVersion;
+    private final String name;
 
-    private Describe() {
-        this.larchVersion = null;
+    private Metadata(Builder b) {
+        this.name = b.name;
     }
 
-    private Describe(Builder builder) {
-        larchVersion = builder.larchVersion;
+    private Metadata() {
+        this.name = null;
     }
 
-    public String getLarchVersion() {
-        return larchVersion;
+    public String getName() {
+        return name;
     }
 
-
-    public static final class Builder {
-        private String larchVersion;
-
-        public Builder() {
+    public static class Builder {
+        private final String name;
+        public Builder(String name) {
+            this.name = name;
         }
 
-        public Builder larchVersion(String larchVersion) {
-            this.larchVersion = larchVersion;
-            return this;
-        }
-
-        public Describe build() {
-            return new Describe(this);
+        public Metadata build() {
+            return new Metadata(this);
         }
     }
 }

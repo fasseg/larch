@@ -34,11 +34,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = LarchServerConfiguration.class)
-@IntegrationTest
-@WebAppConfiguration
-public class WeedFsIT {
+public class WeedFsIT extends AbstractLarchIT{
 
     @Autowired
     private WeedFsMaster master;
@@ -60,8 +56,8 @@ public class WeedFsIT {
         // wait at most 500ms until the master is up then throw an exception
         long time = System.currentTimeMillis();
         while (!master.isAlive()) {
-            if (System.currentTimeMillis() > time + 1500) {
-                fail("WeedFS master not alive after 500ms");
+            if (System.currentTimeMillis() > time + 3000) {
+                fail("WeedFS master not alive after 1500ms");
             }
         }
         assertTrue(master.isAlive());
@@ -70,8 +66,8 @@ public class WeedFsIT {
         volume.runVolume();
         time = System.currentTimeMillis();
         while (!volume.isAlive()) {
-            if (System.currentTimeMillis() > time + 1500) {
-                fail("WeedFS volume not alive after 500ms");
+            if (System.currentTimeMillis() > time + 3000) {
+                fail("WeedFS volume not alive after 1500ms");
             }
         }
         assertTrue(volume.isAlive());
