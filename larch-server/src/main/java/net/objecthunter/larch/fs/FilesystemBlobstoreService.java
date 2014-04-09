@@ -15,6 +15,8 @@
 */
 package net.objecthunter.larch.fs;
 
+import net.objecthunter.larch.model.BlobstoreState;
+import net.objecthunter.larch.model.FilesystemBlobstoreState;
 import net.objecthunter.larch.service.BlobstoreService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -88,5 +90,15 @@ public class FilesystemBlobstoreService implements BlobstoreService {
             throw new IOException(data.getAbsolutePath() + " can not be updated sine it does not exist");
         }
         IOUtils.copy(src, new FileOutputStream(data));
+    }
+
+    @Override
+    public FilesystemBlobstoreState status() throws IOException {
+        FilesystemBlobstoreState state = new FilesystemBlobstoreState();
+        state.setPath(this.directory.getAbsolutePath());
+        state.setTotalSpace(this.directory.getTotalSpace());
+        state.setFreeSpace(this.directory.getFreeSpace());
+        state.setUsableSpace(this.directory.getUsableSpace());
+        return state;
     }
 }

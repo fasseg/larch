@@ -17,6 +17,8 @@ package net.objecthunter.larch.weedfs;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.objecthunter.larch.model.BlobstoreState;
+import net.objecthunter.larch.model.WeedFsBlobstoreState;
 import net.objecthunter.larch.service.BlobstoreService;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
@@ -68,7 +70,7 @@ public class WeedFSBlobstoreService implements BlobstoreService {
                 .execute()
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 201) {
-            throw new IOException("WeedFS returned:\n" + EntityUtils.toString(resp.getEntity()));
+            throw new IOException("WeedFS returned HTTP " + resp.getStatusLine().getStatusCode() + "\n" + EntityUtils.toString(resp.getEntity()));
         }
         log.debug("WeedFS wrote {} bytes", mapper.readTree(resp.getEntity().getContent()).get("size").asInt());
         return fid;
@@ -83,7 +85,7 @@ public class WeedFSBlobstoreService implements BlobstoreService {
             throw new FileNotFoundException(fid + " could not be found in WeedFS");
         }
         if (resp.getStatusLine().getStatusCode() != 200) {
-            throw new IOException("WeedFS returned:\n" + EntityUtils.toString(resp.getEntity()));
+            throw new IOException("WeedFS returned HTTP " + resp.getStatusLine().getStatusCode() + "\n" + EntityUtils.toString(resp.getEntity()));
         }
         return resp.getEntity().getContent();
     }
@@ -95,7 +97,7 @@ public class WeedFSBlobstoreService implements BlobstoreService {
                 .execute()
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 202) {
-            throw new IOException("WeedFS returned:\n" + EntityUtils.toString(resp.getEntity()));
+            throw new IOException("WeedFS returned HTTP " + resp.getStatusLine().getStatusCode() + "\n" + EntityUtils.toString(resp.getEntity()));
         }
     }
 
@@ -113,6 +115,23 @@ public class WeedFSBlobstoreService implements BlobstoreService {
         log.debug("WeedFS updated {} bytes", mapper.readTree(resp.getEntity().getContent()).get("size").asInt());
     }
 
+    @Override
+    public WeedFsBlobstoreState status() throws IOException {
+        final HttpResponse resp = Request.Get(this.weedfsUrl + "/dir/status")
+                .execute()
+                .returnResponse();
+        if (resp.getStatusLine().getStatusCode() != 200) {
+            throw new IOException("WeedFS returned HTTP " + resp.getStatusLine().getStatusCode() + "\n" + EntityUtils.toString(resp.getEntity()));
+        }
+        final JsonNode node = mapper.readTree(resp.getEntity().getContent());
+        final JsonNode topology = node.get("Topology");
+        final WeedFsBlobstoreState state = new WeedFsBlobstoreState();
+        state.setFree(topology.get("Free").asLong());
+        state.setMax(topology.get("Max").asLong());
+        state.setVersion(node.get("Version").textValue());
+        return state;
+    }
+
     private String lookupVolumeUrl(String fid) throws IOException {
         final int separator = fid.indexOf(',');
         final String volumeId = fid.substring(0, fid.indexOf(','));
@@ -121,7 +140,7 @@ public class WeedFSBlobstoreService implements BlobstoreService {
                 .execute()
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
-            throw new IOException("WeedFS returned:\n" + EntityUtils.toString(resp.getEntity()));
+            throw new IOException("WeedFS returned HTTP " + resp.getStatusLine().getStatusCode() + "\n" + EntityUtils.toString(resp.getEntity()));
         }
         final JsonNode json = mapper.readTree(resp.getEntity().getContent());
         return "http://" + json.get("locations").get(0).get("url").textValue() + "/" + fid;

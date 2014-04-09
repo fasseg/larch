@@ -18,6 +18,7 @@ package net.objecthunter.larch.integration;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.fs.FilesystemBlobstoreService;
+import net.objecthunter.larch.model.WeedFsBlobstoreState;
 import net.objecthunter.larch.weedfs.WeedFSBlobstoreService;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -33,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class WeedFsBlobStoreIT extends AbstractLarchIT{
     @Autowired
@@ -85,5 +87,15 @@ public class WeedFsBlobStoreIT extends AbstractLarchIT{
         String path = blobstoreService.create(new ByteArrayInputStream(data.getBytes()));
         blobstoreService.delete(path);
         blobstoreService.retrieve(path);
+    }
+
+    @Test
+    public void testGetStatus() throws Exception {
+        blobstoreService.create(new ByteArrayInputStream("foo".getBytes()));
+        blobstoreService.create(new ByteArrayInputStream("bar".getBytes()));
+        blobstoreService.create(new ByteArrayInputStream("baz".getBytes()));
+        WeedFsBlobstoreState state = blobstoreService.status();
+        assertNotNull(state);
+        assertNotNull(state.getVersion());
     }
 }

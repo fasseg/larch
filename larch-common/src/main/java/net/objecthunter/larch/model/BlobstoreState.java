@@ -13,17 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.service;
+package net.objecthunter.larch.model;
 
-import net.objecthunter.larch.model.BlobstoreState;
-
-import java.io.IOException;
-import java.io.InputStream;
-
-public interface BlobstoreService {
-    String create(InputStream src) throws IOException;
-    InputStream retrieve(String path) throws IOException;
-    void delete(String path) throws IOException;
-    void update(String path, InputStream src) throws IOException;
-    BlobstoreState status() throws IOException;
+public abstract class BlobstoreState {
 }

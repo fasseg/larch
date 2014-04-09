@@ -13,17 +13,34 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.service;
+package net.objecthunter.larch.model;
 
-import net.objecthunter.larch.model.BlobstoreState;
+public class WeedFsBlobstoreState extends BlobstoreState {
+    private String version;
+    private long free;
+    private long max;
 
-import java.io.IOException;
-import java.io.InputStream;
+    public String getVersion() {
+        return version;
+    }
 
-public interface BlobstoreService {
-    String create(InputStream src) throws IOException;
-    InputStream retrieve(String path) throws IOException;
-    void delete(String path) throws IOException;
-    void update(String path, InputStream src) throws IOException;
-    BlobstoreState status() throws IOException;
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public long getFree() {
+        return free;
+    }
+
+    public void setFree(long free) {
+        this.free = free;
+    }
+
+    public long getMax() {
+        return max;
+    }
+
+    public void setMax(long max) {
+        this.max = max;
+    }
 }

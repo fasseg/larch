@@ -16,6 +16,7 @@
 package net.objecthunter.larch.integration;
 
 import net.objecthunter.larch.fs.FilesystemBlobstoreService;
+import net.objecthunter.larch.model.FilesystemBlobstoreState;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,5 +57,10 @@ public class FileSystemBlobStoreIT extends AbstractLarchIT{
         String path = blobstoreService.create(new ByteArrayInputStream(data.getBytes()));
         blobstoreService.delete(path);
         blobstoreService.retrieve(path);
+    }
+
+    @Test
+    public void testgetStatus() throws Exception {
+        FilesystemBlobstoreState state = blobstoreService.status();
     }
 }
