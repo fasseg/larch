@@ -21,16 +21,17 @@ import net.objecthunter.larch.model.state.IndexState;
 import java.io.IOException;
 
 public interface IndexService {
-    void create(Entity e) throws IOException;
+    String create(Entity e) throws IOException;
 
     void update(Entity e) throws IOException;
 
     Entity retrieve(String id, int version) throws IOException;
+
+    Entity retrieve(String id) throws IOException;
 
     void delete(String id) throws IOException;
 
     IndexState status() throws IOException;
 
     boolean exists(String id) throws IOException;
-
 }

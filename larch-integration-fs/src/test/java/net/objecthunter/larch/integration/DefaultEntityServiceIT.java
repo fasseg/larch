@@ -24,16 +24,57 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.junit.Assert.*;
 
 public class DefaultEntityServiceIT extends AbstractLarchIT {
     @Autowired
     private DefaultEntityService entityService;
 
     @Test
-    public void testCreateEntity() throws Exception {
+    public void testCreateAndGetEntityAndContent() throws Exception {
+        Entity e = createFixtureEntity();
+        entityService.create(e);
+        Entity fetched = entityService.retrieve(e.getId());
+        assertEquals(e.getId(), fetched.getId());
+        assertEquals(e.getLabel(), fetched.getLabel());
+        assertEquals(e.getBinaries().size(), fetched.getBinaries().size());
+        assertEquals(1, fetched.getVersion());
+        fetched.getBinaries().values().forEach(b -> {
+            assertNotNull(b.getChecksum());
+            assertNotNull(b.getChecksumType());
+            assertNotNull(b.getFilename());
+            assertNotNull(b.getMimetype());
+            assertNotNull(b.getPath());
+            try (final InputStream src = entityService.getContent(e.getId(), b.getName())) {
+                assertTrue(src.available() > 0);
+            } catch (IOException e1) {
+                fail("IOException: " + e1.getLocalizedMessage());
+            }
+        });
+    }
+
+    @Test
+    public void testCreateAndUpdate() throws Exception {
+        Entity e = createFixtureEntity();
+        String id = entityService.create(e);
+        Entity orig = entityService.retrieve(id);
+        Entity update = createFixtureEntity();
+        update.setId(id);
+        update.setLabel("My updated label");
+        entityService.update(update);
+        Entity fetched = entityService.retrieve(e.getId());
+        assertEquals(update.getLabel(), fetched.getLabel());
+        assertNotEquals(orig.getUtcLastModified(), fetched.getUtcLastModified());
+        assertEquals(orig.getUtcCreated(), fetched.getUtcCreated());
+    }
+
+
+    private Entity createFixtureEntity() throws Exception {
         Binary bin1 = new Binary();
         bin1.setMimetype("image/png");
         bin1.setFilename("image_1.png");
@@ -49,9 +90,9 @@ public class DefaultEntityServiceIT extends AbstractLarchIT {
         binaries.put(bin2.getName(), bin2);
         Entity e = new Entity();
         e.setLabel("My Label");
-        e.setTags(Arrays.asList("test","integration-test"));
+        e.setTags(Arrays.asList("test", "integration-test"));
         e.setType("Book");
         e.setBinaries(binaries);
-        entityService.create(e);
+        return e;
     }
 }

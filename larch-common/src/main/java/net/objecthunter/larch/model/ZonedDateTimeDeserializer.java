@@ -13,13 +13,19 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.model.source;
+package net.objecthunter.larch.model;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.time.ZonedDateTime;
 
-public interface BinarySource {
-    InputStream getInputStream() throws IOException;
+public class ZonedDateTimeDeserializer extends JsonDeserializer<ZonedDateTime> {
+    @Override
+    public ZonedDateTime deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+        return ZonedDateTime.parse(jp.getValueAsString());
+    }
 }

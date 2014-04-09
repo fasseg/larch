@@ -15,6 +15,8 @@
 */
 package net.objecthunter.larch.model;
 
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -26,8 +28,26 @@ public class Entity {
     private String parentId;
     private Map<String, Metadata> metadata;
     private Map<String, Binary> binaries;
+    private ZonedDateTime utcLastModified;
+    private ZonedDateTime utcCreated;
     private String state;
     private int version;
+
+    public ZonedDateTime getUtcLastModified() {
+        return utcLastModified;
+    }
+
+    public void setUtcLastModified(ZonedDateTime utcLastModified) {
+        this.utcLastModified = utcLastModified;
+    }
+
+    public ZonedDateTime getUtcCreated() {
+        return utcCreated;
+    }
+
+    public void setUtcCreated(ZonedDateTime utcCreated) {
+        this.utcCreated = utcCreated;
+    }
 
     public String getId() {
         return id;

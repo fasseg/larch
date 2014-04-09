@@ -18,10 +18,12 @@ package net.objecthunter.larch.service;
 import net.objecthunter.larch.model.Entity;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 public interface EntityService {
-    void create(Entity e) throws IOException;
+    String create(Entity e) throws IOException;
     void update(Entity e) throws IOException;
-    Entity retrieve(Entity e) throws IOException;
-    Entity delete(Entity e) throws IOException;
+    Entity retrieve(String id) throws IOException;
+    void delete(String id) throws IOException;
+    InputStream getContent(String id, String name) throws IOException;
 }

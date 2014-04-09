@@ -21,17 +21,19 @@ import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.service.BlobstoreService;
 import net.objecthunter.larch.service.EntityService;
 import net.objecthunter.larch.service.IndexService;
-import net.objecthunter.larch.source.InternalBinarySource;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 public class DefaultEntityService implements EntityService {
     private static final Logger log = LoggerFactory.getLogger(DefaultEntityService.class);
@@ -43,7 +45,7 @@ public class DefaultEntityService implements EntityService {
     private IndexService indexService;
 
     @Override
-    public void create(Entity e) throws IOException {
+    public String create(Entity e) throws IOException {
         if (e.getId() == null || e.getId().isEmpty()) {
             e.setId(generateId());
         } else {
@@ -55,8 +57,9 @@ public class DefaultEntityService implements EntityService {
             createAndMutateBinary(b);
         }
         e.setState(ElasticSearchIndexService.STATE_INGESTED);
-        this.indexService.create(e);
-        log.debug("finished creating Entity {}", e.getId());
+        final String id = this.indexService.create(e);
+        log.debug("finished creating Entity {}", id);
+        return id;
     }
 
     private void createAndMutateBinary(Binary b) throws IOException {
@@ -67,12 +70,15 @@ public class DefaultEntityService implements EntityService {
             throw new IOException(e);
         }
         try (final DigestInputStream src = new DigestInputStream(b.getSource().getInputStream(), digest)) {
+            final ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
             final String path = this.blobstoreService.create(src);
             final String checksum = new BigInteger(1, digest.digest()).toString(16);
             b.setChecksum(checksum);
             b.setSize(digest.getDigestLength());
             b.setChecksumType(digest.getAlgorithm());
-            b.setSource(new InternalBinarySource(path));
+            b.setPath(path);
+            b.setUtcCreated(created);
+            b.setUtcLastModified(created);
         }
     }
 
@@ -87,16 +93,30 @@ public class DefaultEntityService implements EntityService {
 
     @Override
     public void update(Entity e) throws IOException {
-
+        for (final Binary b : e.getBinaries().values()) {
+            createAndMutateBinary(b);
+        }
+        this.indexService.update(e);
     }
 
     @Override
-    public Entity retrieve(Entity e) throws IOException {
-        return null;
+    public Entity retrieve(String id) throws IOException {
+        return indexService.retrieve(id);
     }
 
     @Override
-    public Entity delete(Entity e) throws IOException {
-        return null;
+    public void delete(String id) throws IOException {
+        final Entity e = indexService.retrieve(id);
+        for (Binary b : e.getBinaries().values()) {
+            blobstoreService.delete(b.getPath());
+        }
     }
+
+    @Override
+    public InputStream getContent(String id, String name) throws IOException {
+        final Entity e = indexService.retrieve(id);
+        final Binary b = e.getBinaries().get(name);
+        return blobstoreService.retrieve(b.getPath());
+    }
+
 }

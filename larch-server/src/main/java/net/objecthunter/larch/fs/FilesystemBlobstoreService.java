@@ -53,7 +53,7 @@ public class FilesystemBlobstoreService implements BlobstoreService {
         final File folder = new File(this.directory, RandomStringUtils.random(2));
         if (!folder.exists()) {
             if (!folder.mkdir()) {
-                throw new IOException("unabel to create folder " + folder.getAbsolutePath());
+                throw new IOException("unable to create folder " + folder.getAbsolutePath());
             }
         }
         File data;

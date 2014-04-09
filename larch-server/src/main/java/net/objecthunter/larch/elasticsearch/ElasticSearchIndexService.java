@@ -35,6 +35,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.time.Clock;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 public class ElasticSearchIndexService implements IndexService {
     public static final String INDEX_ENTITIES = "entities";
@@ -72,10 +76,13 @@ public class ElasticSearchIndexService implements IndexService {
                 .actionGet();
     }
     @Override
-    public void create(Entity e) throws IOException {
+    public String create(Entity e) throws IOException {
         log.debug("creating new entity");
+        final ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
         e.setVersion(1);
         e.setState("Active");
+        e.setUtcCreated(created);
+        e.setUtcLastModified(created);
         if (e.getId() != null) {
             final GetResponse resp = client.prepareGet(INDEX_ENTITIES, INDEX_ENTITY_TYPE, e.getId())
                     .execute()
@@ -88,6 +95,7 @@ public class ElasticSearchIndexService implements IndexService {
                 .setSource(mapper.writeValueAsBytes(e))
                 .execute()
                 .actionGet();
+        return e.getId();
     }
 
     @Override
@@ -101,6 +109,8 @@ public class ElasticSearchIndexService implements IndexService {
         final String oldVersionId = oldVersion.getId() + ".V" + oldVersion.getVersion();
         e.setVersion(oldVersion.getVersion() + 1);
         e.setState(oldVersion.getState());
+        e.setUtcCreated(oldVersion.getUtcCreated());
+        e.setUtcLastModified(ZonedDateTime.now(ZoneOffset.UTC));
         oldVersion.setState(STATE_ARCHIVED);
 
         IndexResponse resp = client.prepareIndex(INDEX_ENTITIES, INDEX_ENTITY_TYPE, oldVersionId)
@@ -127,10 +137,15 @@ public class ElasticSearchIndexService implements IndexService {
             id = id + ".V" + version;
         }
         log.debug("fetching entity " + id);
-        GetResponse resp = client.prepareGet(INDEX_ENTITIES, INDEX_ENTITY_TYPE, id)
+        final GetResponse resp = client.prepareGet(INDEX_ENTITIES, INDEX_ENTITY_TYPE, id)
                 .execute()
                 .actionGet();
         return mapper.readValue(resp.getSourceAsBytes(), Entity.class);
+    }
+
+    @Override
+    public Entity retrieve(String id) throws IOException {
+        return retrieve(id, 0);
     }
 
     @Override
