@@ -163,4 +163,12 @@ public class ElasticSearchIndexService implements IndexService {
         state.setTotalRefreshTime(esState.getRefreshStats().getTotalTimeInMillis());
         return state;
     }
+
+    @Override
+    public boolean exists(String id) throws IOException {
+        return client.prepareGet(INDEX_ENTITIES,INDEX_ENTITY_TYPE,id)
+                .execute()
+                .actionGet()
+                .isExists();
+    }
 }

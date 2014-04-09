@@ -30,4 +30,7 @@ public interface IndexService {
     void delete(String id) throws IOException;
 
     IndexState status() throws IOException;
+
+    boolean exists(String id) throws IOException;
+
 }

@@ -35,8 +35,6 @@ public class FilesystemBlobstoreService implements BlobstoreService {
     @Autowired
     private Environment env;
 
-    private RandomStringUtils rnd;
-
     private File directory;
 
     @PostConstruct
