@@ -15,120 +15,89 @@
 */
 package net.objecthunter.larch.model;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 public class Entity {
-    private final String id;
-    private final String label;
-    private final String type;
-    private final List<String> tags;
-    private final String parentId;
-    private final Map<String, Metadata> metadata;
-    private final Map<String, Binary> binaries;
-
-    private Entity(Builder b) {
-        this.id = b.id;
-        this.label = b.label;
-        this.tags = b.tags;
-        this.parentId = b.parentId;
-        this.metadata = b.metadata;
-        this.type = b.type;
-        this.binaries = b.binaries;
-    }
-    private Entity() {
-        this.binaries = null;
-        this.id = null;
-        this.label = null;
-        this.tags = null;
-        this.parentId = null;
-        this.metadata = null;
-        this.type = null;
-    }
+    private String id;
+    private String label;
+    private String type;
+    private List<String> tags;
+    private String parentId;
+    private Map<String, Metadata> metadata;
+    private Map<String, Binary> binaries;
+    private String state;
+    private int version;
 
     public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getLabel() {
         return label;
     }
 
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
     public List<String> getTags() {
         return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 
     public String getParentId() {
         return parentId;
     }
 
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
+
     public Map<String, Metadata> getMetadata() {
         return metadata;
+    }
+
+    public void setMetadata(Map<String, Metadata> metadata) {
+        this.metadata = metadata;
     }
 
     public String getType() {
         return type;
     }
 
-    public static class Builder  {
-        private final String id;
-        private String label;
-        private String type;
-        private List<String> tags = new ArrayList<>();
-        private String parentId;
-        private Map<String, Metadata> metadata = new HashMap<>();
-        public Map<String,Binary> binaries = new HashMap<>();
+    public void setType(String type) {
+        this.type = type;
+    }
 
-        public Builder(String id) {
-            this.id = id;
-        }
+    public Map<String, Binary> getBinaries() {
+        return binaries;
+    }
 
-        public Builder binaries(Map<String, Binary> binaries) {
-            this.binaries.putAll(binaries);
-            return this;
-        }
+    public void setBinaries(Map<String, Binary> binaries) {
+        this.binaries = binaries;
+    }
 
-        public Builder binary(Binary binary) {
-            this.binaries.put(binary.getName(), binary);
-            return this;
-        }
+    public int getVersion() {
+        return version;
+    }
 
-        public Builder type(String type) {
-            this.type = type;
-            return this;
-        }
+    public void setVersion(int version) {
+        this.version = version;
+    }
 
-        public Builder label(String label) {
-            this.label = label;
-            return this;
-        }
+    public String getState() {
+        return state;
+    }
 
-        public Builder parentId(String parentId) {
-            this.parentId = parentId;
-            return this;
-        }
-
-        public Builder tags(Collection<String> tags) {
-            this.tags.addAll(tags);
-            return this;
-        }
-
-        public Builder tag(String name) {
-            this.tags.add(name);
-            return this;
-        }
-
-        public Builder metadata(Map<String, Metadata> metadata) {
-            this.metadata.putAll(metadata);
-            return this;
-        }
-
-        public Builder metadata(Metadata md) {
-            this.metadata.put(md.getName(), md);
-            return this;
-        }
-
-        public Entity build() {
-            return new Entity(this);
-        }
+    public void setState(String state) {
+        this.state = state;
     }
 }

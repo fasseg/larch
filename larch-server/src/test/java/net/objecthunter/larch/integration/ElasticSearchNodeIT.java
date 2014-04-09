@@ -30,4 +30,5 @@ public class ElasticSearchNodeIT extends AbstractLarchIT {
     public void testElasticSearchNodeAlive() {
         assertTrue(node.isAlive());
     }
+
 }

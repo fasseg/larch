@@ -15,10 +15,13 @@
 */
 package net.objecthunter.larch;
 
+import net.objecthunter.larch.elasticsearch.ElasticSearchIndexService;
+import net.objecthunter.larch.elasticsearch.ElasticSearchNode;
 import net.objecthunter.larch.fs.FilesystemBlobstoreService;
 import net.objecthunter.larch.weedfs.WeedFSBlobstoreService;
-import net.objecthunter.larch.weedfs.WeedFsVolume;
 import net.objecthunter.larch.weedfs.WeedFsMaster;
+import net.objecthunter.larch.weedfs.WeedFsVolume;
+import org.elasticsearch.client.Client;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -34,6 +37,22 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableWebMvc
 @EnableAsync
 public class LarchServerConfiguration {
+
+    @Bean
+    public ElasticSearchIndexService elasticSearchIndexService() {
+        return new ElasticSearchIndexService();
+    }
+
+    @Bean
+    public Client elasticSearchClient() {
+        return this.elasticSearchNode().getClient();
+    }
+
+    @Bean
+    public ElasticSearchNode elasticSearchNode() {
+        return new ElasticSearchNode();
+    }
+
     @Bean
     @Profile("fs")
     public FilesystemBlobstoreService filesystemBlobstoreService() {
