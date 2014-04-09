@@ -15,90 +15,81 @@
 */
 package net.objecthunter.larch.model;
 
-import java.util.HashMap;
+import net.objecthunter.larch.model.source.BinarySource;
+
 import java.util.Map;
 
 public class Binary {
-    private final String name;
-    private final long size;
-    private final String mimetype;
-    private final Map<String, Metadata> metadata;
-    private final String filename;
+    private String name;
+    private long size;
+    private String mimetype;
+    private Map<String, Metadata> metadata;
+    private String filename;
+    private BinarySource source;
+    private String checksum;
+    private String checksumType;
 
-    private Binary() {
-        this.name = null;
-        this.size = 0l;
-        this.mimetype = null;
-        this.metadata = null;
-        this.filename = null;
+    public String getChecksumType() {
+        return checksumType;
     }
 
-    private Binary(Builder b) {
-        this.name = b.name;
-        this.size = b.size;
-        this.mimetype = b.mimetype;
-        this.metadata = b.metadata;
-        this.filename = b.filename;
+    public void setChecksumType(String checksumType) {
+        this.checksumType = checksumType;
+    }
+
+    public String getChecksum() {
+        return checksum;
+    }
+
+    public void setChecksum(String checksum) {
+        this.checksum = checksum;
     }
 
     public String getName() {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public long getSize() {
         return size;
+    }
+
+    public void setSize(long size) {
+        this.size = size;
     }
 
     public String getMimetype() {
         return mimetype;
     }
 
+    public void setMimetype(String mimetype) {
+        this.mimetype = mimetype;
+    }
+
     public Map<String, Metadata> getMetadata() {
         return metadata;
+    }
+
+    public void setMetadata(Map<String, Metadata> metadata) {
+        this.metadata = metadata;
     }
 
     public String getFilename() {
         return filename;
     }
 
-    public static class Builder {
-        private final String name;
-        private long size;
-        private Map<String, Metadata> metadata = new HashMap<>();
-        private String mimetype;
-        private String filename;
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
 
-        public Builder(String name) {
-            this.name = name;
-        }
+    public BinarySource getSource() {
+        return source;
+    }
 
-        public Builder size(long size) {
-            this.size = size;
-            return this;
-        }
-
-        public Builder metadata(Map<String, Metadata> metadata) {
-            this.metadata.putAll(metadata);
-            return this;
-        }
-
-        public Builder metadata(Metadata md) {
-            this.metadata.put(md.getName(), md);
-            return this;
-        }
-
-        public Builder mimetype(String mimetype) {
-            this.mimetype = mimetype;
-            return this;
-        }
-
-        public Builder filename(String filename) {
-            this.filename = filename;
-            return this;
-        }
-
-        public Binary build() {
-            return new Binary(this);
-        }
+    public void setSource(BinarySource source) {
+        this.source = source;
     }
 }

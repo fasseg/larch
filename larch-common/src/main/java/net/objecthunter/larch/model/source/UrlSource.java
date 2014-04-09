@@ -13,12 +13,25 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.service;
-
-import net.objecthunter.larch.model.state.LarchState;
+package net.objecthunter.larch.model.source;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 
-public interface RepositoryService {
-    LarchState status() throws IOException;
+public class UrlSource implements BinarySource {
+    private final URI uri;
+
+    public UrlSource(URI uri) {
+        this.uri = uri;
+    }
+
+    public UrlSource(String url) {
+        this.uri = URI.create(url);
+    }
+
+    @Override
+    public InputStream getInputStream() throws IOException {
+        return uri.toURL().openStream();
+    }
 }

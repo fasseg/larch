@@ -15,7 +15,7 @@
 */
 package net.objecthunter.larch.service;
 
-import net.objecthunter.larch.model.BlobstoreState;
+import net.objecthunter.larch.model.state.BlobstoreState;
 
 import java.io.IOException;
 import java.io.InputStream;

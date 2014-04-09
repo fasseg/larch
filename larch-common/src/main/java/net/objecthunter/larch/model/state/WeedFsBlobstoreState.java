@@ -13,12 +13,34 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.service;
+package net.objecthunter.larch.model.state;
 
-import net.objecthunter.larch.model.state.LarchState;
+public class WeedFsBlobstoreState extends BlobstoreState {
+    private String version;
+    private long free;
+    private long max;
 
-import java.io.IOException;
+    public String getVersion() {
+        return version;
+    }
 
-public interface RepositoryService {
-    LarchState status() throws IOException;
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public long getFree() {
+        return free;
+    }
+
+    public void setFree(long free) {
+        this.free = free;
+    }
+
+    public long getMax() {
+        return max;
+    }
+
+    public void setMax(long max) {
+        this.max = max;
+    }
 }

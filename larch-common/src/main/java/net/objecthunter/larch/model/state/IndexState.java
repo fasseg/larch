@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.model;
+package net.objecthunter.larch.model.state;
 
 public class IndexState {
     long storeSize;

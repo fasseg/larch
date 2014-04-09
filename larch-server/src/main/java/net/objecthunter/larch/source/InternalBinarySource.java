@@ -13,28 +13,32 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.service.impl;
+package net.objecthunter.larch.source;
 
-import net.objecthunter.larch.model.state.LarchState;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.objecthunter.larch.model.source.BinarySource;
 import net.objecthunter.larch.service.BlobstoreService;
-import net.objecthunter.larch.service.IndexService;
-import net.objecthunter.larch.service.RepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.io.InputStream;
 
-public class DefaultRepositoryService implements RepositoryService {
-    @Autowired
-    private IndexService indexService;
-
+public class InternalBinarySource implements BinarySource {
+    private final String path;
     @Autowired
     private BlobstoreService blobstoreService;
 
+    public InternalBinarySource(String path) {
+        this.path = path;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
     @Override
-    public LarchState status() throws IOException {
-        final LarchState state = new LarchState();
-        state.setBlobstoreState(blobstoreService.status());
-        state.setIndexState(indexService.status());
-        return state;
+    @JsonIgnore
+    public InputStream getInputStream() throws IOException {
+        return blobstoreService.retrieve(this.path);
     }
 }

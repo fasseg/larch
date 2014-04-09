@@ -13,7 +13,19 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.model;
+package net.objecthunter.larch.model.source;
 
-public abstract class BlobstoreState {
+import java.io.IOException;
+import java.io.InputStream;
+
+public class StreamSource implements BinarySource {
+    private final InputStream src;
+    public StreamSource(InputStream src) {
+        this.src = src;
+    }
+
+    @Override
+    public InputStream getInputStream() throws IOException {
+        return src;
+    }
 }

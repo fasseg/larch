@@ -17,7 +17,7 @@ package net.objecthunter.larch.elasticsearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.model.Entity;
-import net.objecthunter.larch.model.IndexState;
+import net.objecthunter.larch.model.state.IndexState;
 import net.objecthunter.larch.service.IndexService;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
@@ -166,7 +166,7 @@ public class ElasticSearchIndexService implements IndexService {
 
     @Override
     public boolean exists(String id) throws IOException {
-        return client.prepareGet(INDEX_ENTITIES,INDEX_ENTITY_TYPE,id)
+        return client.prepareGet(INDEX_ENTITIES, INDEX_ENTITY_TYPE, id)
                 .execute()
                 .actionGet()
                 .isExists();

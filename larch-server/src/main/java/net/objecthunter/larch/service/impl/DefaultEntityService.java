@@ -15,24 +15,23 @@
 */
 package net.objecthunter.larch.service.impl;
 
+import net.objecthunter.larch.elasticsearch.ElasticSearchIndexService;
 import net.objecthunter.larch.model.Binary;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.service.BlobstoreService;
 import net.objecthunter.larch.service.EntityService;
 import net.objecthunter.larch.service.IndexService;
+import net.objecthunter.larch.source.InternalBinarySource;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigInteger;
-import java.net.URL;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.UUID;
 
 public class DefaultEntityService implements EntityService {
     private static final Logger log = LoggerFactory.getLogger(DefaultEntityService.class);
@@ -47,20 +46,42 @@ public class DefaultEntityService implements EntityService {
     public void create(Entity e) throws IOException {
         if (e.getId() == null || e.getId().isEmpty()) {
             e.setId(generateId());
-        }else{
+        } else {
             if (this.indexService.exists(e.getId())) {
                 throw new IOException("Entity with id " + e.getId() + " could not be created because it already exists in the index");
             }
         }
+        for (final Binary b : e.getBinaries().values()) {
+            createAndMutateBinary(b);
+        }
+        e.setState(ElasticSearchIndexService.STATE_INGESTED);
         this.indexService.create(e);
-        log.debug("finished creating Entity {}",e.getId());
+        log.debug("finished creating Entity {}", e.getId());
     }
 
-    private String generateId() throws IOException{
-        String generated ;
+    private void createAndMutateBinary(Binary b) throws IOException {
+        final MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            throw new IOException(e);
+        }
+        try (final DigestInputStream src = new DigestInputStream(b.getSource().getInputStream(), digest)) {
+            final String path = this.blobstoreService.create(src);
+            final String checksum = new BigInteger(1, digest.digest()).toString(16);
+            b.setChecksum(checksum);
+            b.setSize(digest.getDigestLength());
+            b.setChecksumType(digest.getAlgorithm());
+            b.setSource(new InternalBinarySource(path));
+        }
+    }
+
+
+    private String generateId() throws IOException {
+        String generated;
         do {
             generated = RandomStringUtils.randomAlphabetic(16);
-        }while (indexService.exists(generated));
+        } while (indexService.exists(generated));
         return generated;
     }
 

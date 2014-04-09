@@ -16,7 +16,7 @@
 package net.objecthunter.larch.service;
 
 import net.objecthunter.larch.model.Entity;
-import net.objecthunter.larch.model.IndexState;
+import net.objecthunter.larch.model.state.IndexState;
 
 import java.io.IOException;
 

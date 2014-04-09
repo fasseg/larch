@@ -15,8 +15,7 @@
 */
 package net.objecthunter.larch.fs;
 
-import net.objecthunter.larch.model.BlobstoreState;
-import net.objecthunter.larch.model.FilesystemBlobstoreState;
+import net.objecthunter.larch.model.state.FilesystemBlobstoreState;
 import net.objecthunter.larch.service.BlobstoreService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;

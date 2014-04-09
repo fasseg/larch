@@ -13,12 +13,25 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.service;
+package net.objecthunter.larch.model.state;
 
-import net.objecthunter.larch.model.state.LarchState;
+public class LarchState {
+    private IndexState indexState;
+    private BlobstoreState blobstoreState;
 
-import java.io.IOException;
+    public IndexState getIndexState() {
+        return indexState;
+    }
 
-public interface RepositoryService {
-    LarchState status() throws IOException;
+    public void setIndexState(IndexState indexState) {
+        this.indexState = indexState;
+    }
+
+    public BlobstoreState getBlobstoreState() {
+        return blobstoreState;
+    }
+
+    public void setBlobstoreState(BlobstoreState blobstoreState) {
+        this.blobstoreState = blobstoreState;
+    }
 }

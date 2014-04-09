@@ -17,8 +17,7 @@ package net.objecthunter.larch.weedfs;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.objecthunter.larch.model.BlobstoreState;
-import net.objecthunter.larch.model.WeedFsBlobstoreState;
+import net.objecthunter.larch.model.state.WeedFsBlobstoreState;
 import net.objecthunter.larch.service.BlobstoreService;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;

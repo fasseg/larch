@@ -15,7 +15,7 @@
 */
 package net.objecthunter.larch.integration;
 
-import net.objecthunter.larch.model.LarchState;
+import net.objecthunter.larch.model.state.LarchState;
 import net.objecthunter.larch.service.impl.DefaultRepositoryService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

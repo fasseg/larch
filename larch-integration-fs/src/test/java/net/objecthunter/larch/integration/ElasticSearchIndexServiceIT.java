@@ -17,7 +17,7 @@ package net.objecthunter.larch.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.elasticsearch.ElasticSearchIndexService;
-import net.objecthunter.larch.model.IndexState;
+import net.objecthunter.larch.model.state.IndexState;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

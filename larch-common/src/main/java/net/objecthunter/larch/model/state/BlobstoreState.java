@@ -13,34 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.model;
+package net.objecthunter.larch.model.state;
 
-public class WeedFsBlobstoreState extends BlobstoreState {
-    private String version;
-    private long free;
-    private long max;
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public long getFree() {
-        return free;
-    }
-
-    public void setFree(long free) {
-        this.free = free;
-    }
-
-    public long getMax() {
-        return max;
-    }
-
-    public void setMax(long max) {
-        this.max = max;
-    }
+public abstract class BlobstoreState {
 }
