@@ -16,4 +16,13 @@
 package net.objecthunter.larch.model.state;
 
 public abstract class BlobstoreState {
+    private final String name;
+
+    protected BlobstoreState(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
 }

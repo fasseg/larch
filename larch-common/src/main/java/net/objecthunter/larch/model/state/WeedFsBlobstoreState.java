@@ -20,6 +20,11 @@ public class WeedFsBlobstoreState extends BlobstoreState {
     private long free;
     private long max;
 
+    public WeedFsBlobstoreState() {
+        super("Weed FS blob store");
+    }
+
+
     public String getVersion() {
         return version;
     }

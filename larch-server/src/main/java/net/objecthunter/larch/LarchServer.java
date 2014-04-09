@@ -26,6 +26,6 @@ public class LarchServer {
                 .showBanner(false)
                 .web(true)
                 .sources(LarchServerConfiguration.class)
-                .run();
+                .run(args);
     }
 }

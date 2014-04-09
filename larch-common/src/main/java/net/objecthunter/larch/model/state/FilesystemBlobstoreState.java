@@ -21,6 +21,10 @@ public class FilesystemBlobstoreState extends BlobstoreState {
     private long freeSpace;
     private long usableSpace;
 
+    public FilesystemBlobstoreState() {
+        super("POSIX File system blob store");
+    }
+
     public String getPath() {
         return path;
     }
