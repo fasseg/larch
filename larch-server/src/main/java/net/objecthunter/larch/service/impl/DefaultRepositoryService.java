@@ -15,11 +15,13 @@
 */
 package net.objecthunter.larch.service.impl;
 
+import net.objecthunter.larch.model.Describe;
 import net.objecthunter.larch.model.state.LarchState;
 import net.objecthunter.larch.service.BlobstoreService;
 import net.objecthunter.larch.service.IndexService;
 import net.objecthunter.larch.service.RepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 
 import java.io.IOException;
 
@@ -30,11 +32,23 @@ public class DefaultRepositoryService implements RepositoryService {
     @Autowired
     private BlobstoreService blobstoreService;
 
+    @Autowired
+    private Environment env;
+
     @Override
     public LarchState status() throws IOException {
         final LarchState state = new LarchState();
         state.setBlobstoreState(blobstoreService.status());
         state.setIndexState(indexService.status());
         return state;
+    }
+
+    @Override
+    public Describe describe() {
+        final Describe desc = new Describe();
+        desc.setLarchVersion(env.getProperty("larch.version"));
+        desc.setLarchHost("localhost:" + env.getProperty("server.port"));
+        desc.setLarchClusterName(env.getProperty("larch.cluster.name"));
+        return desc;
     }
 }

@@ -16,11 +16,17 @@
 package net.objecthunter.larch.controller;
 
 import net.objecthunter.larch.model.Describe;
+import net.objecthunter.larch.service.RepositoryService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 
@@ -29,11 +35,20 @@ import java.io.IOException;
 @RequestMapping("/")
 @Component
 public class DescribeController {
-    @RequestMapping(method= RequestMethod.GET)
+
+    @Autowired
+    private RepositoryService repositoryService;
+
+    @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     public Describe describe() throws IOException {
-        return new Describe.Builder()
-                .larchVersion("version")
-                .build();
+        return repositoryService.describe();
+    }
+
+    @RequestMapping(method = RequestMethod.GET, produces = "text/html")
+    @ResponseStatus(HttpStatus.OK)
+    public ModelAndView describeHtml() throws IOException {
+        return new ModelAndView("describe","describe", repositoryService.describe());
     }
 }

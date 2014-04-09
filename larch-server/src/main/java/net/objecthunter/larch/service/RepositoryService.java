@@ -15,10 +15,13 @@
 */
 package net.objecthunter.larch.service;
 
+import net.objecthunter.larch.model.Describe;
 import net.objecthunter.larch.model.state.LarchState;
 
 import java.io.IOException;
 
 public interface RepositoryService {
     LarchState status() throws IOException;
+
+    Describe describe();
 }

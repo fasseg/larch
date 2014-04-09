@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head th:include="fragments :: header">
+    </head>
+    <body>
+        <div class="container">
+            <table>
+                <tr>
+                    <td>Version</td>
+                    <td th:text="${describe.larchVersion}"></td>
+                </tr>
+                <tr>
+                    <td>Hostname</td>
+                    <td th:text="${describe.larchHost}"></td>
+                </tr>
+                <tr>
+                    <td>Cluster name</td>
+                    <td th:text="${describe.larchClusterName}"></td>
+                </tr>
+            </table>
+        </div>
+        <footer th:include="fragments :: footer">
+        </footer>
+    </body>
+</html>

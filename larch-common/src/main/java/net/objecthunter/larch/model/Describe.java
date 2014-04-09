@@ -17,34 +17,31 @@ package net.objecthunter.larch.model;
 
 
 public class Describe {
-    private final String larchVersion;
+    private String larchVersion;
+    private String larchHost;
+    private String larchClusterName;
 
-    private Describe() {
-        this.larchVersion = null;
+    public String getLarchClusterName() {
+        return larchClusterName;
     }
 
-    private Describe(Builder builder) {
-        larchVersion = builder.larchVersion;
+    public void setLarchClusterName(String larchClusterName) {
+        this.larchClusterName = larchClusterName;
+    }
+
+    public String getLarchHost() {
+        return larchHost;
+    }
+
+    public void setLarchHost(String larchHost) {
+        this.larchHost = larchHost;
     }
 
     public String getLarchVersion() {
         return larchVersion;
     }
 
-
-    public static final class Builder {
-        private String larchVersion;
-
-        public Builder() {
-        }
-
-        public Builder larchVersion(String larchVersion) {
-            this.larchVersion = larchVersion;
-            return this;
-        }
-
-        public Describe build() {
-            return new Describe(this);
-        }
+    public void setLarchVersion(String larchVersion) {
+        this.larchVersion = larchVersion;
     }
 }
