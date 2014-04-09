@@ -18,25 +18,40 @@ package net.objecthunter.larch;
 import net.objecthunter.larch.elasticsearch.ElasticSearchIndexService;
 import net.objecthunter.larch.elasticsearch.ElasticSearchNode;
 import net.objecthunter.larch.fs.FilesystemBlobstoreService;
+import net.objecthunter.larch.service.BlobstoreService;
+import net.objecthunter.larch.service.impl.DefaultEntityService;
+import net.objecthunter.larch.service.impl.DefaultRepositoryService;
 import net.objecthunter.larch.weedfs.WeedFSBlobstoreService;
 import net.objecthunter.larch.weedfs.WeedFsMaster;
 import net.objecthunter.larch.weedfs.WeedFsVolume;
 import org.elasticsearch.client.Client;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.event.ApplicationContextEvent;
+import org.springframework.context.event.ContextStoppedEvent;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @EnableAutoConfiguration
-@ComponentScan(basePackages = "net.objecthunter.larch")
+@ComponentScan(basePackages = "net.objecthunter.larch.controller")
 @Configuration
 @EnableWebMvc
-@EnableAsync
 public class LarchServerConfiguration {
+
+    @Bean
+    public DefaultEntityService defaultEntityService() {
+        return new DefaultEntityService();
+    }
+
+    @Bean
+    public DefaultRepositoryService defaultRepositoryService() {
+        return new DefaultRepositoryService();
+    }
 
     @Bean
     public ElasticSearchIndexService elasticSearchIndexService() {
@@ -77,5 +92,16 @@ public class LarchServerConfiguration {
     @Profile("weedfs")
     public WeedFSBlobstoreService weedFSBlobstoreService() {
         return new WeedFSBlobstoreService();
+    }
+
+
+    @Bean
+    public ApplicationListener<ContextStoppedEvent> contextStoppedEvent() {
+        return new ApplicationListener<ContextStoppedEvent>() {
+            @Override
+            public void onApplicationEvent(ContextStoppedEvent event) {
+                System.out.println("\n\n\nSHUTDOWN\n\n\n");
+            }
+        };
     }
 }

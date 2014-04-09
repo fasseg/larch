@@ -11,6 +11,9 @@
     <modules>
         <module>larch-server</module>
         <module>larch-common</module>
+        <module>larch-client</module>
+        <module>larch-integration-fs</module>
+        <module>larch-integration-weedfs</module>
     </modules>
 
     <properties>
@@ -38,6 +41,7 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-test</artifactId>
                 <version>${spring.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -48,6 +52,17 @@
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpmime</artifactId>
                 <version>4.3</version>
+            </dependency>
+            <dependency>
+                <groupId>net.objecthunter.larch</groupId>
+                <artifactId>larch-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.11</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

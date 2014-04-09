@@ -17,24 +17,36 @@ package net.objecthunter.larch.integration;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.objecthunter.larch.weedfs.WeedFsVolume;
+import net.objecthunter.larch.LarchServerConfiguration;
 import net.objecthunter.larch.weedfs.WeedFsMaster;
+import net.objecthunter.larch.weedfs.WeedFsVolume;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
-import org.junit.After;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 
-import static org.junit.Assert.*;
-import static org.junit.Assume.assumeTrue;
+import javax.annotation.PostConstruct;
 
-public class WeedFsIT extends AbstractLarchIT{
+import static org.junit.Assert.assertTrue;
+
+public class WeedFsIT extends AbstractWeedFsLarchIT {
 
     @Autowired
+    private LarchServerConfiguration config;
+
     private WeedFsMaster master;
 
-    @Autowired
     private WeedFsVolume volume;
+
+    @Autowired
+    private Environment env;
+
+    @PostConstruct
+    public void setup() {
+        master = config.weedFsMaster();
+        volume = config.weedfsVolume();
+    }
 
     @Test
     public void testGetFid() throws Exception {

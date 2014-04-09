@@ -15,51 +15,21 @@
 */
 package net.objecthunter.larch.integration;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.fs.FilesystemBlobstoreService;
-import net.objecthunter.larch.model.WeedFsBlobstoreState;
-import net.objecthunter.larch.weedfs.WeedFSBlobstoreService;
+import net.objecthunter.larch.model.FilesystemBlobstoreState;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.fluent.Request;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
-public class WeedFsBlobStoreIT extends AbstractLarchIT{
+public class FileSystemBlobStoreIT extends AbstractLarchIT{
     @Autowired
-    private WeedFSBlobstoreService blobstoreService;
-
-    @Autowired
-    private ObjectMapper mapper;
-
-    @PostConstruct
-    public void waitForWeedFs() throws Exception {
-        int count = 0;
-        boolean weedfsReady = false;
-        do {
-            HttpResponse resp = Request.Get("http://localhost:9333/dir/status")
-                    .execute()
-                    .returnResponse();
-            JsonNode node = mapper.readTree(resp.getEntity().getContent());
-            if (node.get("Topology").get("DataCenters").get(0) != null) {
-                weedfsReady = true;
-            }else{
-                Thread.sleep(50);
-            }
-        }while (!weedfsReady && count++ < 150);
-
-    }
+    private FilesystemBlobstoreService blobstoreService;
 
     @Test
     public void testCreateAndRetrieve() throws Exception {
@@ -90,12 +60,7 @@ public class WeedFsBlobStoreIT extends AbstractLarchIT{
     }
 
     @Test
-    public void testGetStatus() throws Exception {
-        blobstoreService.create(new ByteArrayInputStream("foo".getBytes()));
-        blobstoreService.create(new ByteArrayInputStream("bar".getBytes()));
-        blobstoreService.create(new ByteArrayInputStream("baz".getBytes()));
-        WeedFsBlobstoreState state = blobstoreService.status();
-        assertNotNull(state);
-        assertNotNull(state.getVersion());
+    public void testgetStatus() throws Exception {
+        FilesystemBlobstoreState state = blobstoreService.status();
     }
 }
