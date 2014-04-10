@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,6 +42,13 @@ public class EntityController {
     @ResponseStatus(HttpStatus.OK)
     public Entity retrieve(@PathVariable("id") final String id) throws IOException {
         return entityService.retrieve(id);
+    }
+
+    @RequestMapping(value = "/{id}", produces = "text/html")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public ModelAndView retrieveHtml(@PathVariable("id") final String id) throws IOException {
+        return new ModelAndView("entity", "entity", entityService.retrieve(id));
     }
 
     @RequestMapping("/{id}/version/{version}")

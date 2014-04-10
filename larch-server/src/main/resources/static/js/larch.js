@@ -1,4 +1,4 @@
-function createEntity(id, type, label, tags) {
+function createEntity(id, type, label, tags, parentId) {
     var tagList = tags.split(',');
     for (var i = 0; i< tagList.length;i++) {
         tagList[i] = $.trim(tagList[i]);
@@ -7,9 +7,10 @@ function createEntity(id, type, label, tags) {
         'id' : id,
         'type' : type,
         'label' : label,
+        'parentId' : parentId,
         'tags' : tagList
     };
-    jQuery.ajax ({
+    $.ajax ({
         url: "/entity",
         type: "POST",
         data: JSON.stringify(entity),
