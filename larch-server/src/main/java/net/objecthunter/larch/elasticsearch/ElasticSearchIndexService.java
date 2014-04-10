@@ -29,7 +29,10 @@ import org.elasticsearch.action.admin.indices.status.IndicesStatusResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +43,9 @@ import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ElasticSearchIndexService implements IndexService {
     public static final String INDEX_ENTITIES = "entities";
@@ -90,11 +96,26 @@ public class ElasticSearchIndexService implements IndexService {
                 throw new IOException("Entity with id " + e.getId() + " already exists");
             }
         }
+        if (e.getChildren() != null) {
+            for (final Entity child : e.getChildren()) {
+                child.setParentId(e.getId());
+                this.create(child);
+            }
+        }
+        e.setChildren(Collections.<Entity>emptyList());
         final IndexResponse resp = client.prepareIndex(INDEX_ENTITIES, INDEX_ENTITY_TYPE, e.getId())
                 .setSource(mapper.writeValueAsBytes(e))
                 .execute()
                 .actionGet();
+        refreshIndex(INDEX_ENTITIES);
         return e.getId();
+    }
+
+    private void refreshIndex(String ... indices) {
+        client.admin()
+                .indices()
+                .refresh(new RefreshRequest(indices))
+                .actionGet();
     }
 
     @Override
@@ -118,7 +139,20 @@ public class ElasticSearchIndexService implements IndexService {
         final GetResponse resp = client.prepareGet(INDEX_ENTITIES, INDEX_ENTITY_TYPE, id)
                 .execute()
                 .actionGet();
-        return mapper.readValue(resp.getSourceAsBytes(), Entity.class);
+        final Entity parent = mapper.readValue(resp.getSourceAsBytes(), Entity.class);
+        final SearchResponse search = client.prepareSearch(INDEX_ENTITIES)
+                .setTypes(INDEX_ENTITY_TYPE)
+                .setQuery(QueryBuilders.matchQuery("parentId", id))
+                .execute()
+                .actionGet();
+        if (search.getHits().getTotalHits() > 0) {
+            final List<Entity> children = new ArrayList<>();
+            for (SearchHit hit : search.getHits().getHits()) {
+                children.add(retrieve(hit.getId()));
+            }
+            parent.setChildren(children);
+        }
+        return parent;
     }
 
     @Override

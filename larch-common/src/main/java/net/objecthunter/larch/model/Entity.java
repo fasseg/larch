@@ -19,18 +19,27 @@ import java.util.List;
 import java.util.Map;
 
 public class Entity {
+    private int version;
     private String id;
     private String label;
     private String type;
-    private List<String> tags;
     private String parentId;
-    private Map<String, Metadata> metadata;
-    private Map<String, Binary> binaries;
     private String state;
-    private int version;
-    private Map<Integer, String> versionPaths;
     private String utcCreated;
     private String utcLastModified;
+    private List<String> tags;
+    private List<Entity> children;
+    private Map<String, Metadata> metadata;
+    private Map<String, Binary> binaries;
+    private Map<Integer, String> versionPaths;
+
+    public List<Entity> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<Entity> children) {
+        this.children = children;
+    }
 
     public String getUtcLastModified() {
         return utcLastModified;

@@ -54,6 +54,14 @@ public class DefaultEntityServiceIT extends AbstractLarchIT {
     }
 
     @Test
+    public void testCreateAndGetEntityWithChildren() throws Exception {
+        Entity e = createFixtureEntityWithChildren();
+        entityService.create(e);
+        Entity fetched = entityService.retrieve(e.getId());
+        assertEquals(2, fetched.getChildren().size());
+    }
+
+    @Test
     public void testCreateAndUpdate() throws Exception {
         Entity e = createFixtureEntity();
         String id = entityService.create(e);

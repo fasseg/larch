@@ -46,4 +46,26 @@ public abstract class Fixtures {
         return e;
     }
 
+    public static Entity createFixtureEntityWithChildren() throws Exception {
+        Binary bin1 = new Binary();
+        bin1.setMimetype("image/png");
+        bin1.setFilename("image_1.png");
+        bin1.setSource(new UrlSource(Fixtures.class.getClassLoader().getResource("fixtures/image_1.png").toURI()));
+        bin1.setName("image-1");
+        Binary bin2 = new Binary();
+        bin2.setMimetype("image/png");
+        bin2.setFilename("image_2.png");
+        bin2.setSource(new UrlSource(Fixtures.class.getClassLoader().getResource("fixtures/image_1.png").toURI()));
+        bin2.setName("image-2");
+        Map<String, Binary> binaries = new HashMap<>();
+        binaries.put(bin1.getName(), bin1);
+        binaries.put(bin2.getName(), bin2);
+        Entity e = new Entity();
+        e.setLabel("My Label");
+        e.setTags(Arrays.asList("test", "integration-test"));
+        e.setType("Book");
+        e.setBinaries(binaries);
+        e.setChildren(Arrays.asList(createFixtureEntity(), createFixtureEntity()));
+        return e;
+    }
 }

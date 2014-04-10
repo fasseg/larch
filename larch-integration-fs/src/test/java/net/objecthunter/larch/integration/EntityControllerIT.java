@@ -21,6 +21,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
 import org.apache.http.util.EntityUtils;
+import org.bouncycastle.ocsp.Req;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -28,6 +29,7 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 
 import static net.objecthunter.larch.integration.helpers.Fixtures.createFixtureEntity;
+import static net.objecthunter.larch.integration.helpers.Fixtures.createFixtureEntityWithChildren;
 import static org.junit.Assert.*;
 
 public class EntityControllerIT extends AbstractLarchIT {
@@ -78,5 +80,21 @@ public class EntityControllerIT extends AbstractLarchIT {
             assertNotNull(b.getUtcCreated());
             assertNotNull(b.getUtcLastModified());
         });
+    }
+
+    @Test
+    public void testCreateAndRetrieveEntityWithChildren() throws Exception {
+        HttpResponse resp = Request.Post("http://localhost:8080/entity")
+                .bodyString(mapper.writeValueAsString(createFixtureEntityWithChildren()), ContentType.APPLICATION_JSON)
+                .execute()
+                .returnResponse();
+        assertEquals(200, resp.getStatusLine().getStatusCode());
+        final String id = EntityUtils.toString(resp.getEntity());
+
+        resp = Request.Get("http://localhost:8080/entity/" + id)
+                .execute()
+                .returnResponse();
+        Entity fetched = mapper.readValue(resp.getEntity().getContent(), Entity.class);
+        assertEquals(2, fetched.getChildren().size());
     }
 }
