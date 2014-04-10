@@ -17,7 +17,6 @@ package net.objecthunter.larch.model;
 
 import net.objecthunter.larch.model.source.UrlSource;
 
-import java.time.ZonedDateTime;
 import java.util.Map;
 
 public class Binary {
@@ -30,6 +29,24 @@ public class Binary {
     private String checksumType;
     private String path;
     private UrlSource source;
+    private String utcCreated;
+    private String utcLastModified;
+
+    public String getUtcLastModified() {
+        return utcLastModified;
+    }
+
+    public void setUtcLastModified(String utcLastModified) {
+        this.utcLastModified = utcLastModified;
+    }
+
+    public String getUtcCreated() {
+        return utcCreated;
+    }
+
+    public void setUtcCreated(String utcCreated) {
+        this.utcCreated = utcCreated;
+    }
 
     public UrlSource getSource() {
         return source;

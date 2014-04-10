@@ -62,13 +62,14 @@ public class DefaultEntityService implements EntityService {
         }
         if (e.getBinaries() != null) {
             for (final Binary b : e.getBinaries().values()) {
-                createAndMutateBinary(e.getId(),b);
+                createAndMutateBinary(e.getId(), b);
             }
         }
         e.setState(ElasticSearchIndexService.STATE_INGESTED);
         e.setVersion(1);
-        e.setUtcCreated(ZonedDateTime.now(ZoneOffset.UTC).toString());
-        e.setUtcLastModified(ZonedDateTime.now(ZoneOffset.UTC).toString());
+        final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
+        e.setUtcCreated(now);
+        e.setUtcLastModified(now);
         final String id = this.indexService.create(e);
         log.debug("finished creating Entity {}", id);
         return id;
@@ -90,6 +91,9 @@ public class DefaultEntityService implements EntityService {
             b.setChecksumType(digest.getAlgorithm());
             b.setPath(path);
             b.setSource(new UrlSource(URI.create("http://localhost:8080/entity/" + entityId + "/binary/" + b.getName() + "/content"), true));
+            final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
+            b.setUtcCreated(now);
+            b.setUtcLastModified(now);
         }
     }
 
@@ -113,7 +117,10 @@ public class DefaultEntityService implements EntityService {
         e.setUtcLastModified(ZonedDateTime.now(ZoneOffset.UTC).toString());
         if (e.getBinaries() != null) {
             for (final Binary b : e.getBinaries().values()) {
-                if  (!(b.getSource() instanceof UrlSource) && !((UrlSource) b.getSource()).isInternal()) {
+                if (b.getSource().isInternal()) {
+                    b.setUtcLastModified(oldVersion.getBinaries().get(b.getName()).getUtcLastModified());
+                    b.setUtcCreated(oldVersion.getBinaries().get(b.getName()).getUtcCreated());
+                } else {
                     createAndMutateBinary(e.getId(), b);
                 }
             }

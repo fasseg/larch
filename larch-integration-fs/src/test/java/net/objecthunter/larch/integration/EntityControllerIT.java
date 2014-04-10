@@ -55,7 +55,6 @@ public class EntityControllerIT extends AbstractLarchIT {
         resp = Request.Get("http://localhost:8080/entity/" + id)
                 .execute()
                 .returnResponse();
-        System.out.println(EntityUtils.toString(resp.getEntity()));
         Entity fetched = mapper.readValue(resp.getEntity().getContent(), Entity.class);
         assertNotNull(fetched.getVersionPaths());
         assertEquals(1, fetched.getVersionPaths().size());
@@ -71,5 +70,13 @@ public class EntityControllerIT extends AbstractLarchIT {
         assertNotNull(oldVersion.getUtcLastModified());
         assertTrue(Duration.between(ZonedDateTime.parse(oldVersion.getUtcLastModified()), ZonedDateTime.parse(fetched.getUtcLastModified())).getNano() > 0);
         assertEquals(ZonedDateTime.parse(oldVersion.getUtcCreated()), ZonedDateTime.parse(fetched.getUtcCreated()));
+        oldVersion.getBinaries().values().forEach(b -> {
+            assertNotNull(b.getUtcCreated());
+            assertNotNull(b.getUtcLastModified());
+        });
+        fetched.getBinaries().values().forEach(b -> {
+            assertNotNull(b.getUtcCreated());
+            assertNotNull(b.getUtcLastModified());
+        });
     }
 }
