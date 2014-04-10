@@ -25,8 +25,6 @@ public interface IndexService {
 
     void update(Entity e) throws IOException;
 
-    Entity retrieve(String id, int version) throws IOException;
-
     Entity retrieve(String id) throws IOException;
 
     void delete(String id) throws IOException;

@@ -15,8 +15,7 @@
 */
 package net.objecthunter.larch.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.objecthunter.larch.model.source.BinarySource;
+import net.objecthunter.larch.model.source.UrlSource;
 
 import java.time.ZonedDateTime;
 import java.util.Map;
@@ -30,29 +29,18 @@ public class Binary {
     private String checksum;
     private String checksumType;
     private String path;
-    private ZonedDateTime utcLastModified;
-    private ZonedDateTime utcCreated;
-    @JsonIgnore
-    private BinarySource source;
+    private UrlSource source;
+
+    public UrlSource getSource() {
+        return source;
+    }
+
+    public void setSource(UrlSource source) {
+        this.source = source;
+    }
 
     public String getPath() {
         return path;
-    }
-
-    public ZonedDateTime getUtcLastModified() {
-        return utcLastModified;
-    }
-
-    public void setUtcLastModified(ZonedDateTime utcLastModified) {
-        this.utcLastModified = utcLastModified;
-    }
-
-    public ZonedDateTime getUtcCreated() {
-        return utcCreated;
-    }
-
-    public void setUtcCreated(ZonedDateTime utcCreated) {
-        this.utcCreated = utcCreated;
     }
 
     public void setPath(String path) {
@@ -115,11 +103,4 @@ public class Binary {
         this.filename = filename;
     }
 
-    public BinarySource getSource() {
-        return source;
-    }
-
-    public void setSource(BinarySource source) {
-        this.source = source;
-    }
 }

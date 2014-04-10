@@ -15,22 +15,45 @@
 */
 package net.objecthunter.larch.model.source;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
-public class UrlSource implements BinarySource {
+public class UrlSource{
     private final URI uri;
+    private final boolean internal;
+
+    private UrlSource() {
+        this.uri = null;
+        this.internal = false;
+    }
+
+    public UrlSource(URI uri, boolean internal) {
+        this.uri = uri;
+        this.internal = internal;
+    }
 
     public UrlSource(URI uri) {
         this.uri = uri;
+        this.internal = false;
     }
 
     public UrlSource(String url) {
+        this.internal = false;
         this.uri = URI.create(url);
     }
 
-    @Override
+    public URI getUri() {
+        return uri;
+    }
+
+    public boolean isInternal() {
+        return internal;
+    }
+
+    @JsonIgnore
     public InputStream getInputStream() throws IOException {
         return uri.toURL().openStream();
     }

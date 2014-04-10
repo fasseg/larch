@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.state.IndexState;
 import net.objecthunter.larch.service.IndexService;
+import org.apache.http.HttpResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
@@ -81,8 +82,6 @@ public class ElasticSearchIndexService implements IndexService {
         final ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
         e.setVersion(1);
         e.setState("Active");
-        e.setUtcCreated(created);
-        e.setUtcLastModified(created);
         if (e.getId() != null) {
             final GetResponse resp = client.prepareGet(INDEX_ENTITIES, INDEX_ENTITY_TYPE, e.getId())
                     .execute()
@@ -101,26 +100,8 @@ public class ElasticSearchIndexService implements IndexService {
     @Override
     public void update(Entity e) throws IOException {
         log.debug("updating entity " + e.getId());
-        /* fetch the source and copy it to another record */
-        final GetResponse get = client.prepareGet(INDEX_ENTITIES, INDEX_ENTITY_TYPE, e.getId())
-                .execute()
-                .actionGet();
-        final Entity oldVersion = mapper.readValue(get.getSourceAsBytes(), Entity.class);
-        final String oldVersionId = oldVersion.getId() + ".V" + oldVersion.getVersion();
-        e.setVersion(oldVersion.getVersion() + 1);
-        e.setState(oldVersion.getState());
-        e.setUtcCreated(oldVersion.getUtcCreated());
-        e.setUtcLastModified(ZonedDateTime.now(ZoneOffset.UTC));
-        oldVersion.setState(STATE_ARCHIVED);
-
-        IndexResponse resp = client.prepareIndex(INDEX_ENTITIES, INDEX_ENTITY_TYPE, oldVersionId)
-                .setSource(mapper.writeValueAsBytes(oldVersion))
-                .execute()
-                .actionGet();
-        log.debug("created old version " + oldVersionId);
-
         /* and create the updated document */
-        resp = client.prepareIndex(INDEX_ENTITIES, INDEX_ENTITY_TYPE, e.getId())
+        IndexResponse resp = client.prepareIndex(INDEX_ENTITIES, INDEX_ENTITY_TYPE, e.getId())
                 .setSource(mapper.writeValueAsBytes(e))
                 .execute()
                 .actionGet();
@@ -132,20 +113,12 @@ public class ElasticSearchIndexService implements IndexService {
     }
 
     @Override
-    public Entity retrieve(String id, int version) throws IOException {
-        if (version > 0) {
-            id = id + ".V" + version;
-        }
+    public Entity retrieve(String id) throws IOException {
         log.debug("fetching entity " + id);
         final GetResponse resp = client.prepareGet(INDEX_ENTITIES, INDEX_ENTITY_TYPE, id)
                 .execute()
                 .actionGet();
         return mapper.readValue(resp.getSourceAsBytes(), Entity.class);
-    }
-
-    @Override
-    public Entity retrieve(String id) throws IOException {
-        return retrieve(id, 0);
     }
 
     @Override

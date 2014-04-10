@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.model.json;
+package net.objecthunter.larch.json;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,10 +22,11 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
-public class ZonedDateTimeDeserializer extends JsonDeserializer<ZonedDateTime> {
+public class ZonedDateTimeDeserializer extends JsonDeserializer<ZonedDateTime>{
     @Override
     public ZonedDateTime deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-        return ZonedDateTime.parse(jp.getValueAsString());
+        return ZonedDateTime.parse(jp.getText(), DateTimeFormatter.ISO_DATE_TIME);
     }
 }

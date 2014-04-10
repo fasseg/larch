@@ -22,8 +22,14 @@ import java.io.InputStream;
 
 public interface EntityService {
     String create(Entity e) throws IOException;
+
     void update(Entity e) throws IOException;
+
     Entity retrieve(String id) throws IOException;
+
     void delete(String id) throws IOException;
+
     InputStream getContent(String id, String name) throws IOException;
+
+    Entity retrieve(String id, int i) throws IOException;
 }

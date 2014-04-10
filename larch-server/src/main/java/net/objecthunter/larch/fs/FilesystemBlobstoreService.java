@@ -15,6 +15,8 @@
 */
 package net.objecthunter.larch.fs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.state.FilesystemBlobstoreState;
 import net.objecthunter.larch.service.BlobstoreService;
 import org.apache.commons.io.IOUtils;
@@ -34,32 +36,40 @@ public class FilesystemBlobstoreService implements BlobstoreService {
     @Autowired
     private Environment env;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     private File directory;
+    private File oldVersionDirectory;
 
     @PostConstruct
     public void init() throws IOException {
         this.directory = new File(env.getProperty("fs.path"));
-        if (!this.directory.exists()) {
+        this.oldVersionDirectory = new File(env.getProperty("fs.oldversion.path"));
+        checkAndCreate(this.directory);
+        checkAndCreate(this.oldVersionDirectory);
+    }
+
+    private void checkAndCreate(File dir) throws IOException {
+        if (!dir.exists()) {
             log.info("Creating non existing data directory {}", this.directory.getAbsolutePath());
-            this.directory.mkdir();
+            if (!dir.mkdir()) {
+                throw new IOException(dir.getAbsolutePath() + " could not be created");
+            }
         }
-        if (!this.directory.isDirectory()) {
-            throw new IOException(this.directory.getAbsolutePath() + " does exist, and is not a directory");
+        if (!dir.isDirectory()) {
+            throw new IOException(dir.getAbsolutePath() + " does exist, and is not a directory");
         }
     }
 
     @Override
     public String create(InputStream src) throws IOException {
-        final File folder = new File(this.directory, RandomStringUtils.random(2));
-        if (!folder.exists()) {
-            if (!folder.mkdir()) {
-                throw new IOException("unable to create folder " + folder.getAbsolutePath());
-            }
-        }
+        final File folder = new File(this.directory, RandomStringUtils.randomAlphabetic(2));
+        checkAndCreate(folder);
         File data;
         do {
              /* create a new random file name */
-            data = new File(folder, RandomStringUtils.random(16));
+            data = new File(folder, RandomStringUtils.randomAlphabetic(16));
         } while (data.exists());
         log.debug("creating Blob at {}", data.getAbsolutePath());
         final FileOutputStream sink = new FileOutputStream(data);
@@ -97,5 +107,25 @@ public class FilesystemBlobstoreService implements BlobstoreService {
         state.setFreeSpace(this.directory.getFreeSpace());
         state.setUsableSpace(this.directory.getUsableSpace());
         return state;
+    }
+
+    @Override
+    public String createOldVersionBlob(Entity oldVersion) throws IOException{
+        final File folder = new File(this.oldVersionDirectory, RandomStringUtils.randomAlphabetic(2));
+        checkAndCreate(folder);
+        File data;
+        do {
+             /* create a new random file name */
+            data = new File(folder, RandomStringUtils.randomAlphabetic(16));
+        } while (data.exists());
+        try (final OutputStream sink = new FileOutputStream(data)) {
+            mapper.writeValue(sink, oldVersion);
+            return folder.getName() + "/" + data.getName();
+        }
+    }
+
+    @Override
+    public InputStream retrieveOldVersionBlob(String path) throws IOException {
+        return new FileInputStream(new File(oldVersionDirectory, path));
     }
 }

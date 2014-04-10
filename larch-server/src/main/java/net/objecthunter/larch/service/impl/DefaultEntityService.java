@@ -15,9 +15,11 @@
 */
 package net.objecthunter.larch.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.elasticsearch.ElasticSearchIndexService;
 import net.objecthunter.larch.model.Binary;
 import net.objecthunter.larch.model.Entity;
+import net.objecthunter.larch.model.source.UrlSource;
 import net.objecthunter.larch.service.BlobstoreService;
 import net.objecthunter.larch.service.EntityService;
 import net.objecthunter.larch.service.IndexService;
@@ -29,11 +31,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.net.URI;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 
 public class DefaultEntityService implements EntityService {
     private static final Logger log = LoggerFactory.getLogger(DefaultEntityService.class);
@@ -44,6 +48,9 @@ public class DefaultEntityService implements EntityService {
     @Autowired
     private IndexService indexService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Override
     public String create(Entity e) throws IOException {
         if (e.getId() == null || e.getId().isEmpty()) {
@@ -53,16 +60,21 @@ public class DefaultEntityService implements EntityService {
                 throw new IOException("Entity with id " + e.getId() + " could not be created because it already exists in the index");
             }
         }
-        for (final Binary b : e.getBinaries().values()) {
-            createAndMutateBinary(b);
+        if (e.getBinaries() != null) {
+            for (final Binary b : e.getBinaries().values()) {
+                createAndMutateBinary(e.getId(),b);
+            }
         }
         e.setState(ElasticSearchIndexService.STATE_INGESTED);
+        e.setVersion(1);
+        e.setUtcCreated(ZonedDateTime.now(ZoneOffset.UTC).toString());
+        e.setUtcLastModified(ZonedDateTime.now(ZoneOffset.UTC).toString());
         final String id = this.indexService.create(e);
         log.debug("finished creating Entity {}", id);
         return id;
     }
 
-    private void createAndMutateBinary(Binary b) throws IOException {
+    private void createAndMutateBinary(String entityId, Binary b) throws IOException {
         final MessageDigest digest;
         try {
             digest = MessageDigest.getInstance("MD5");
@@ -77,8 +89,7 @@ public class DefaultEntityService implements EntityService {
             b.setSize(digest.getDigestLength());
             b.setChecksumType(digest.getAlgorithm());
             b.setPath(path);
-            b.setUtcCreated(created);
-            b.setUtcLastModified(created);
+            b.setSource(new UrlSource(URI.create("http://localhost:8080/entity/" + entityId + "/binary/" + b.getName() + "/content"), true));
         }
     }
 
@@ -93,8 +104,19 @@ public class DefaultEntityService implements EntityService {
 
     @Override
     public void update(Entity e) throws IOException {
-        for (final Binary b : e.getBinaries().values()) {
-            createAndMutateBinary(b);
+        final Entity oldVersion = this.indexService.retrieve(e.getId());
+        final String oldVersionPath = this.blobstoreService.createOldVersionBlob(oldVersion);
+        e.setVersion(oldVersion.getVersion() + 1);
+        e.setVersionPaths(oldVersion.getVersionPaths() != null ? oldVersion.getVersionPaths() : new HashMap<Integer, String>(1));
+        e.getVersionPaths().put(oldVersion.getVersion(), oldVersionPath);
+        e.setUtcCreated(oldVersion.getUtcCreated());
+        e.setUtcLastModified(ZonedDateTime.now(ZoneOffset.UTC).toString());
+        if (e.getBinaries() != null) {
+            for (final Binary b : e.getBinaries().values()) {
+                if  (!(b.getSource() instanceof UrlSource) && !((UrlSource) b.getSource()).isInternal()) {
+                    createAndMutateBinary(e.getId(), b);
+                }
+            }
         }
         this.indexService.update(e);
     }
@@ -117,6 +139,12 @@ public class DefaultEntityService implements EntityService {
         final Entity e = indexService.retrieve(id);
         final Binary b = e.getBinaries().get(name);
         return blobstoreService.retrieve(b.getPath());
+    }
+
+    @Override
+    public Entity retrieve(String id, int i) throws IOException {
+        final Entity e = this.indexService.retrieve(id);
+        return mapper.readValue(this.blobstoreService.retrieveOldVersionBlob(e.getVersionPaths().get(i)), Entity.class);
     }
 
 }

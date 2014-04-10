@@ -16,13 +16,15 @@
 package net.objecthunter.larch;
 
 import com.fasterxml.jackson.core.Version;
+import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import net.objecthunter.larch.elasticsearch.ElasticSearchIndexService;
 import net.objecthunter.larch.elasticsearch.ElasticSearchNode;
 import net.objecthunter.larch.fs.FilesystemBlobstoreService;
-import net.objecthunter.larch.model.json.ZonedDateTimeDeserializer;
-import net.objecthunter.larch.model.json.ZonedDateTimeSerializer;
+import net.objecthunter.larch.json.ZonedDateTimeDeserializer;
+import net.objecthunter.larch.json.ZonedDateTimeSerializer;
 import net.objecthunter.larch.service.impl.DefaultEntityService;
 import net.objecthunter.larch.service.impl.DefaultRepositoryService;
 import net.objecthunter.larch.weedfs.WeedFSBlobstoreService;
@@ -30,12 +32,7 @@ import net.objecthunter.larch.weedfs.WeedFsMaster;
 import net.objecthunter.larch.weedfs.WeedFsVolume;
 import org.elasticsearch.client.Client;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.context.event.ContextStoppedEvent;
+import org.springframework.context.annotation.*;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
@@ -98,23 +95,24 @@ public class LarchServerConfiguration {
         return new WeedFSBlobstoreService();
     }
 
-
     @Bean
+    @Primary
     public ObjectMapper objectMapper() {
         final ObjectMapper mapper = new ObjectMapper();
-        final SimpleModule zoneDateTimeModule = new SimpleModule("ZoneDateTimeModule",new Version(1,0,0,"static version","net.objecthunter.larch","larch-common"));
-        zoneDateTimeModule.addSerializer(ZonedDateTime.class, new ZonedDateTimeSerializer());
-        zoneDateTimeModule.addDeserializer(ZonedDateTime.class, new ZonedDateTimeDeserializer());
-        mapper.registerModule(zoneDateTimeModule);
+        mapper.registerModule(zoneDateTimeModule());
         return mapper;
     }
     @Bean
-    public ApplicationListener<ContextStoppedEvent> contextStoppedEvent() {
-        return new ApplicationListener<ContextStoppedEvent>() {
-            @Override
-            public void onApplicationEvent(ContextStoppedEvent event) {
-                System.out.println("\n\n\nSHUTDOWN\n\n\n");
-            }
-        };
+    public SerializationConfig serializationConfig() {
+        return objectMapper().getSerializationConfig();
     }
+
+    @Bean
+    public SimpleModule zoneDateTimeModule() {
+        final SimpleModule zoneDateTimeModule = new SimpleModule("ZoneDateTimeModule", new Version(1, 0, 0, "static version", "net.objecthunter.larch", "larch-common"));
+        zoneDateTimeModule.addSerializer(ZonedDateTime.class, new ZonedDateTimeSerializer());
+        zoneDateTimeModule.addDeserializer(ZonedDateTime.class, new ZonedDateTimeDeserializer());
+        return zoneDateTimeModule;
+    }
+
 }

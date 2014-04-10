@@ -17,6 +17,7 @@ package net.objecthunter.larch.weedfs;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.state.WeedFsBlobstoreState;
 import net.objecthunter.larch.service.BlobstoreService;
 import org.apache.http.HttpResponse;
@@ -49,20 +50,13 @@ public class WeedFSBlobstoreService implements BlobstoreService {
 
     @Override
     public String create(InputStream src) throws IOException {
-        // first request a new fid from the master server
-        HttpResponse resp = Request.Get(weedfsUrl + "/dir/assign")
-                .execute()
-                .returnResponse();
-        if (resp.getStatusLine().getStatusCode() != 200) {
-            throw new IOException("WeedFS returned:\n" + EntityUtils.toString(resp.getEntity()));
-        }
-        final JsonNode json = mapper.readTree(resp.getEntity().getContent());
+        final JsonNode json = retrieveFid();
         final String fid = json.get("fid").textValue();
         log.debug("WeedFS returned fid {} for file creation", fid);
 
         // secondly post the file contents to the assigned volumeserver using the fid
         final String volumeUrl = "http://" + json.get("url").textValue() + "/";
-        resp = Request.Post(volumeUrl + fid)
+        final HttpResponse resp = Request.Post(volumeUrl + fid)
                 .body(MultipartEntityBuilder.create()
                         .addBinaryBody("data", src)
                         .build())
@@ -73,6 +67,16 @@ public class WeedFSBlobstoreService implements BlobstoreService {
         }
         log.debug("WeedFS wrote {} bytes", mapper.readTree(resp.getEntity().getContent()).get("size").asInt());
         return fid;
+    }
+
+    private JsonNode retrieveFid() throws IOException {
+        HttpResponse resp = Request.Get(weedfsUrl + "/dir/assign")
+                .execute()
+                .returnResponse();
+        if (resp.getStatusLine().getStatusCode() != 200) {
+            throw new IOException("WeedFS returned:\n" + EntityUtils.toString(resp.getEntity()));
+        }
+        return mapper.readTree(resp.getEntity().getContent());
     }
 
     @Override
@@ -129,6 +133,32 @@ public class WeedFSBlobstoreService implements BlobstoreService {
         state.setMax(topology.get("Max").asLong());
         state.setVersion(node.get("Version").textValue());
         return state;
+    }
+
+    @Override
+    public String createOldVersionBlob(Entity oldVersion) throws IOException {
+        final JsonNode json = retrieveFid();
+        final String fid = json.get("fid").textValue();
+        log.debug("WeedFS returned fid {} for file creation", fid);
+
+        // secondly post the file contents to the assigned volumeserver using the fid
+        final String volumeUrl = "http://" + json.get("url").textValue() + "/";
+        final HttpResponse resp = Request.Post(volumeUrl + fid)
+                .body(MultipartEntityBuilder.create()
+                        .addBinaryBody("data", mapper.writeValueAsBytes(oldVersion))
+                        .build())
+                .execute()
+                .returnResponse();
+        if (resp.getStatusLine().getStatusCode() != 201) {
+            throw new IOException("WeedFS returned HTTP " + resp.getStatusLine().getStatusCode() + "\n" + EntityUtils.toString(resp.getEntity()));
+        }
+        log.debug("WeedFS wrote {} bytes", mapper.readTree(resp.getEntity().getContent()).get("size").asInt());
+        return fid;
+    }
+
+    @Override
+    public InputStream retrieveOldVersionBlob(String fid) throws IOException {
+        return this.retrieve(fid);
     }
 
     private String lookupVolumeUrl(String fid) throws IOException {

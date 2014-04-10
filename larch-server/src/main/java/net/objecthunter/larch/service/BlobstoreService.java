@@ -15,6 +15,7 @@
 */
 package net.objecthunter.larch.service;
 
+import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.state.BlobstoreState;
 
 import java.io.IOException;
@@ -26,4 +27,6 @@ public interface BlobstoreService {
     void delete(String path) throws IOException;
     void update(String path, InputStream src) throws IOException;
     BlobstoreState status() throws IOException;
+    String createOldVersionBlob(Entity oldVersion) throws IOException;
+    InputStream retrieveOldVersionBlob(String path) throws IOException;
 }
