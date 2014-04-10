@@ -84,8 +84,6 @@ public class ElasticSearchIndexService implements IndexService {
     public String create(Entity e) throws IOException {
         log.debug("creating new entity");
         final ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
-        e.setVersion(1);
-        e.setState("Active");
         if (e.getId() != null) {
             final GetResponse resp = client.prepareGet(INDEX_ENTITIES, INDEX_ENTITY_TYPE, e.getId())
                     .execute()
@@ -94,13 +92,6 @@ public class ElasticSearchIndexService implements IndexService {
                 throw new IOException("Entity with id " + e.getId() + " already exists");
             }
         }
-        if (e.getChildren() != null) {
-            for (final Entity child : e.getChildren()) {
-                child.setParentId(e.getId());
-                this.create(child);
-            }
-        }
-        e.setChildren(Collections.<Entity>emptyList());
         final IndexResponse resp = client.prepareIndex(INDEX_ENTITIES, INDEX_ENTITY_TYPE, e.getId())
                 .setSource(mapper.writeValueAsBytes(e))
                 .execute()
@@ -142,8 +133,8 @@ public class ElasticSearchIndexService implements IndexService {
         return parent;
     }
 
-    private List<Entity> fetchChildren(String id) throws IOException {
-        final List<Entity> children = new ArrayList<>();
+    private List<String> fetchChildren(String id) throws IOException {
+        final List<String> children = new ArrayList<>();
         SearchResponse search;
         int offset = 0;
         int max = 64;
@@ -157,7 +148,7 @@ public class ElasticSearchIndexService implements IndexService {
                     .actionGet();
             if (search.getHits().getHits().length > 0) {
                 for (SearchHit hit : search.getHits().getHits()) {
-                    children.add(retrieve(hit.getId()));
+                    children.add(hit.getId());
                 }
             }
             offset = offset + max;

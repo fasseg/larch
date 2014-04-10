@@ -22,12 +22,15 @@ import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.source.UrlSource;
 import net.objecthunter.larch.service.BlobstoreService;
 import net.objecthunter.larch.service.EntityService;
+import net.objecthunter.larch.service.ExportService;
 import net.objecthunter.larch.service.IndexService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
@@ -50,6 +53,19 @@ public class DefaultEntityService implements EntityService {
 
     @Autowired
     private ObjectMapper mapper;
+    @Autowired
+    private ExportService exportService;
+
+    @Autowired
+    private Environment env;
+
+    private boolean autoExport;
+
+    @PostConstruct
+    public void init() {
+        final String val = env.getProperty("larch.export.auto");
+        autoExport = val == null ? false : Boolean.valueOf(val);
+    }
 
     @Override
     public String create(Entity e) throws IOException {
@@ -72,6 +88,10 @@ public class DefaultEntityService implements EntityService {
         e.setUtcLastModified(now);
         final String id = this.indexService.create(e);
         log.debug("finished creating Entity {}", id);
+        if (autoExport) {
+            exportService.export(e);
+            log.debug("exported entity {} ", id);
+        }
         return id;
     }
 
@@ -126,6 +146,10 @@ public class DefaultEntityService implements EntityService {
             }
         }
         this.indexService.update(e);
+        if (autoExport) {
+            exportService.export(e);
+            log.debug("exported entity {} ", e.getId());
+        }
     }
 
     @Override

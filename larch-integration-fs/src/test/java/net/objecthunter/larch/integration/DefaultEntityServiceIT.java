@@ -23,8 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.junit.Assert.*;
 import static net.objecthunter.larch.integration.helpers.Fixtures.*;
+import static org.junit.Assert.*;
 
 public class DefaultEntityServiceIT extends AbstractLarchIT {
     @Autowired
@@ -55,9 +55,14 @@ public class DefaultEntityServiceIT extends AbstractLarchIT {
 
     @Test
     public void testCreateAndGetEntityWithChildren() throws Exception {
-        Entity e = createFixtureEntityWithChildren();
-        entityService.create(e);
-        Entity fetched = entityService.retrieve(e.getId());
+        Entity e = createFixtureCollectionEntity();
+        String parentId = entityService.create(e);
+        for (int i = 0; i < 2; i++) {
+            Entity child = createSimpleFixtureEntity();
+            child.setParentId(parentId);
+            entityService.create(child);
+        }
+        Entity fetched = entityService.retrieve(parentId);
         assertEquals(2, fetched.getChildren().size());
     }
 
@@ -84,7 +89,7 @@ public class DefaultEntityServiceIT extends AbstractLarchIT {
         update.setId(id);
         update.setLabel("My updated label");
         entityService.update(update);
-        Entity fetched = entityService.retrieve(e.getId(),1);
+        Entity fetched = entityService.retrieve(e.getId(), 1);
         assertEquals(orig.getLabel(), fetched.getLabel());
         assertEquals(1, orig.getVersion());
         assertNull(orig.getVersionPaths());

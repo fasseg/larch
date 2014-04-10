@@ -28,16 +28,16 @@ public class Entity {
     private String utcCreated;
     private String utcLastModified;
     private List<String> tags;
-    private List<Entity> children;
+    private List<String> children;
     private Map<String, Metadata> metadata;
     private Map<String, Binary> binaries;
     private Map<Integer, String> versionPaths;
 
-    public List<Entity> getChildren() {
+    public List<String> getChildren() {
         return children;
     }
 
-    public void setChildren(List<Entity> children) {
+    public void setChildren(List<String> children) {
         this.children = children;
     }
 

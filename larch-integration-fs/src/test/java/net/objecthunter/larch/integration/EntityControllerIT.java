@@ -31,9 +31,7 @@ import org.springframework.test.annotation.Timed;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 
-import static net.objecthunter.larch.integration.helpers.Fixtures.createFixtureEntity;
-import static net.objecthunter.larch.integration.helpers.Fixtures.createFixtureEntityWith100Children;
-import static net.objecthunter.larch.integration.helpers.Fixtures.createFixtureEntityWithChildren;
+import static net.objecthunter.larch.integration.helpers.Fixtures.*;
 import static org.junit.Assert.*;
 
 public class EntityControllerIT extends AbstractLarchIT {
@@ -90,11 +88,21 @@ public class EntityControllerIT extends AbstractLarchIT {
     @Test
     public void testCreateAndRetrieveEntityWithChildren() throws Exception {
         HttpResponse resp = Request.Post("http://localhost:8080/entity")
-                .bodyString(mapper.writeValueAsString(createFixtureEntityWithChildren()), ContentType.APPLICATION_JSON)
+                .bodyString(mapper.writeValueAsString(createSimpleFixtureEntity()), ContentType.APPLICATION_JSON)
                 .execute()
                 .returnResponse();
         assertEquals(200, resp.getStatusLine().getStatusCode());
         final String id = EntityUtils.toString(resp.getEntity());
+
+        for (int i = 0 ;i<2;i++) {
+            Entity child =createSimpleFixtureEntity();
+            child.setParentId(id);
+            resp = Request.Post("http://localhost:8080/entity")
+                    .bodyString(mapper.writeValueAsString(child), ContentType.APPLICATION_JSON)
+                    .execute()
+                    .returnResponse();
+            assertEquals(200, resp.getStatusLine().getStatusCode());
+        }
 
         resp = Request.Get("http://localhost:8080/entity/" + id)
                 .execute()
@@ -104,15 +112,25 @@ public class EntityControllerIT extends AbstractLarchIT {
     }
     @Test
     public void testCreateAndRetrieveEntityWithOneHundredChildren() throws Exception {
-        Entity e = createFixtureEntityWith100Children();
+        Entity e = createFixtureCollectionEntity();
         long time = System.currentTimeMillis();
         HttpResponse resp = Request.Post("http://localhost:8080/entity")
                 .bodyString(mapper.writeValueAsString(e), ContentType.APPLICATION_JSON)
                 .execute()
                 .returnResponse();
+        final String id = EntityUtils.toString(resp.getEntity());
+
+        for (int i = 0 ;i<100;i++) {
+            Entity child =createSimpleFixtureEntity();
+            child.setParentId(id);
+            resp = Request.Post("http://localhost:8080/entity")
+                    .bodyString(mapper.writeValueAsString(child), ContentType.APPLICATION_JSON)
+                    .execute()
+                    .returnResponse();
+            assertEquals(200, resp.getStatusLine().getStatusCode());
+        }
         log.debug("creating an entity with 100 children took {} ms", System.currentTimeMillis() - time);
         assertEquals(200, resp.getStatusLine().getStatusCode());
-        final String id = EntityUtils.toString(resp.getEntity());
 
         time = System.currentTimeMillis();
         resp = Request.Get("http://localhost:8080/entity/" + id)

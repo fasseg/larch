@@ -29,6 +29,8 @@ import org.springframework.core.env.Environment;
 import javax.annotation.PostConstruct;
 import java.io.*;
 
+import static net.objecthunter.larch.util.FileSystemUtil.*;
+
 public class FilesystemBlobstoreService implements BlobstoreService {
 
     private static final Logger log = LoggerFactory.getLogger(FilesystemBlobstoreService.class);
@@ -48,18 +50,6 @@ public class FilesystemBlobstoreService implements BlobstoreService {
         this.oldVersionDirectory = new File(env.getProperty("fs.oldversion.path"));
         checkAndCreate(this.directory);
         checkAndCreate(this.oldVersionDirectory);
-    }
-
-    private void checkAndCreate(File dir) throws IOException {
-        if (!dir.exists()) {
-            log.info("Creating non existing data directory {}", this.directory.getAbsolutePath());
-            if (!dir.mkdir()) {
-                throw new IOException(dir.getAbsolutePath() + " could not be created");
-            }
-        }
-        if (!dir.isDirectory()) {
-            throw new IOException(dir.getAbsolutePath() + " does exist, and is not a directory");
-        }
     }
 
     @Override

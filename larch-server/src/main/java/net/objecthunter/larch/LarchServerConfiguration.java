@@ -25,7 +25,9 @@ import net.objecthunter.larch.elasticsearch.ElasticSearchNode;
 import net.objecthunter.larch.fs.FilesystemBlobstoreService;
 import net.objecthunter.larch.json.ZonedDateTimeDeserializer;
 import net.objecthunter.larch.json.ZonedDateTimeSerializer;
+import net.objecthunter.larch.service.ExportService;
 import net.objecthunter.larch.service.impl.DefaultEntityService;
+import net.objecthunter.larch.service.impl.DefaultExportService;
 import net.objecthunter.larch.service.impl.DefaultRepositoryService;
 import net.objecthunter.larch.weedfs.WeedFSBlobstoreService;
 import net.objecthunter.larch.weedfs.WeedFsMaster;
@@ -107,6 +109,10 @@ public class LarchServerConfiguration {
         return objectMapper().getSerializationConfig();
     }
 
+    @Bean
+    public ExportService exportService() {
+        return new DefaultExportService();
+    }
     @Bean
     public SimpleModule zoneDateTimeModule() {
         final SimpleModule zoneDateTimeModule = new SimpleModule("ZoneDateTimeModule", new Version(1, 0, 0, "static version", "net.objecthunter.larch", "larch-common"));
