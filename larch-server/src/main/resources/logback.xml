@@ -1,0 +1,16 @@
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>:: [fs-it] %-5level - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <logger name="net.objecthunter.larch" level="DEBUG" />
+
+    <logger name="org.springframework" level="INFO" />
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>

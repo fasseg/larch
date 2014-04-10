@@ -41,10 +41,10 @@ public class InputStreamLoggerTask implements Runnable {
                 if (this.reader.ready() && (line = this.reader.readLine()) != null) {
                     log.info(line);
                 } else {
-                    Thread.yield();
+                    Thread.sleep(200);
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException| InterruptedException e) {
+                log.error("PANIC! Unable to read from WeedFs output",e);
             }
         }
     }

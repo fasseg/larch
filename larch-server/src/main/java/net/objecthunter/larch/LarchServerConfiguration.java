@@ -16,16 +16,17 @@
 package net.objecthunter.larch;
 
 import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import net.objecthunter.larch.elasticsearch.ElasticSearchIndexService;
 import net.objecthunter.larch.elasticsearch.ElasticSearchNode;
+import net.objecthunter.larch.elasticsearch.ElasticSearchSearchService;
 import net.objecthunter.larch.fs.FilesystemBlobstoreService;
 import net.objecthunter.larch.json.ZonedDateTimeDeserializer;
 import net.objecthunter.larch.json.ZonedDateTimeSerializer;
 import net.objecthunter.larch.service.ExportService;
+import net.objecthunter.larch.service.SearchService;
 import net.objecthunter.larch.service.impl.DefaultEntityService;
 import net.objecthunter.larch.service.impl.DefaultExportService;
 import net.objecthunter.larch.service.impl.DefaultRepositoryService;
@@ -37,13 +38,14 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.*;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.time.ZonedDateTime;
 
 @EnableAutoConfiguration
 @ComponentScan(basePackages = "net.objecthunter.larch.controller")
 @Configuration
-@EnableWebMvc
 public class LarchServerConfiguration {
 
     @Bean
@@ -104,6 +106,7 @@ public class LarchServerConfiguration {
         mapper.registerModule(zoneDateTimeModule());
         return mapper;
     }
+
     @Bean
     public SerializationConfig serializationConfig() {
         return objectMapper().getSerializationConfig();
@@ -113,6 +116,12 @@ public class LarchServerConfiguration {
     public ExportService exportService() {
         return new DefaultExportService();
     }
+
+    @Bean
+    public SearchService service() {
+        return new ElasticSearchSearchService();
+    }
+
     @Bean
     public SimpleModule zoneDateTimeModule() {
         final SimpleModule zoneDateTimeModule = new SimpleModule("ZoneDateTimeModule", new Version(1, 0, 0, "static version", "net.objecthunter.larch", "larch-common"));

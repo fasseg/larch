@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head th:include="fragments :: header">
+    </head>
+    <body>
+        <div class="container">
+            <table>
+                <tr>
+                    <td>Id</td>
+                    <td th:text="${entity.id}"></td>
+                </tr>
+                <tr>
+                    <td>Label</td>
+                    <td th:text="${entity.label}"></td>
+                </tr>
+                <tr>
+                    <td>Type</td>
+                    <td th:text="${entity.type}"></td>
+                </tr>
+                <tr>
+                    <td>Parent</td>
+                    <td th:text="${entity.parentId}"></td>
+                </tr>
+                <tr>
+                    <td>State</td>
+                    <td th:text="${entity.state}"></td>
+                </tr>
+                <tr>
+                    <td>Created</td>
+                    <td th:text="${entity.utcCreated}"></td>
+                </tr>
+                <tr>
+                    <td>Last Modified</td>
+                    <td th:text="${entity.utcLastModified}"></td>
+                </tr>
+            </table>
+            <table>
+                <tr th:each="tag : ${entity.tags}">
+                    <td th:text="${tag}"></td>
+                </tr>
+            </table>
+            <table>
+                <tr th:each="md : ${entity.metadata}">
+                    <td th:text="${md.key}"></td>
+                </tr>
+            </table>
+            <table>
+                <tr th:each="bin : ${entity.binaries}">
+                    <td th:text="${bin.key}"></td>
+                </tr>
+            </table>
+            <table>
+                <tr th:each="child : ${entity.children}">
+                    <td th:text="${child.key}"></td>
+                </tr>
+            </table>
+            <table>
+                <tr th:each="v : ${entity.version}">
+                    <td th:text="${v.key}"></td>
+                </tr>
+            </table>
+        </div>
+        <footer th:include="fragments :: footer">
+        </footer>
+    </body>
+</html>
