@@ -19,9 +19,7 @@ import net.objecthunter.larch.model.Binary;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.source.UrlSource;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public abstract class Fixtures {
     public static Entity createFixtureEntity() throws Exception {
@@ -46,6 +44,22 @@ public abstract class Fixtures {
         return e;
     }
 
+    public static Entity createSimpleFixtureEntity() throws Exception {
+        Binary bin1 = new Binary();
+        bin1.setMimetype("image/png");
+        bin1.setFilename("image_1.png");
+        bin1.setSource(new UrlSource(Fixtures.class.getClassLoader().getResource("fixtures/image_1.png").toURI()));
+        bin1.setName("image-1");
+        Map<String, Binary> binaries = new HashMap<>();
+        binaries.put(bin1.getName(), bin1);
+        Entity e = new Entity();
+        e.setLabel("My Label");
+        e.setTags(Arrays.asList("test", "integration-test"));
+        e.setType("Image");
+        e.setBinaries(binaries);
+        return e;
+    }
+
     public static Entity createFixtureEntityWithChildren() throws Exception {
         Binary bin1 = new Binary();
         bin1.setMimetype("image/png");
@@ -66,6 +80,17 @@ public abstract class Fixtures {
         e.setType("Book");
         e.setBinaries(binaries);
         e.setChildren(Arrays.asList(createFixtureEntity(), createFixtureEntity()));
+        return e;
+    }
+
+    public static Entity createFixtureEntityWith100Children() throws Exception {
+        Entity e = createSimpleFixtureEntity();
+        List<Entity> children = new ArrayList<>(100);
+        for (int i = 0; i < 100; i++) {
+            children.add(createSimpleFixtureEntity());
+        }
+        e.setType("Collection");
+        e.setChildren(children);
         return e;
     }
 }

@@ -19,7 +19,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.state.IndexState;
 import net.objecthunter.larch.service.IndexService;
-import org.apache.http.HttpResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
@@ -39,8 +38,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.time.Clock;
-import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -50,9 +47,9 @@ import java.util.List;
 public class ElasticSearchIndexService implements IndexService {
     public static final String INDEX_ENTITIES = "entities";
     public static final String INDEX_ENTITY_TYPE = "entity";
-    public static final String STATE_PUBLISHED="published";
-    public static final String STATE_ARCHIVED="archived";
-    public static final String STATE_INGESTED="ingested";
+    public static final String STATE_PUBLISHED = "published";
+    public static final String STATE_ARCHIVED = "archived";
+    public static final String STATE_INGESTED = "ingested";
 
     private static final Logger log = LoggerFactory.getLogger(ElasticSearchIndexService.class);
 
@@ -82,6 +79,7 @@ public class ElasticSearchIndexService implements IndexService {
                 .execute()
                 .actionGet();
     }
+
     @Override
     public String create(Entity e) throws IOException {
         log.debug("creating new entity");
@@ -111,7 +109,7 @@ public class ElasticSearchIndexService implements IndexService {
         return e.getId();
     }
 
-    private void refreshIndex(String ... indices) {
+    private void refreshIndex(String... indices) {
         client.admin()
                 .indices()
                 .refresh(new RefreshRequest(indices))
@@ -140,25 +138,37 @@ public class ElasticSearchIndexService implements IndexService {
                 .execute()
                 .actionGet();
         final Entity parent = mapper.readValue(resp.getSourceAsBytes(), Entity.class);
-        final SearchResponse search = client.prepareSearch(INDEX_ENTITIES)
-                .setTypes(INDEX_ENTITY_TYPE)
-                .setQuery(QueryBuilders.matchQuery("parentId", id))
-                .execute()
-                .actionGet();
-        if (search.getHits().getTotalHits() > 0) {
-            final List<Entity> children = new ArrayList<>();
-            for (SearchHit hit : search.getHits().getHits()) {
-                children.add(retrieve(hit.getId()));
-            }
-            parent.setChildren(children);
-        }
+        parent.setChildren(fetchChildren(id));
         return parent;
+    }
+
+    private List<Entity> fetchChildren(String id) throws IOException {
+        final List<Entity> children = new ArrayList<>();
+        SearchResponse search;
+        int offset = 0;
+        int max = 64;
+        do {
+            search = client.prepareSearch(INDEX_ENTITIES)
+                    .setTypes(INDEX_ENTITY_TYPE)
+                    .setQuery(QueryBuilders.matchQuery("parentId", id))
+                    .setFrom(offset)
+                    .setSize(max)
+                    .execute()
+                    .actionGet();
+            if (search.getHits().getHits().length > 0) {
+                for (SearchHit hit : search.getHits().getHits()) {
+                    children.add(retrieve(hit.getId()));
+                }
+            }
+            offset = offset + max;
+        } while (offset < search.getHits().getTotalHits());
+        return children;
     }
 
     @Override
     public void delete(String id) throws IOException {
         log.debug("deleting entity " + id);
-        DeleteResponse resp = client.prepareDelete(INDEX_ENTITIES,INDEX_ENTITY_TYPE, id)
+        DeleteResponse resp = client.prepareDelete(INDEX_ENTITIES, INDEX_ENTITY_TYPE, id)
                 .execute()
                 .actionGet();
         this.client.admin().indices()

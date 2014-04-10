@@ -6,7 +6,7 @@
     </appender>
 
 
-    <logger name="net.objecthunter.larch" level="INFO" />
+    <logger name="net.objecthunter.larch" level="DEBUG" />
 
     <logger name="org.springframework" level="WARN" />
 

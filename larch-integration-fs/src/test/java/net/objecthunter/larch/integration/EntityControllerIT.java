@@ -23,16 +23,21 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.util.EntityUtils;
 import org.bouncycastle.ocsp.Req;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.Timed;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
 
 import static net.objecthunter.larch.integration.helpers.Fixtures.createFixtureEntity;
+import static net.objecthunter.larch.integration.helpers.Fixtures.createFixtureEntityWith100Children;
 import static net.objecthunter.larch.integration.helpers.Fixtures.createFixtureEntityWithChildren;
 import static org.junit.Assert.*;
 
 public class EntityControllerIT extends AbstractLarchIT {
+    private static final Logger log = LoggerFactory.getLogger(EntityControllerIT.class);
 
     @Autowired
     private ObjectMapper mapper;
@@ -97,4 +102,26 @@ public class EntityControllerIT extends AbstractLarchIT {
         Entity fetched = mapper.readValue(resp.getEntity().getContent(), Entity.class);
         assertEquals(2, fetched.getChildren().size());
     }
+    @Test
+    public void testCreateAndRetrieveEntityWithOneHundredChildren() throws Exception {
+        Entity e = createFixtureEntityWith100Children();
+        long time = System.currentTimeMillis();
+        HttpResponse resp = Request.Post("http://localhost:8080/entity")
+                .bodyString(mapper.writeValueAsString(e), ContentType.APPLICATION_JSON)
+                .execute()
+                .returnResponse();
+        log.debug("creating an entity with 100 children took {} ms", System.currentTimeMillis() - time);
+        assertEquals(200, resp.getStatusLine().getStatusCode());
+        final String id = EntityUtils.toString(resp.getEntity());
+
+        time = System.currentTimeMillis();
+        resp = Request.Get("http://localhost:8080/entity/" + id)
+                .execute()
+                .returnResponse();
+        log.debug("fetching an entity with 100 children took {} ms", System.currentTimeMillis() - time);
+        Entity fetched = mapper.readValue(resp.getEntity().getContent(), Entity.class);
+        assertEquals(100, fetched.getChildren().size());
+        assertEquals("Collection", fetched.getType());
+    }
+
 }
