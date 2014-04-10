@@ -38,29 +38,11 @@ public class WeedFsBlobStoreIT extends AbstractWeedFsLarchIT{
     @Autowired
     LarchServerConfiguration config;
 
+    @Autowired
     private WeedFSBlobstoreService blobstoreService;
 
     @Autowired
     private ObjectMapper mapper;
-
-    @PostConstruct
-    public void waitForWeedFs() throws Exception {
-        blobstoreService = (WeedFSBlobstoreService) config.weedFSBlobstoreService();
-        int count = 0;
-        boolean weedfsReady = false;
-        do {
-            HttpResponse resp = Request.Get("http://localhost:9333/dir/status")
-                    .execute()
-                    .returnResponse();
-            JsonNode node = mapper.readTree(resp.getEntity().getContent());
-            if (node.get("Topology").get("DataCenters").get(0) != null) {
-                weedfsReady = true;
-            }else{
-                Thread.sleep(50);
-            }
-        }while (!weedfsReady && count++ < 150);
-
-    }
 
     @Test
     public void testCreateAndRetrieve() throws Exception {
