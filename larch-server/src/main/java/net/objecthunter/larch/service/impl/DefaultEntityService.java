@@ -178,4 +178,31 @@ public class DefaultEntityService implements EntityService {
         return mapper.readValue(this.blobstoreService.retrieveOldVersionBlob(e.getVersionPaths().get(i)), Entity.class);
     }
 
+    @Override
+    public void createBinary(String entityId, String name, String contentType, InputStream inputStream) throws IOException {
+        final Entity e = indexService.retrieve(entityId);
+        final MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e1) {
+            throw new IOException(e1);
+        }
+        String path = blobstoreService.create(new DigestInputStream(inputStream, digest));
+        final Binary b = new Binary();
+        b.setName(name);
+        b.setMimetype(contentType);
+        b.setChecksum(new BigInteger(1, digest.digest()).toString(16));
+        b.setChecksumType("MD5");
+        b.setSource(new UrlSource(URI.create("http://localhost:8080/entity/" + entityId + "/binary/" + name + "/content"), true));
+        b.setPath(path);
+        final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
+        b.setUtcCreated(now);
+        b.setUtcLastModified(now);
+        if (e.getBinaries()== null) {
+            e.setBinaries(new HashMap<>(1));
+        }
+        e.getBinaries().put(name, b);
+        indexService.update(e);
+    }
+
 }

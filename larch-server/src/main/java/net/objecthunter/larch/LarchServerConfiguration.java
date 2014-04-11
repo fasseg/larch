@@ -37,9 +37,7 @@ import org.elasticsearch.client.Client;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.*;
 import org.springframework.core.annotation.Order;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import java.time.ZonedDateTime;
 
@@ -103,7 +101,6 @@ public class LarchServerConfiguration {
     @Primary
     public ObjectMapper objectMapper() {
         final ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(zoneDateTimeModule());
         return mapper;
     }
 
@@ -123,11 +120,9 @@ public class LarchServerConfiguration {
     }
 
     @Bean
-    public SimpleModule zoneDateTimeModule() {
-        final SimpleModule zoneDateTimeModule = new SimpleModule("ZoneDateTimeModule", new Version(1, 0, 0, "static version", "net.objecthunter.larch", "larch-common"));
-        zoneDateTimeModule.addSerializer(ZonedDateTime.class, new ZonedDateTimeSerializer());
-        zoneDateTimeModule.addDeserializer(ZonedDateTime.class, new ZonedDateTimeDeserializer());
-        return zoneDateTimeModule;
+    public CommonsMultipartResolver multipartResolver() {
+        return new CommonsMultipartResolver();
     }
+
 
 }

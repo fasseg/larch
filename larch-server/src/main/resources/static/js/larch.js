@@ -21,3 +21,7 @@ function createEntity(id, type, label, tags, parentId) {
         }
     });
 }
+
+function createBinary(id, name) {
+    var binary
+}

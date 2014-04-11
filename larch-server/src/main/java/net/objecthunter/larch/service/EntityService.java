@@ -32,4 +32,6 @@ public interface EntityService {
     InputStream getContent(String id, String name) throws IOException;
 
     Entity retrieve(String id, int i) throws IOException;
+
+    void createBinary(String entityId, String name, String contentType, InputStream inputStream) throws IOException;
 }
