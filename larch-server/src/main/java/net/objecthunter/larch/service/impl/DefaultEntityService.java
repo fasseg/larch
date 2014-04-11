@@ -15,7 +15,9 @@
 */
 package net.objecthunter.larch.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 import net.objecthunter.larch.elasticsearch.ElasticSearchIndexService;
 import net.objecthunter.larch.model.Binary;
 import net.objecthunter.larch.model.Entity;
@@ -41,6 +43,8 @@ import java.security.NoSuchAlgorithmException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class DefaultEntityService implements EntityService {
     private static final Logger log = LoggerFactory.getLogger(DefaultEntityService.class);
@@ -131,7 +135,11 @@ public class DefaultEntityService implements EntityService {
         final Entity oldVersion = this.indexService.retrieve(e.getId());
         final String oldVersionPath = this.blobstoreService.createOldVersionBlob(oldVersion);
         e.setVersion(oldVersion.getVersion() + 1);
-        e.setVersionPaths(oldVersion.getVersionPaths() != null ? oldVersion.getVersionPaths() : new HashMap<Integer, String>(1));
+        if (oldVersion.getVersionPaths() == null) {
+            e.setVersionPaths(new HashMap<>());
+        }else {
+            e.setVersionPaths(oldVersion.getVersionPaths());
+        }
         e.getVersionPaths().put(oldVersion.getVersion(), oldVersionPath);
         e.setUtcCreated(oldVersion.getUtcCreated());
         e.setUtcLastModified(ZonedDateTime.now(ZoneOffset.UTC).toString());
@@ -181,28 +189,74 @@ public class DefaultEntityService implements EntityService {
     @Override
     public void createBinary(String entityId, String name, String contentType, InputStream inputStream) throws IOException {
         final Entity e = indexService.retrieve(entityId);
+        final String oldVersionPath = this.blobstoreService.createOldVersionBlob(e);
         final MessageDigest digest;
         try {
             digest = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e1) {
             throw new IOException(e1);
         }
-        String path = blobstoreService.create(new DigestInputStream(inputStream, digest));
+        final String path = blobstoreService.create(new DigestInputStream(inputStream, digest));
         final Binary b = new Binary();
+        final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
+        b.setUtcCreated(now);
+        b.setUtcLastModified(now);
         b.setName(name);
         b.setMimetype(contentType);
         b.setChecksum(new BigInteger(1, digest.digest()).toString(16));
         b.setChecksumType("MD5");
         b.setSource(new UrlSource(URI.create("http://localhost:8080/entity/" + entityId + "/binary/" + name + "/content"), true));
         b.setPath(path);
-        final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
         b.setUtcCreated(now);
         b.setUtcLastModified(now);
         if (e.getBinaries()== null) {
             e.setBinaries(new HashMap<>(1));
         }
         e.getBinaries().put(name, b);
-        indexService.update(e);
+        e.setVersion(e.getVersion() + 1);
+        if (e.getVersionPaths() == null) {
+            e.setVersionPaths(new HashMap<>());
+        }
+        e.getVersionPaths().put(e.getVersion(), oldVersionPath);
+        this.indexService.update(e);
+        if (autoExport) {
+            exportService.export(e);
+            log.debug("exported entity {} ", e.getId());
+        }
+    }
+
+    @Override
+    public void patch(final String id, final JsonNode node) throws IOException {
+        final Entity e = this.indexService.retrieve(id);
+        final Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
+        while (fields.hasNext()) {
+            final Map.Entry<String, JsonNode> field = fields.next();
+            if (field.getValue().getNodeType() != JsonNodeType.STRING) {
+                throw new IOException("The patch data is invalid");
+            }
+            switch(field.getKey()) {
+                case "label":
+                    e.setLabel(field.getValue().asText());
+                    break;
+                case "type":
+                    e.setType(field.getValue().asText());
+                    break;
+                case "parentId":
+                    final String parentId = field.getValue().asText();
+                    if (parentId.equals(id)) {
+                        throw new IOException("Can not add a parent relation to itself");
+                    }
+                    e.setParentId(parentId);
+                    break;
+                case "state":
+                    final String state = field.getValue().asText();
+                    e.setState(state);
+                    break;
+                default:
+                    throw new IOException("Unable to update field " + field.getKey());
+            }
+        }
+        update(e);
     }
 
 }

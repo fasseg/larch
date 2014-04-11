@@ -15,6 +15,7 @@
 */
 package net.objecthunter.larch.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import net.objecthunter.larch.model.Entity;
 
 import java.io.IOException;
@@ -34,4 +35,6 @@ public interface EntityService {
     Entity retrieve(String id, int i) throws IOException;
 
     void createBinary(String entityId, String name, String contentType, InputStream inputStream) throws IOException;
+
+    void patch(String id, JsonNode node) throws IOException;
 }

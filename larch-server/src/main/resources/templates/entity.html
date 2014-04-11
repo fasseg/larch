@@ -14,31 +14,33 @@ $(document).ready(function() {
         createEntity($('#ceId').val(), $('#ceType').val(),$('#ceLabel').val(),$('#ceTags').val(), $('#ceParentId').val());
     })
 });
-
-
-
+var patch = {};
 </script>
 <div class="container">
     <table>
         <tr>
             <td>Id</td>
-            <td th:text="${entity.id}"></td>
+            <td id="entityId" th:text="${entity.id}"></td>
         </tr>
         <tr>
             <td>Label</td>
-            <td th:text="${entity.label}"></td>
+            <td th:text="${entity.label}" th:onclick="'javascript:edit(this,\'label\');'"></td>
         </tr>
         <tr>
             <td>Type</td>
-            <td th:text="${entity.type}"></td>
+            <td th:text="${entity.type}"  th:onclick="'javascript:edit(this,\'type\');'"></td>
         </tr>
         <tr>
             <td>Parent</td>
-            <td th:text="${entity.parentId}"></td>
+            <td th:text="${entity.parentId}"  th:onclick="'javascript:edit(this,\'parentId\');'"></td>
         </tr>
         <tr>
             <td>State</td>
-            <td th:text="${entity.state}"></td>
+            <td th:text="${entity.state}" th:onclick="'javascript:edit(this,\'state\');'"></td>
+        </tr>
+        <tr>
+            <td>Version</td>
+            <td th:text="${entity.version}"></td>
         </tr>
         <tr>
             <td>Created</td>
@@ -91,11 +93,15 @@ $(document).ready(function() {
             <td>Versions</td>
         </tr>
         </thead>
-        <tr th:each="v : ${entity.version}">
+        <tr th:each="path : ${entity.versionPaths}">
             <td></td>
-            <td th:text="'Version ' +  ${v}"></td>
+            <td>
+                <a th:href="@{'~/entity/'} + ${entity.id} + '/version/' + ${path.key}" th:text="'Version ' + ${path.key}"></a>
+            </td>
         </tr>
     </table>
+    <input class="hidden" type="button" id="updateButton" value="Update entity"/>
+    <input class="hidden" type="button" id="cancelUpdateButton" value="Cancel update"/>
 </div>
 <div id="right" class="container">
     <table>
