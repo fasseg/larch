@@ -32,7 +32,7 @@ import java.io.IOException;
 
 
 @Controller
-@RequestMapping("/")
+@RequestMapping("/describe")
 @Component
 public class DescribeController {
 
