@@ -14,7 +14,7 @@ function createEntity(id, type, label, tags, parentId) {
     $.ajax ({
         url: "/entity",
         type: "POST",
-        data: JSON.stringify(patch),
+        data: JSON.stringify(entity),
         dataType: "text",
         contentType: "application/json; charset=utf-8",
         success: function(createdId){

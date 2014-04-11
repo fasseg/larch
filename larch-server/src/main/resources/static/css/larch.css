@@ -1,7 +1,60 @@
+body{
+    background-color: #efefef;
+}
+
+.container:before,
+.container:after {
+  content:"";
+  display:table;
+}
+.container:after {
+  clear:both;
+}
+.container {
+  zoom:1; /* For IE 6/7 (trigger hasLayout) */
+}
+
 .hidden{
     display:none;
 }
 
 .changed {
     background-color: yellow;
+}
+.item {
+    background-color: #fff;
+    width: 280px;
+    -webkit-box-shadow: 2px 2px 5px 0px rgba(50, 50, 50, 0.75);
+    -moz-box-shadow:    2px 2px 5px 0px rgba(50, 50, 50, 0.75);
+    box-shadow:         2px 2px 5px 0px rgba(50, 50, 50, 0.75);
+    float:left;
+    margin: 10px;
+    padding: 6px;
+}
+.item h1 {
+    font-size: 14pt;
+    color: #666666;
+    font-family:'Alegreya Sans', sans-serif;
+}
+.item h2 {
+    font-size: 12pt;
+}
+.item h3 {
+    font-size: 11pt;
+}
+.item img {
+    float: right;
+    width: 32px;
+    height: 32px;
+    margin-top: 10px;
+    margin-right: 6px;
+}
+.item:hover{
+    -webkit-box-shadow: 4px 4px 5px 0px rgba(50, 50, 50, 0.75);
+    -moz-box-shadow:    4px 4px 5px 0px rgba(50, 50, 50, 0.75);
+    box-shadow:         4px 4px 5px 0px rgba(50, 50, 50, 0.75);
+}
+a {
+  color: inherit;
+  text-decoration: inherit;
 }

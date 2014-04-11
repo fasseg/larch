@@ -80,6 +80,9 @@ public class DefaultEntityService implements EntityService {
                 throw new IOException("Entity with id " + e.getId() + " could not be created because it already exists in the index");
             }
         }
+        if (e.getLabel() == null || e.getLabel().isEmpty()) {
+            e.setLabel("Unnamed entity");
+        }
         if (e.getBinaries() != null) {
             for (final Binary b : e.getBinaries().values()) {
                 createAndMutateBinary(e.getId(), b);
@@ -143,6 +146,9 @@ public class DefaultEntityService implements EntityService {
         e.getVersionPaths().put(oldVersion.getVersion(), oldVersionPath);
         e.setUtcCreated(oldVersion.getUtcCreated());
         e.setUtcLastModified(ZonedDateTime.now(ZoneOffset.UTC).toString());
+        if (e.getLabel() == null || e.getLabel().isEmpty()) {
+            e.setLabel("Unnamed entity");
+        }
         if (e.getBinaries() != null) {
             for (final Binary b : e.getBinaries().values()) {
                 if (b.getSource().isInternal()) {
@@ -255,6 +261,9 @@ public class DefaultEntityService implements EntityService {
                 default:
                     throw new IOException("Unable to update field " + field.getKey());
             }
+        }
+        if (e.getLabel() == null || e.getLabel().isEmpty()) {
+            e.setLabel("Unnamed Entity");
         }
         update(e);
     }
