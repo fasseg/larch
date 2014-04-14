@@ -40,7 +40,7 @@ Settings can be found in
  * `src/main/resources/application-fs.properties`
  * `src/main/resources/application-weedfs.properties`
 
-All settings can be overwritten on the command line using spring-boots property substitution e.g.:
+All settings can be overwritten on the command line using spring-boot's property substitution e.g.:
 The property `elasticsearch.http.enabled` can be passed on the commandline in the following way:
 ```
 #> java -jar larch-server/target/larch-server-VERSION.jar --elasticsearch.http.enabled=false
