@@ -4,6 +4,7 @@
 </head>
 <body>
 <header>
+    <div class="three_dots"></div>
 </header>
 
 <div class="content">
@@ -13,15 +14,17 @@
             <p>Administrator</p>
         </div>
         <ul class="left_menu">
-            <li><a th:href="@{/}" th:text="'DASHBOARD'"></a></li>
-            <li><a th:href="@{/browse}" th:text="'BROWSE'"></a></li>
-            <li><a th:href="@{/list}" th:text="'LIST'"></a></li>
-            <li><a th:href="@{/search}" th:text="'SEARCH'"></a></li>
+            <li><p class="icon" id="icon_dashboard"></p><a th:href="@{/}" th:text="'DASHBOARD'"></a></li>
+            <li><p class="icon" id="icon_browse"></p><a th:href="@{/browse}" th:text="'BROWSE'"></a></li>
+            <li><p class="icon" id="icon_list"></p><a th:href="@{/list}" th:text="'LIST'"></a></li>
+            <li><p class="icon" id="icon_search"></p><a th:href="@{/search}" th:text="'SEARCH'"></a></li>
+            <li><p class="icon" id="icon_users"></p><a th:href="@{/users}" th:text="'USERS'"></a></li>
         </ul>
     </div>
     <div class="main">
         <div class="title">
-            <h1>Project Larch</h1>
+            <span class="three_bars"></span>
+            <h1>Larch repository</h1>
         </div>
     </div>
 </div>
