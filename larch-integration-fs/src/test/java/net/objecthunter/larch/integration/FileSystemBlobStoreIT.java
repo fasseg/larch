@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 import static org.junit.Assert.assertEquals;
 
@@ -31,30 +32,32 @@ public class FileSystemBlobStoreIT extends AbstractLarchIT{
     @Autowired
     private FilesystemBlobstoreService blobstoreService;
 
+    private static final Charset cs = Charset.forName("UTF-8");
+
     @Test
     public void testCreateAndRetrieve() throws Exception {
         String data = "mysimpledatawithÄ";
-        String path = blobstoreService.create(new ByteArrayInputStream(data.getBytes()));
+        String path = blobstoreService.create(new ByteArrayInputStream(data.getBytes(cs)));
         try (InputStream src = blobstoreService.retrieve(path)) {
-            assertEquals(data, IOUtils.toString(src));
+            assertEquals(data, IOUtils.toString(src, cs));
         }
     }
 
     @Test
     public void testUpdateAndRetrieve() throws Exception {
         String data = "mysimpledatawithö";
-        String path = blobstoreService.create(new ByteArrayInputStream(data.getBytes()));
+        String path = blobstoreService.create(new ByteArrayInputStream(data.getBytes(cs)));
         String update = "mysimpledatawithßandé";
-        blobstoreService.update(path, new ByteArrayInputStream(update.getBytes()));
+        blobstoreService.update(path, new ByteArrayInputStream(update.getBytes(cs)));
         try (InputStream src = blobstoreService.retrieve(path)) {
-            assertEquals(update, IOUtils.toString(src));
+            assertEquals(update, IOUtils.toString(src, cs));
         }
     }
 
     @Test(expected = FileNotFoundException.class)
     public void testCreateAndDelete() throws Exception {
         String data = "mysimpledatawithÄ";
-        String path = blobstoreService.create(new ByteArrayInputStream(data.getBytes()));
+        String path = blobstoreService.create(new ByteArrayInputStream(data.getBytes(cs)));
         blobstoreService.delete(path);
         blobstoreService.retrieve(path);
     }

@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.*;
+import java.nio.file.FileSystemNotFoundException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -57,6 +58,16 @@ public class WeedFsMaster{
         if (!dir.canRead() || !dir.canWrite()) {
             log.error("Unable to create master directory. The application was not initialiazed correctly");
             throw new IllegalArgumentException("Unable to use master directory. Please check the configuration");
+        }
+        if (env.getProperty("weedfs.binary") == null) {
+            throw new IllegalArgumentException("The WeedFs Binary path has to be set");
+        }
+        final File binary = new File(env.getProperty("weedfs.binary"));
+        if (!binary.exists()) {
+            throw new IllegalArgumentException(new FileSystemNotFoundException("The weedfs binary can not be found at " + binary.getAbsolutePath()));
+        }
+        if (!binary.canExecute()) {
+            throw new IllegalArgumentException("The weedfs binary at " + binary.getAbsolutePath() + " can not be executed");
         }
         try {
             log.info("starting WeedFS master");

@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.model.Describe;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
+import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,10 +32,11 @@ public class DescribeControllerIT extends AbstractLarchIT{
 
     @Test
     public void testDescribe() throws Exception {
-        HttpResponse resp = Request.Get("http://localhost:8080")
+        HttpResponse resp = Request.Get("http://localhost:8080/describe")
                 .execute()
                 .returnResponse();
         assertEquals(200, resp.getStatusLine().getStatusCode());
-        Describe desc = mapper.readValue(resp.getEntity().getContent(), Describe.class);
+        String data = EntityUtils.toString(resp.getEntity());
+        Describe desc = mapper.readValue(data, Describe.class);
     }
 }
