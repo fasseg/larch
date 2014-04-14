@@ -9,11 +9,6 @@ This project integrates ElasticSearch and WeedFs into a large scale distributed 
  * [WeedFs](https://code.google.com/p/weed-fs/)
  * [Facebook's Haystack paper](http://www.usenix.org/event/osdi10/tech/full_papers/Beaver.pdf)
 
-## Settings
-Settings can be found in
- * `src/main/resources/application.properties`
- * `src/main/resources/application-fs.properties`
- * `src/main/resources/application-weedfs.properties`
 
 ## Build Larch
 
@@ -21,10 +16,11 @@ Settings can be found in
 #> mvn clean package
 ```
 
-## Run the application using the WeedFs adapter. This will start a WeedFs master and volume server
+## Run the application using the WeedFs adapter.
+This will start a WeedFs master and volume server
 
 ```
-#> java -jar larch-server/target/larch-server-1.0-SNAPSHOT.jar
+#> java -jar larch-server/target/larch-server-VERSION.jar
 ```
 
 ## Run the application using the plain filesystem adapter
@@ -38,3 +34,14 @@ Settings can be found in
 Various endpoints are exposed via a REST API (see package `net.objecthunter.larch.controller` in `larch-server` for now).
 A Dashboard view is exposed at the webserver root `http://localhost:8080/` and port is `8080`
 
+## Settings
+Settings can be found in
+ * `src/main/resources/application.properties`
+ * `src/main/resources/application-fs.properties`
+ * `src/main/resources/application-weedfs.properties`
+
+All settings can be overwritten on the command line using spring-boots property substitution e.g.:
+The property `elasticsearch.http.enabled` can be passed on the commandline in the following way:
+```
+#> java -jar larch-server/target/larch-server-VERSION.jar --elasticsearch.http.enabled=false
+```
