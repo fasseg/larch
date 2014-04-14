@@ -18,7 +18,6 @@ package net.objecthunter.larch.controller;
 import net.objecthunter.larch.service.RepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -36,8 +35,8 @@ public class DashboardController {
     @RequestMapping(produces = "text/html")
     @ResponseBody
     public ModelAndView dashboardHtml() throws IOException {
-        ModelMap model = new ModelMap();
+        final ModelMap model = new ModelMap();
         model.addAttribute("describe", repositoryService.describe());
-        return new ModelAndView("dashboard", "dashboard",null);
+        return new ModelAndView("dashboard", model);
     }
 }

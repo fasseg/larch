@@ -31,7 +31,7 @@ header{
     margin-left: 30px;
     height: 29px;
     width: 35px;
-    float:left;
+    display: inline-block;
 }
 
 .left {
@@ -110,7 +110,7 @@ header{
     font-size: 26pt;
     font-weight: normal;
     margin-left: 10px;
-    float: left;
+    display: inline-block;
 }
 
 .left_menu li a:link, a:visited, a:active, a:hover{
@@ -159,4 +159,41 @@ header{
     background-image: url("/images/sprite.png");
     background-position: 0px -39px;
     height: 20px;
+}
+.panel {
+    margin-top: 30px;
+    margin-left: 40px;
+    float:left;
+    background-color:white;
+    padding: 0px 20px 20px 20px;
+    -webkit-box-shadow: 1px 1px 2px 0px rgba(50, 50, 50, 0.75);
+    -moz-box-shadow:    1px 1px 2px 0px rgba(50, 50, 50, 0.75);
+    box-shadow:         1px 1px 2px 0px rgba(50, 50, 50, 0.75);
+    border-radius: 2px;
+}
+.panel:hover {
+    -webkit-box-shadow: 2px 2px 4px 0px rgba(50, 50, 50, 0.75);
+    -moz-box-shadow:    2px 2px 4px 0px rgba(50, 50, 50, 0.75);
+    box-shadow:         2px 2px 4px 0px rgba(50, 50, 50, 0.75);
+}
+.panel_title {
+    color: #bcbcbc;
+    font-weight: bold;
+    font-size: 11pt;
+    padding-bottom: 10px;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-bottom-color: #cdcdcd;
+
+}
+.property{
+    color: #000000;
+    font-weight: bold;
+    margin: 0px;
+}
+.value {
+    margin-top: 0px;
+    color: #ababab;
+    font-family: monospace;
+    font-size:10pt;
 }

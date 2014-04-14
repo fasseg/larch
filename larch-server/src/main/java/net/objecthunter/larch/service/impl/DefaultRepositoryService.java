@@ -20,6 +20,11 @@ import net.objecthunter.larch.model.state.LarchState;
 import net.objecthunter.larch.service.BlobstoreService;
 import net.objecthunter.larch.service.IndexService;
 import net.objecthunter.larch.service.RepositoryService;
+import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
+import org.elasticsearch.action.admin.cluster.state.ClusterStateRequestBuilder;
+import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
+import org.elasticsearch.action.admin.cluster.stats.ClusterStatsResponse;
+import org.elasticsearch.client.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
@@ -35,6 +40,9 @@ public class DefaultRepositoryService implements RepositoryService {
     @Autowired
     private Environment env;
 
+    @Autowired
+    private Client client;
+
     @Override
     public LarchState status() throws IOException {
         final LarchState state = new LarchState();
@@ -49,6 +57,21 @@ public class DefaultRepositoryService implements RepositoryService {
         desc.setLarchVersion(env.getProperty("larch.version"));
         desc.setLarchHost("localhost:" + env.getProperty("server.port"));
         desc.setLarchClusterName(env.getProperty("larch.cluster.name"));
+        final ClusterStateResponse state = client.admin().cluster().prepareState()
+                .setBlocks(false)
+                .setMetaData(true)
+                .setRoutingTable(false)
+                .setNodes(true)
+                .execute()
+                .actionGet();
+        desc.setEsMasterNodeName(state.getState().getNodes().getMasterNodeId());
+        desc.setEsNumDataNodes(state.getState().getNodes().getDataNodes().size());
+        desc.setEsMasterNodeAddress(state.getState().getNodes().getMasterNode().address().toString());
+        desc.setEsNodeName(state.getState().getNodes().getLocalNodeId());
+        final ClusterStatsResponse stats = client.admin().cluster().prepareClusterStats()
+                .execute()
+                .actionGet();
+        desc.setEsNumIndexedRecords(stats.getIndicesStats().getDocs().getCount());
         return desc;
     }
 }

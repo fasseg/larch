@@ -20,6 +20,60 @@ public class Describe {
     private String larchVersion;
     private String larchHost;
     private String larchClusterName;
+    private String esNodeName;
+    private String esVersion;
+    private String esMasterNodeName;
+    private String esMasterNodeAddress;
+    private int esNumDataNodes;
+    private long esNumIndexedRecords;
+
+    public long getEsNumIndexedRecords() {
+        return esNumIndexedRecords;
+    }
+
+    public void setEsNumIndexedRecords(long esNumIndexedRecords) {
+        this.esNumIndexedRecords = esNumIndexedRecords;
+    }
+
+    public String getEsMasterNodeAddress() {
+        return esMasterNodeAddress;
+    }
+
+    public void setEsMasterNodeAddress(String esMasterNodeAddress) {
+        this.esMasterNodeAddress = esMasterNodeAddress;
+    }
+
+    public int getEsNumDataNodes() {
+        return esNumDataNodes;
+    }
+
+    public void setEsNumDataNodes(int esNumDataNodes) {
+        this.esNumDataNodes = esNumDataNodes;
+    }
+
+    public String getEsNodeName() {
+        return esNodeName;
+    }
+
+    public void setEsNodeName(String esNodeName) {
+        this.esNodeName = esNodeName;
+    }
+
+    public String getEsVersion() {
+        return esVersion;
+    }
+
+    public void setEsVersion(String esVersion) {
+        this.esVersion = esVersion;
+    }
+
+    public String getEsMasterNodeName() {
+        return esMasterNodeName;
+    }
+
+    public void setEsMasterNodeName(String esMasterNodeName) {
+        this.esMasterNodeName = esMasterNodeName;
+    }
 
     public String getLarchClusterName() {
         return larchClusterName;
