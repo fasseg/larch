@@ -32,7 +32,7 @@ This will start a WeedFs master and volume server
 ## Accessing the repository
 
 Various endpoints are exposed via a REST API (see package `net.objecthunter.larch.controller` in `larch-server` for now).
-A Dashboard view is exposed at the webserver root `http://localhost:8080/` and port is `8080`
+A Dashboard view is exposed at the webserver root `http://localhost:8080/`
 
 ## Settings
 Settings can be found in
