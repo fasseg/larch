@@ -89,3 +89,9 @@ header{
     margin-top: 0px;
     padding-top: 1em;
 }
+
+.left_menu li a:link, a:visited, a:active, a:hover{
+    color: white;
+    text-decoration: none;
+    display:block;
+}
