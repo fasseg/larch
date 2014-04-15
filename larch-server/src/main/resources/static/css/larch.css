@@ -207,6 +207,14 @@ select,
 .button:hover {
     text-shadow: 1px 1px #000000;
 }
+.right {
+    float:right;
+    width: 320px;
+}
+.right .panel {
+    width: 250px;
+}
+
 .panel_title {
     color: #bcbcbc;
     font-weight: bold;

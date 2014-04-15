@@ -40,8 +40,6 @@
             <p class="panel_title" th:text="${md.key}"></p>
             <p class="property">Type</p>
             <p class="value" th:text="${md.value.type}"></p>
-            <p class="property">Schema</p>
-            <p class="value" th:text="${md.value.schemaUrl}"></p>
             <p class="property">Mime type</p>
             <p class="value" th:text="${md.value.mimetype}"></p>
             <p class="property">Original file name</p>
@@ -68,55 +66,57 @@
             <p class="panel_title">Children</p>
             <p th:each="child: ${entity.children}" class="value"><a  th:href="@{'/entity/'} + ${child}" th:text="${child}"></a></p>
         </div>
-        <div class="panel">
-            <script>
-            $(document).ready(function() {
-            $('#ceId').watermark('Generated Id', {className: 'inactive'});
-            $('#ceLabel').watermark('Unnamed Entity', {className: 'inactive'});
-            $('#ceType').watermark('Type', {className: 'inactive'});
-            $('#ceTags').watermark('Tags', {className: 'inactive'});
-            $('#ceButton').click(function() {
-                createEntity($('#ceId').val(), $('#ceType').val(),$('#ceLabel').val(),$('#ceTags').val(),$('#ceParentId').val());
-                })
-            });
-            </script>
-            <p class="panel_title">Create new child</p>
-            <input id="ceId" type="text" name="id" title="Set the identifier of the entity or leave empty for a generated value"/>
-            <input id="ceLabel" type="text" name="label" title="Set the label of the entity"/>
-            <input id="ceParentId" type="hidden" name="parentId" th:value="${entity.id}"/>
-            <input id="ceType" type="text" name="type" title="Set the user defined type of the entity"/>
-            <input id="ceTags" type="text" name="tags" title="Set a comma separated list of tags for this entity"/>
-            <input class="button" id="ceButton" type="button" value="CREATE ENTITY"/>
-        </div>
-        <div class="panel">
-            <script>
-            $(document).ready(function() {
-                $('#binName').watermark('Name', {className: 'inactive'});
-             });
-            </script>
-            <p class="panel_title">Create new binary</p>
-            <form th:action="@{'~/entity/' + ${entity.id} + '/binary'}" method="post" enctype="multipart/form-data">
-                <input id="binName" type="text" name="name" title="Set the name of the binary"/>
-                <input id="binFile" type="file" name="binary" title="Select a file for upload"/>
-                <input class="button" type="submit" value="Create new binary"/>
-            </form>
-        </div>
-        <div class="panel">
-            <script>
-            $(document).ready(function() {
-                $('#mdName').watermark('Name', {className: 'inactive'});
-             });
-            </script>
-            <p class="panel_title">Create new metadata</p>
-            <form enctype="multipart/form-data" method="post"
-                  th:action="@{'~/entity/' + ${entity.id} + '/metadata'}">
-                <input id="mdName" type="text" name="name" title="Set the name of the metadata"/>
-                <input id="mdFile" type="file" name="metadata" title="Select a metadata file for upload"/>
-                <select id="mdType" name="type" title="Select a valid metadata type">
-                    <option label="Dublin Core" selected="selected">DC</option>
-                </select>
-                <input class="button" type="submit" value="Create Metadata"/>
-            </form>
+        <div class="right">
+            <div class="panel">
+                <script>
+                $(document).ready(function() {
+                $('#ceId').watermark('Generated Id', {className: 'inactive'});
+                $('#ceLabel').watermark('Unnamed Entity', {className: 'inactive'});
+                $('#ceType').watermark('Type', {className: 'inactive'});
+                $('#ceTags').watermark('Tags', {className: 'inactive'});
+                $('#ceButton').click(function() {
+                    createEntity($('#ceId').val(), $('#ceType').val(),$('#ceLabel').val(),$('#ceTags').val(),$('#ceParentId').val());
+                    })
+                });
+                </script>
+                <p class="panel_title">Create new child</p>
+                <input id="ceId" type="text" name="id" title="Set the identifier of the entity or leave empty for a generated value"/>
+                <input id="ceLabel" type="text" name="label" title="Set the label of the entity"/>
+                <input id="ceParentId" type="hidden" name="parentId" th:value="${entity.id}"/>
+                <input id="ceType" type="text" name="type" title="Set the user defined type of the entity"/>
+                <input id="ceTags" type="text" name="tags" title="Set a comma separated list of tags for this entity"/>
+                <input class="button" id="ceButton" type="button" value="CREATE ENTITY"/>
+            </div>
+            <div class="panel">
+                <script>
+                $(document).ready(function() {
+                    $('#binName').watermark('Name', {className: 'inactive'});
+                 });
+                </script>
+                <p class="panel_title">Create new binary</p>
+                <form th:action="@{'~/entity/' + ${entity.id} + '/binary'}" method="post" enctype="multipart/form-data">
+                    <input id="binName" type="text" name="name" title="Set the name of the binary"/>
+                    <input id="binFile" type="file" name="binary" title="Select a file for upload"/>
+                    <input class="button" type="submit" value="Create new binary"/>
+                </form>
+            </div>
+            <div class="panel">
+                <script>
+                $(document).ready(function() {
+                    $('#mdName').watermark('Name', {className: 'inactive'});
+                 });
+                </script>
+                <p class="panel_title">Create new metadata</p>
+                <form enctype="multipart/form-data" method="post"
+                      th:action="@{'~/entity/' + ${entity.id} + '/metadata'}">
+                    <input id="mdName" type="text" name="name" title="Set the name of the metadata"/>
+                    <input id="mdFile" type="file" name="metadata" title="Select a metadata file for upload"/>
+                    <select id="mdType" name="type" title="Select a valid metadata type">
+                        <option label="Dublin Core" selected="selected">DC</option>
+                    </select>
+                    <input class="button" type="submit" value="Create Metadata"/>
+                </form>
+            </div>
         </div>
     </div>
 </div>
