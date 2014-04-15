@@ -112,6 +112,16 @@ header{
     margin-left: 10px;
     display: inline-block;
 }
+.title input{
+    margin-top: 36px;
+    width: 180px;
+    margin-right: 20px;
+    padding: 4px;
+    float:right;
+}
+.title form {
+    display: inline;
+}
 
 li a{
     color: #aaaaaa;
@@ -235,4 +245,7 @@ select,
     color: #ababab;
     font-family: monospace;
     font-size:10pt;
+}
+.resultstats {
+    padding-left: 40px;
 }

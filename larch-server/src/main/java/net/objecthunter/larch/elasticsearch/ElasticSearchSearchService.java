@@ -18,6 +18,7 @@ package net.objecthunter.larch.elasticsearch;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.SearchResult;
 import net.objecthunter.larch.service.SearchService;
+import net.objecthunter.larch.service.impl.DefaultEntityService;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.admin.indices.refresh.RefreshResponse;
@@ -94,10 +95,10 @@ public class ElasticSearchSearchService implements SearchService {
     public SearchResult searchEntities(String terms) {
         int numRecords = 20;
         final long time = System.currentTimeMillis();
-        final ActionFuture<RefreshResponse> refresh = this.client.admin().indices().refresh(new RefreshRequest(("groven")));
+        final ActionFuture<RefreshResponse> refresh = this.client.admin().indices().refresh(new RefreshRequest(ElasticSearchIndexService.INDEX_ENTITIES));
         refresh.actionGet();
 
-        final SearchResponse resp = this.client.prepareSearch("groven")
+        final SearchResponse resp = this.client.prepareSearch(ElasticSearchIndexService.INDEX_ENTITIES)
                 .addFields("id", "label", "type", "tags")
                 .setQuery(QueryBuilders.wildcardQuery("_all", terms))
                 .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
@@ -112,8 +113,8 @@ public class ElasticSearchSearchService implements SearchService {
             String type = hit.field("type") != null ? hit.field("type").value() : "";
             final Entity e = new Entity();
             e.setId(hit.field("id").getValue());
-            e.setUtcLastModified(label);
             e.setType(type);
+            e.setLabel(label);
 
             final List<String> tags = new ArrayList<>();
             for (Object o : hit.field("tags").values()) {

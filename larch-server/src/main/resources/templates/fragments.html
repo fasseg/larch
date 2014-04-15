@@ -16,6 +16,12 @@
 <div th:fragment="banner">
     <span class="three_bars"></span>
     <h1>Larch repository</h1>
+    <script>
+    $(document).ready(function() {
+        $('#search').watermark('Search', {className: 'inactive'});
+    });
+    </script>
+    <form method="post" action="/search" enctype="multipart/form-data"><input type="text" id="search" name="term"/></form>
 </div>
 
 <div th:fragment="left">
