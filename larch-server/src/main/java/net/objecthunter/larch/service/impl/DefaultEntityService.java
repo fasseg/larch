@@ -205,6 +205,12 @@ public class DefaultEntityService implements EntityService {
     @Override
     public Entity retrieve(String id, int i) throws IOException {
         final Entity e = this.indexService.retrieve(id);
+        if (i == e.getVersion()){
+            return e; // the current version
+        }
+        if (e.getVersionPaths() == null || !e.getVersionPaths().containsKey(i)) {
+            throw new IOException("Unknown version " + i + " for Entity " + id);
+        }
         return mapper.readValue(this.blobstoreService.retrieveOldVersionBlob(e.getVersionPaths().get(i)), Entity.class);
     }
 
@@ -235,11 +241,11 @@ public class DefaultEntityService implements EntityService {
             e.setBinaries(new HashMap<>(1));
         }
         e.getBinaries().put(name, b);
-        e.setVersion(e.getVersion() + 1);
         if (e.getVersionPaths() == null) {
             e.setVersionPaths(new HashMap<>());
         }
         e.getVersionPaths().put(e.getVersion(), oldVersionPath);
+        e.setVersion(e.getVersion() + 1);
         this.indexService.update(e);
         if (autoExport) {
             exportService.export(e);
