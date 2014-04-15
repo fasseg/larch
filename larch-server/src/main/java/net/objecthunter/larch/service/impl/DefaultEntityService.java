@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 import net.objecthunter.larch.elasticsearch.ElasticSearchIndexService;
 import net.objecthunter.larch.model.Binary;
 import net.objecthunter.larch.model.Entity;
+import net.objecthunter.larch.model.Metadata;
 import net.objecthunter.larch.model.source.UrlSource;
 import net.objecthunter.larch.service.BlobstoreService;
 import net.objecthunter.larch.service.EntityService;
@@ -73,11 +74,18 @@ public class DefaultEntityService implements EntityService {
 
     @Override
     public String create(Entity e) throws IOException {
+        final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
         if (e.getId() == null || e.getId().isEmpty()) {
             e.setId(generateId());
         } else {
             if (this.indexService.exists(e.getId())) {
                 throw new IOException("Entity with id " + e.getId() + " could not be created because it already exists in the index");
+            }
+        }
+        if(e.getMetadata() != null) {
+            for (final Metadata md: e.getMetadata().values()) {
+                md.setUtcCreated(now);
+                md.setUtcLastModified(now);
             }
         }
         if (e.getLabel() == null || e.getLabel().isEmpty()) {
@@ -90,7 +98,6 @@ public class DefaultEntityService implements EntityService {
         }
         e.setState(ElasticSearchIndexService.STATE_INGESTED);
         e.setVersion(1);
-        final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
         e.setUtcCreated(now);
         e.setUtcLastModified(now);
         final String id = this.indexService.create(e);
@@ -137,15 +144,24 @@ public class DefaultEntityService implements EntityService {
     public void update(Entity e) throws IOException {
         final Entity oldVersion = this.indexService.retrieve(e.getId());
         final String oldVersionPath = this.blobstoreService.createOldVersionBlob(oldVersion);
+        final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
         e.setVersion(oldVersion.getVersion() + 1);
         if (oldVersion.getVersionPaths() == null) {
             e.setVersionPaths(new HashMap<>());
         }else {
             e.setVersionPaths(oldVersion.getVersionPaths());
         }
+        if (e.getMetadata() != null) {
+            for (final Metadata md: e.getMetadata().values()) {
+                if (md.getUtcCreated() == null) {
+                    md.setUtcCreated(now);
+                }
+                md.setUtcLastModified(now);
+            }
+        }
         e.getVersionPaths().put(oldVersion.getVersion(), oldVersionPath);
         e.setUtcCreated(oldVersion.getUtcCreated());
-        e.setUtcLastModified(ZonedDateTime.now(ZoneOffset.UTC).toString());
+        e.setUtcLastModified(now);
         if (e.getLabel() == null || e.getLabel().isEmpty()) {
             e.setLabel("Unnamed entity");
         }

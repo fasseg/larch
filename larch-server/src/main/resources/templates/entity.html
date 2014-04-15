@@ -3,143 +3,127 @@
 <head th:include="fragments :: header">
 </head>
 <body>
-<script>
-$(document).ready(function() {
-    $('#ceId').watermark('Generated Id', {className: 'inactive'});
-    $('#ceLabel').watermark('Unnamed Entity', {className: 'inactive'});
-    $('#ceType').watermark('Type', {className: 'inactive'});
-    $('#ceTags').watermark('Tags', {className: 'inactive'});
-    $('#binName').watermark('Name', {className: 'inactive'});
-    $('#ceButton').click(function() {
-        createEntity($('#ceId').val(), $('#ceType').val(),$('#ceLabel').val(),$('#ceTags').val(), $('#ceParentId').val());
-    })
-});
-var patch = {};
-</script>
-<div class="container">
-    <table>
-        <tr>
-            <td>Id</td>
-            <td id="entityId" th:text="${entity.id}"></td>
-        </tr>
-        <tr>
-            <td>Label</td>
-            <td th:text="${entity.label}" th:onclick="'javascript:edit(this,\'label\');'"></td>
-        </tr>
-        <tr>
-            <td>Type</td>
-            <td th:text="${entity.type}"  th:onclick="'javascript:edit(this,\'type\');'"></td>
-        </tr>
-        <tr>
-            <td>Parent</td>
-            <td th:text="${entity.parentId}"  th:onclick="'javascript:edit(this,\'parentId\');'"></td>
-        </tr>
-        <tr>
-            <td>State</td>
-            <td th:text="${entity.state}" th:onclick="'javascript:edit(this,\'state\');'"></td>
-        </tr>
-        <tr>
-            <td>Version</td>
-            <td th:text="${entity.version}"></td>
-        </tr>
-        <tr>
-            <td>Created</td>
-            <td th:text="${entity.utcCreated}"></td>
-        </tr>
-        <tr>
-            <td>Last Modified</td>
-            <td th:text="${entity.utcLastModified}"></td>
-        </tr>
-    </table>
-    <table>
-        <thead>
-        <tr>
-            <td>Tags</td>
-        </tr>
-        </thead>
-        <tr th:each="tag : ${entity.tags}">
-            <td></td>
-            <td th:text="${tag}"></td>
-        </tr>
-    </table>
-    <table>
-        <tr th:each="md : ${entity.metadata}">
-            <td th:text="${md.key}"></td>
-        </tr>
-    </table>
-    <table>
-        <tr>
-            <td>Binaries</td>
-        </tr>
-        <tr th:each="bin : ${entity.binaries}">
-            <td></td>
-            <td th:text="${bin.key}"></td>
-        </tr>
-    </table>
-    <table>
-        <thead>
-        <tr>
-            <td>Children</td>
-        </tr>
-        </thead>
-        <tr th:each="child : ${entity.children}">
-            <td></td>
-            <td th:text="${child}"></td>
-        </tr>
-    </table>
-    <table>
-        <thead>
-        <tr>
-            <td>Versions</td>
-        </tr>
-        </thead>
-        <tr th:each="path : ${entity.versionPaths}">
-            <td></td>
-            <td>
-                <a th:href="@{'~/entity/'} + ${entity.id} + '/version/' + ${path.key}" th:text="'Version ' + ${path.key}"></a>
-            </td>
-        </tr>
-    </table>
-    <input class="hidden" type="button" id="updateButton" value="Update entity"/>
-    <input class="hidden" type="button" id="cancelUpdateButton" value="Cancel update"/>
+<header>
+    <div class="three_dots"></div>
+</header>
+
+<div class="content">
+    <div th:include="fragments :: left" class="left">
+    </div>
+    <div class="main">
+        <div th:include="fragments :: banner" class="title">
+        </div>
+        <div class="panel">
+            <p class="panel_title" th:text="${entity.id}"></p>
+            <p class="property">Label</p>
+            <p class="value" th:text="${entity.label}"></p>
+            <p class="property">Type</p>
+            <p class="value" th:text="${entity.type} ? ${entity.type} : 'No Type'"></p>
+            <p class="property">Parent</p>
+            <p class="value" th:text="${entity.parentId} ? ${entity.parentId} : 'None'"></p>
+            <p class="property">Tags</p>
+            <p class="value" th:text="${entity.tags}"></p>
+            <p class="property">State</p>
+            <p class="value" th:text="${entity.state}"></p>
+            <p class="property">Version</p>
+            <p class="value" th:text="${entity.version}"></p>
+            <p class="property">Created</p>
+            <p class="value" th:text="${entity.utcCreated}"></p>
+            <p class="property">Last modified</p>
+            <p class="value" th:text="${entity.utcLastModified}"></p>
+            <p class="property">Created</p>
+            <p class="value" th:text="${entity.utcCreated}"></p>
+            <p class="property">Last modified</p>
+            <p class="value" th:text="${entity.utcLastModified}"></p>
+        </div>
+        <div th:each="md : ${entity.metadata}" class="panel">
+            <p class="panel_title" th:text="${md.key}"></p>
+            <p class="property">Type</p>
+            <p class="value" th:text="${md.value.type}"></p>
+            <p class="property">Schema</p>
+            <p class="value" th:text="${md.value.schemaUrl}"></p>
+            <p class="property">Mime type</p>
+            <p class="value" th:text="${md.value.mimetype}"></p>
+            <p class="property">Original file name</p>
+            <p class="value" th:text="${md.value.originalFilename}"></p>
+            <p class="property">Created</p>
+            <p class="value" th:text="${md.value.utcCreated}"></p>
+            <p class="property">Last modified</p>
+            <p class="value" th:text="${md.value.utcLastModified}"></p>
+        </div>
+        <div th:each="bin : ${entity.binaries}" class="panel">
+            <p class="panel_title" th:text="${bin.key}"></p>
+            <p class="property">Mime type</p>
+            <p class="value" th:text="${bin.value.mimetype}"></p>
+            <p class="property">Checksum</p>
+            <p class="value" th:text="${bin.value.checksum}"></p>
+            <p class="property">Checksum type</p>
+            <p class="value" th:text="${bin.value.checksumType}"></p>
+            <p class="property">Created</p>
+            <p class="value" th:text="${bin.value.utcCreated}"></p>
+            <p class="property">Last modified</p>
+            <p class="value" th:text="${bin.value.utcLastModified}"></p>
+        </div>
+        <div th:if="${#lists.size(entity.children) gt 0}" class="panel">
+            <p class="panel_title">Children</p>
+            <p th:each="child: ${entity.children}" class="value"><a  th:href="@{'/entity/'} + ${child}" th:text="${child}"></a></p>
+        </div>
+        <div class="panel">
+            <script>
+            $(document).ready(function() {
+            $('#ceId').watermark('Generated Id', {className: 'inactive'});
+            $('#ceLabel').watermark('Unnamed Entity', {className: 'inactive'});
+            $('#ceType').watermark('Type', {className: 'inactive'});
+            $('#ceTags').watermark('Tags', {className: 'inactive'});
+            $('#ceButton').click(function() {
+                createEntity($('#ceId').val(), $('#ceType').val(),$('#ceLabel').val(),$('#ceTags').val(),$('#ceParentId').val());
+                })
+            });
+            </script>
+            <p class="panel_title">Create new child</p>
+            <input id="ceId" type="text" name="id" title="Set the identifier of the entity or leave empty for a generated value"/>
+            <input id="ceLabel" type="text" name="label" title="Set the label of the entity"/>
+            <input id="ceParentId" type="hidden" name="parentId" th:value="${entity.id}"/>
+            <input id="ceType" type="text" name="type" title="Set the user defined type of the entity"/>
+            <input id="ceTags" type="text" name="tags" title="Set a comma separated list of tags for this entity"/>
+            <input class="button" id="ceButton" type="button" value="CREATE ENTITY"/>
+        </div>
+        <div class="panel">
+            <script>
+            $(document).ready(function() {
+                $('#binName').watermark('Name', {className: 'inactive'});
+             });
+            </script>
+            <p class="panel_title">Create new binary</p>
+            <form th:action="@{'~/entity/' + ${entity.id} + '/binary'}" method="post" enctype="multipart/form-data">
+                <input id="binName" type="text" name="name" title="Set the name of the binary"/>
+                <input id="binFile" type="file" name="binary" title="Select a file for upload"/>
+                <input class="button" type="submit" value="Create new binary"/>
+            </form>
+        </div>
+        <div class="panel">
+            <script>
+            $(document).ready(function() {
+                $('#mdName').watermark('Name', {className: 'inactive'});
+             });
+            </script>
+            <p class="panel_title">Create new metadata</p>
+            <form enctype="multipart/form-data" method="post"
+                  th:action="@{'~/entity/' + ${entity.id} + '/metadata'}">
+                <input id="mdName" type="text" name="name" title="Set the name of the metadata"/>
+                <input id="mdFile" type="file" name="metadata" title="Select a metadata file for upload"/>
+                <select id="mdType" name="type" title="Select a valid metadata type">
+                    <option label="Dublin Core" selected="selected">DC</option>
+                </select>
+                <input class="button" type="submit" value="Create Metadata"/>
+            </form>
+        </div>
+    </div>
 </div>
-<div id="right" class="container">
-    <table>
-        <thead>
-        <tr>
-            <td>Create child entity</td>
-        </tr>
-        </thead>
-        <tr>
-            <td>
-                <input id="ceId" type="text" name="id"
-                       title="Set the identifier of the entity or leave empty for a generated value"/>
-                <input id="ceParentId" type="hidden" name="parentId" th:value="${entity.id}"/>
-                <input id="ceLabel" type="text" name="label" title="Set the label of the entity"/>
-                <input id="ceType" type="text" name="type" title="Set the user defined type of the entity"/>
-                <input id="ceTags" type="text" name="tags" title="Set a comma separated list of tags for this entity"/>
-                <input id="ceButton" type="button" value="Create new Child"/>
-            </td>
-        </tr>
-    </table>
-    <table>
-        <thead>
-        <tr>
-            <td colspan="2">Add Binary</td>
-        </tr>
-        </thead>
-        <tr>
-            <td class="field">
-                <form th:action="@{'~/entity/' + ${entity.id} + '/binary'}" method="post" enctype="multipart/form-data">
-                    <input id="binName" type="text" name="name" title="Set the name of the binary"/>
-                    <input id="binFile" type="file" name="binary" title="Select a file for upload"/>
-                    <input type="submit" value="Create new binary"/>
-                </form>
-            </td>
-        </tr>
-    </table>
+
+<div th:include="fragments :: footer" class="footer">
 </div>
-<footer th:include="fragments :: footer">
-</footer>
 </body>
 </html>
+
+

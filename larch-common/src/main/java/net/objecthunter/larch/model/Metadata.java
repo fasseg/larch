@@ -17,28 +17,76 @@ package net.objecthunter.larch.model;
 
 public class Metadata {
 
-    private final String name;
+    private String name;
+    private String type;
+    private String schemaUrl;
+    private String data;
+    private String mimetype;
+    private String originalFilename;
+    private String utcCreated;
+    private String utcLastModified;
 
-    private Metadata(Builder b) {
-        this.name = b.name;
+    public String getUtcCreated() {
+        return utcCreated;
     }
 
-    private Metadata() {
-        this.name = null;
+    public void setUtcCreated(String utcCreated) {
+        this.utcCreated = utcCreated;
+    }
+
+    public String getUtcLastModified() {
+        return utcLastModified;
+    }
+
+    public void setUtcLastModified(String utcLastModified) {
+        this.utcLastModified = utcLastModified;
+    }
+
+    public String getMimetype() {
+        return mimetype;
+    }
+
+    public void setMimetype(String mimetype) {
+        this.mimetype = mimetype;
+    }
+
+    public String getOriginalFilename() {
+        return originalFilename;
+    }
+
+    public void setOriginalFilename(String originalFilename) {
+        this.originalFilename = originalFilename;
     }
 
     public String getName() {
         return name;
     }
 
-    public static class Builder {
-        private final String name;
-        public Builder(String name) {
-            this.name = name;
-        }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-        public Metadata build() {
-            return new Metadata(this);
-        }
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getSchemaUrl() {
+        return schemaUrl;
+    }
+
+    public void setSchemaUrl(String schemaUrl) {
+        this.schemaUrl = schemaUrl;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
     }
 }

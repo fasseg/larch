@@ -13,14 +13,28 @@
 </head>
 <body>
 
-<div th:fragment="title">
-    <h1>Larch.</h1>
-    <h4>the plain repository</h4>
+<div th:fragment="banner">
+    <span class="three_bars"></span>
+    <h1>Larch repository</h1>
 </div>
 
-<footer th:fragment="footer">
-    <span>Larch</span><span class="right"><a class="grey" href='https://github.com/fasseg/larch'>Fork me on Github!</a></span>
-</footer>
+<div th:fragment="left">
+        <div class="user">
+            <p>Administrator</p>
+            <p><strong>Marc Masteruser</strong></p>
+        </div>
+        <ul class="left_menu">
+            <li><p class="icon" id="icon_dashboard"></p><a th:href="@{/}" th:text="'DASHBOARD'"></a></li>
+            <li><p class="icon" id="icon_browse"></p><a th:href="@{/browse}" th:text="'BROWSE'"></a></li>
+            <li><p class="icon" id="icon_list"></p><a th:href="@{/list}" th:text="'LIST'"></a></li>
+            <li><p class="icon" id="icon_search"></p><a th:href="@{/search}" th:text="'SEARCH'"></a></li>
+            <li><p class="icon" id="icon_users"></p><a th:href="@{/users}" th:text="'USERS'"></a></li>
+        </ul>
+</div>
+
+<div th:fragment="footer">
+    <span>Larch</span><a href="https://github.com/fasseg/larch">Fork me on GitHub!</a>
+</div>
 
 </body>
 </html>

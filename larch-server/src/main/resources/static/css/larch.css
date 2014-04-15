@@ -113,7 +113,7 @@ header{
     display: inline-block;
 }
 
-.left_menu li a:link, a:visited, a:active, a:hover{
+li a{
     color: #aaaaaa;
     text-decoration: none;
     display:block;
@@ -186,6 +186,8 @@ input {
     border-color: #ababab;
     padding: 4px;
 }
+
+select,
 .button {
     display: block;
     background-color:#ababab;
@@ -201,6 +203,9 @@ input {
     font-weight:bold;
     padding:11px 30px;
     text-decoration:none;
+}
+.button:hover {
+    text-shadow: 1px 1px #000000;
 }
 .panel_title {
     color: #bcbcbc;

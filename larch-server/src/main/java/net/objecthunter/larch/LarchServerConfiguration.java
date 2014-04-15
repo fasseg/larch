@@ -15,17 +15,14 @@
 */
 package net.objecthunter.larch;
 
-import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationConfig;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import net.objecthunter.larch.elasticsearch.ElasticSearchIndexService;
 import net.objecthunter.larch.elasticsearch.ElasticSearchNode;
 import net.objecthunter.larch.elasticsearch.ElasticSearchSearchService;
 import net.objecthunter.larch.fs.FilesystemBlobstoreService;
-import net.objecthunter.larch.json.ZonedDateTimeDeserializer;
-import net.objecthunter.larch.json.ZonedDateTimeSerializer;
 import net.objecthunter.larch.service.ExportService;
+import net.objecthunter.larch.service.SchemaService;
 import net.objecthunter.larch.service.SearchService;
 import net.objecthunter.larch.service.impl.DefaultEntityService;
 import net.objecthunter.larch.service.impl.DefaultExportService;
@@ -39,12 +36,15 @@ import org.springframework.context.annotation.*;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
-import java.time.ZonedDateTime;
-
 @EnableAutoConfiguration
 @ComponentScan(basePackages = "net.objecthunter.larch.controller")
 @Configuration
 public class LarchServerConfiguration {
+
+    @Bean
+    public SchemaService schemaService() {
+        return new SchemaService();
+    }
 
     @Bean
     public DefaultEntityService defaultEntityService() {
