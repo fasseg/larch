@@ -33,7 +33,7 @@
             <p class="value" th:text="${entity.utcLastModified}"></p>
         </div>
         <div th:each="md : ${entity.metadata}" class="panel">
-            <p class="panel_title" th:text="${md.key}"></p>
+            <p class="panel_title" th:text="'Metadata: ' + ${md.key}"></p>
             <p class="property">Type</p>
             <p class="value" th:text="${md.value.type}"></p>
             <p class="property">Mime type</p>
@@ -44,9 +44,11 @@
             <p class="value" th:text="${md.value.utcCreated}"></p>
             <p class="property">Last modified</p>
             <p class="value" th:text="${md.value.utcLastModified}"></p>
+            <p class="property">Content</p>
+            <a th:href="'/entity/' + ${entity.id} + '/metadata/' + ${md.key} + '/content'" th:text="'Download'"></a>
         </div>
         <div th:each="bin : ${entity.binaries}" class="panel">
-            <p class="panel_title" th:text="${bin.key}"></p>
+            <p class="panel_title" th:text="'Binary: ' + ${bin.key}"></p>
             <p class="property">Mime type</p>
             <p class="value" th:text="${bin.value.mimetype}"></p>
             <p class="property">Checksum</p>

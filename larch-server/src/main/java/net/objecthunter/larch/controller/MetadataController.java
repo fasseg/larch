@@ -15,9 +15,13 @@
 */
 package net.objecthunter.larch.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.Metadata;
 import net.objecthunter.larch.service.EntityService;
+import net.objecthunter.larch.service.IndexService;
 import net.objecthunter.larch.service.SchemaService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +30,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -36,6 +41,12 @@ public class MetadataController {
 
     @Autowired
     private SchemaService schemaService;
+
+    @Autowired
+    private IndexService indexService;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @RequestMapping(value = "/entity/{id}/metadata", method= RequestMethod.POST, consumes = "multipart/form-data")
     @ResponseStatus(HttpStatus.OK)
@@ -57,4 +68,15 @@ public class MetadataController {
         entityService.update(e);
         return "redirect:/entity/" + entityId;
     }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/entity/{id}/metadata/{metadata-name}/content", produces = {"application/xml", "text/xml"})
+    @ResponseStatus(HttpStatus.OK)
+    public void retrieveXml(@PathVariable("id") final String id, @PathVariable("metadata-name") final String metadataName, @RequestHeader("Accept") final String accept, final HttpServletResponse resp) throws IOException {
+        resp.setContentType("text/xml");
+        resp.setHeader("Content-Disposition", "inline");
+        final String data = indexService.retrieve(id).getMetadata().get(metadataName).getData();
+        IOUtils.write(data, resp.getOutputStream());
+        resp.flushBuffer();
+    }
+
 }
