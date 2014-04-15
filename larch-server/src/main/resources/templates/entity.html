@@ -57,6 +57,8 @@
             <p class="value" th:text="${bin.value.utcCreated}"></p>
             <p class="property">Last modified</p>
             <p class="value" th:text="${bin.value.utcLastModified}"></p>
+            <p class="property">Content</p>
+            <a th:href="'/entity/' + ${entity.id} + '/binary/' + ${bin.key} + '/content'" th:text="'Download'"></a>
         </div>
         <div th:if="${entity.children != null and not #lists.isEmpty(entity.children)}" class="panel">
             <p class="panel_title">Children</p>
