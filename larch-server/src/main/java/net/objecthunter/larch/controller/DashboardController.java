@@ -33,7 +33,6 @@ public class DashboardController {
     @Autowired
     private RepositoryService repositoryService;
 
-    @Secured("ROLE_ADMIN")
     @RequestMapping(produces = "text/html")
     @ResponseBody
     public ModelAndView dashboardHtml() throws IOException {

@@ -27,6 +27,7 @@ import org.elasticsearch.action.admin.cluster.stats.ClusterStatsResponse;
 import org.elasticsearch.client.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.security.access.annotation.Secured;
 
 import java.io.IOException;
 
@@ -44,6 +45,7 @@ public class DefaultRepositoryService implements RepositoryService {
     private Client client;
 
     @Override
+    @Secured("ROLE_ADMIN")
     public LarchState status() throws IOException {
         final LarchState state = new LarchState();
         state.setBlobstoreState(blobstoreService.status());

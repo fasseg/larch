@@ -15,38 +15,28 @@
 */
 package net.objecthunter.larch.service.impl;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.model.security.Group;
 import net.objecthunter.larch.model.security.User;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.client.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 public class LarchElasticSearchAuthenticationManager implements AuthenticationManager {
-    public static final String USER_INDEX="users";
-    public static final String GROUP_INDEX="groups";
+    public static final String USER_INDEX = "users";
+    public static final String GROUP_INDEX = "groups";
 
     @Autowired
     private Client client;
@@ -55,7 +45,7 @@ public class LarchElasticSearchAuthenticationManager implements AuthenticationMa
     private ObjectMapper mapper;
 
     @PostConstruct
-    public void setup() throws IOException{
+    public void setup() throws IOException {
         checkAndOrCreateIndex(USER_INDEX);
         checkAndOrCreateIndex(GROUP_INDEX);
         checkAndOrCreateDefaultGroups();
@@ -73,7 +63,7 @@ public class LarchElasticSearchAuthenticationManager implements AuthenticationMa
                     .execute()
                     .actionGet()
                     .getSourceAsBytes()
-                    ,Group.class);
+                    , Group.class);
             final User admin = new User();
             admin.setName("admin");
             admin.setPwhash(DigestUtils.sha256Hex("admin"));
@@ -98,8 +88,8 @@ public class LarchElasticSearchAuthenticationManager implements AuthenticationMa
             };
             groups[0].setName("ROLE_ADMIN");
             groups[1].setName("ROLE_USER");
-            for (final Group g: groups) {
-                client.prepareIndex(GROUP_INDEX,"group",g.getName())
+            for (final Group g : groups) {
+                client.prepareIndex(GROUP_INDEX, "group", g.getName())
                         .setSource(mapper.writeValueAsBytes(g))
                         .execute()
                         .actionGet();
@@ -124,10 +114,10 @@ public class LarchElasticSearchAuthenticationManager implements AuthenticationMa
     public Authentication authenticate(Authentication auth) throws AuthenticationException {
         final String name = (String) auth.getPrincipal();
         final String hash = DigestUtils.sha256Hex((String) auth.getCredentials());
-        final        GetResponse get = client.prepareGet(USER_INDEX, "user", name)
+        final GetResponse get = client.prepareGet(USER_INDEX, "user", name)
                 .execute()
                 .actionGet();
-        if (get.isExists()){
+        if (get.isExists()) {
             try {
                 final User u = mapper.readValue(get.getSourceAsBytes(), User.class);
                 if (u.getPwhash().equals(hash)) {
@@ -135,7 +125,7 @@ public class LarchElasticSearchAuthenticationManager implements AuthenticationMa
                     for (int i = 0; i < roles.length; i++) {
                         roles[i] = u.getGroups().get(i).getName();
                     }
-                    return new UsernamePasswordAuthenticationToken(u.getName(), u.getPwhash(),AuthorityUtils.createAuthorityList(roles));
+                    return new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), AuthorityUtils.createAuthorityList(roles));
                 }
             } catch (IOException e) {
                 throw new BadCredentialsException("Unable to authenticate");

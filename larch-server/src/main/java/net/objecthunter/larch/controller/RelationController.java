@@ -31,14 +31,12 @@ public class RelationController {
 
     @RequestMapping(value="/entity/{id}/relation", method= RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    @Secured("hasRole([Administrators])")
     public void createHtml(@PathVariable("id") final String id, @RequestParam("predicate") final String predicate, @RequestParam("object") final String object) throws IOException {
         entityService.createRelation(id, predicate, object);
     }
 
     @RequestMapping(value="/entity/{id}/relation", method= RequestMethod.POST, produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
-    @Secured("hasRole([Administrators])")
     public String create(@PathVariable("id") final String id, @RequestParam("predicate") final String predicate, @RequestParam("object") final String object) throws IOException {
         entityService.createRelation(id, predicate, object);
         return "redirect:/entity/" + id;

@@ -15,9 +15,7 @@
 */
 package net.objecthunter.larch;
 
-import net.objecthunter.larch.weedfs.WeedFsMaster;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.event.ContextRefreshedEvent;
 
 public class LarchServer {
 

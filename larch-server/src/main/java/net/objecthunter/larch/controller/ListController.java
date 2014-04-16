@@ -33,14 +33,12 @@ public class ListController {
 
     @RequestMapping(method = RequestMethod.GET, produces = {"text/html"})
     @ResponseBody
-    @Secured("hasRole([Administrators])")
     public ModelAndView listHtml() {
         return new ModelAndView("list", "result", this.list());
     }
 
     @RequestMapping(method = RequestMethod.GET, produces = {"application/json", "application/xml", "text/xml"})
     @ResponseBody
-    @Secured("hasRole([Administrators])")
     public SearchResult list() {
         return searchService.scanIndex(0);
     }

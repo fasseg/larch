@@ -18,7 +18,6 @@ package net.objecthunter.larch.controller;
 import net.objecthunter.larch.model.SearchResult;
 import net.objecthunter.larch.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,45 +32,39 @@ public class BrowseController {
     @Autowired
     private SearchService searchService;
 
-    @Secured("hasRole([Administrators])")
     @RequestMapping(value = "/browse", method = RequestMethod.GET)
     @ResponseBody
     public SearchResult browse() throws IOException {
         return this.searchService.scanIndex(0);
     }
 
-    @Secured("hasRole([Administrators])")
     @RequestMapping(value = "/browse/{offset}", method = RequestMethod.GET)
     @ResponseBody
     public SearchResult browse(@PathVariable("offset") final int offset) throws IOException {
         return this.searchService.scanIndex(offset);
     }
 
-    @Secured("hasRole([Administrators])")
     @RequestMapping(value = "/browse/{offset}/{numrecords}", method = RequestMethod.GET)
     @ResponseBody
     public SearchResult browse(@PathVariable("offset") final int offset, @PathVariable("numrecords") final int numRecords) throws IOException {
         return this.searchService.scanIndex(offset, numRecords);
     }
 
-    @Secured("hasRole([Administrators])")
     @RequestMapping(value = "/browse", method = RequestMethod.GET, produces = "text/html")
     @ResponseBody
     public ModelAndView browseHtml() throws IOException {
-        return new ModelAndView("browse","result",this.searchService.scanIndex(0));
+        return new ModelAndView("browse", "result", this.searchService.scanIndex(0));
     }
 
-    @Secured("hasRole([Administrators])")
     @RequestMapping(value = "/browse/{offset}", method = RequestMethod.GET, produces = "text/html")
     @ResponseBody
     public ModelAndView browseHtml(@PathVariable("offset") final int offset) throws IOException {
-        return new ModelAndView("browse","result",this.searchService.scanIndex(offset));
+        return new ModelAndView("browse", "result", this.searchService.scanIndex(offset));
     }
 
-    @Secured("hasRole([Administrators])")
     @RequestMapping(value = "/browse/{offset}/{numrecords}", method = RequestMethod.GET, produces = "text/html")
     @ResponseBody
     public ModelAndView browseHtml(@PathVariable("offset") final int offset, @PathVariable("numrecords") final int numRecords) throws IOException {
-        return new ModelAndView("browse","result",this.searchService.scanIndex(offset, numRecords));
+        return new ModelAndView("browse", "result", this.searchService.scanIndex(offset, numRecords));
     }
 }

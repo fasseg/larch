@@ -32,13 +32,11 @@ public class SearchController {
     private SearchService searchService;
 
     @RequestMapping(method = RequestMethod.POST, produces = {"application/json"})
-    @Secured("hasRole([Administrators])")
     public SearchResult searchMatchFields(@RequestParam("term") final String query) {
         return searchService.searchEntities(query);
     }
 
     @RequestMapping(method = RequestMethod.POST, produces = {"text/html"})
-    @Secured("hasRole([Administrators])")
     public ModelAndView searchMatchFieldsHtml(@RequestParam("term") final String query) {
         return new ModelAndView("search","result",searchMatchFields(query));
     }

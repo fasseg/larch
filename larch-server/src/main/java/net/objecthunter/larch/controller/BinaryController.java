@@ -42,7 +42,6 @@ public class BinaryController {
     @Autowired
     private BlobstoreService blobstoreService;
 
-    @Secured("hasRole([Administrators])")
     @RequestMapping(value = "/entity/{id}/binary", method = RequestMethod.POST, consumes = {"multipart/form-data", "application/x-www-form-urlencoded"})
     @ResponseStatus(HttpStatus.OK)
     public String create(@PathVariable("id") final String entityId, @RequestParam("name") final String name, @RequestParam("binary") final MultipartFile file) throws IOException {
@@ -50,7 +49,6 @@ public class BinaryController {
         return "redirect:/entity/" + entityId;
     }
 
-    @Secured("hasRole([Administrators])")
     @RequestMapping(value = "/entity/{id}/binary/{binary-name}/content", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody

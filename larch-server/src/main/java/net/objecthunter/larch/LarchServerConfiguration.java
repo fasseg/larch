@@ -17,13 +17,13 @@ package net.objecthunter.larch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationConfig;
-import net.objecthunter.larch.elasticsearch.ElasticSearchIndexService;
-import net.objecthunter.larch.elasticsearch.ElasticSearchNode;
-import net.objecthunter.larch.elasticsearch.ElasticSearchSearchService;
 import net.objecthunter.larch.fs.FilesystemBlobstoreService;
 import net.objecthunter.larch.service.ExportService;
 import net.objecthunter.larch.service.SchemaService;
 import net.objecthunter.larch.service.SearchService;
+import net.objecthunter.larch.service.elasticsearch.ElasticSearchIndexService;
+import net.objecthunter.larch.service.elasticsearch.ElasticSearchNode;
+import net.objecthunter.larch.service.elasticsearch.ElasticSearchSearchService;
 import net.objecthunter.larch.service.impl.DefaultEntityService;
 import net.objecthunter.larch.service.impl.DefaultExportService;
 import net.objecthunter.larch.service.impl.DefaultRepositoryService;
@@ -34,21 +34,14 @@ import net.objecthunter.larch.weedfs.WeedFsVolume;
 import org.elasticsearch.client.Client;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.*;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 @EnableAutoConfiguration
 @ComponentScan(basePackages = "net.objecthunter.larch.controller")
 @Configuration
-@EnableGlobalMethodSecurity
 public class LarchServerConfiguration {
-
-    @Bean
-    public AuthenticationManager authenticationManager() {
-        return new LarchElasticSearchAuthenticationManager();
-    }
 
     @Bean
     public SchemaService schemaService() {
@@ -131,6 +124,18 @@ public class LarchServerConfiguration {
     @Bean
     public CommonsMultipartResolver multipartResolver() {
         return new CommonsMultipartResolver();
+    }
+
+    @Bean
+    @Order(Ordered.LOWEST_PRECEDENCE - 8)
+    public LarchServerSecurityConfiguration larchServerSecurityConfiguration() {
+        return new LarchServerSecurityConfiguration();
+    }
+
+    @Bean
+    @Order(Ordered.LOWEST_PRECEDENCE - 9)
+    public LarchElasticSearchAuthenticationManager larchElasticSearchAuthenticationManager() {
+        return new LarchElasticSearchAuthenticationManager();
     }
 
 

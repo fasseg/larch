@@ -15,7 +15,7 @@
 */
 package net.objecthunter.larch.integration;
 
-import net.objecthunter.larch.elasticsearch.ElasticSearchNode;
+import net.objecthunter.larch.service.elasticsearch.ElasticSearchNode;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

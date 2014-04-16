@@ -18,7 +18,7 @@ package net.objecthunter.larch.service.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
-import net.objecthunter.larch.elasticsearch.ElasticSearchIndexService;
+import net.objecthunter.larch.service.elasticsearch.ElasticSearchIndexService;
 import net.objecthunter.larch.model.Binary;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.LarchConstants;

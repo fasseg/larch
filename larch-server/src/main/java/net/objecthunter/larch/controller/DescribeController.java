@@ -35,7 +35,6 @@ import java.io.IOException;
 @Controller
 @RequestMapping("/describe")
 @Component
-@Secured("hasRole([Administrators])")
 public class DescribeController {
 
     @Autowired
