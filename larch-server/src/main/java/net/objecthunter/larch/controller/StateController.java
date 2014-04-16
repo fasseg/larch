@@ -19,6 +19,7 @@ import net.objecthunter.larch.model.state.LarchState;
 import net.objecthunter.larch.service.RepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -37,6 +38,7 @@ public class StateController {
     @RequestMapping(method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
+    @Secured("hasRole([admin])")
     public LarchState state() throws IOException {
         return repositoryService.status();
     }
@@ -44,6 +46,7 @@ public class StateController {
     @RequestMapping(method = RequestMethod.GET, produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
+    @Secured("hasRole([admin])")
     public ModelAndView stateHtml() throws IOException {
         return new ModelAndView("state", "state", repositoryService.status());
     }

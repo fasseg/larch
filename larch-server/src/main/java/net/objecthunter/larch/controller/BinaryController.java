@@ -23,6 +23,7 @@ import net.objecthunter.larch.service.IndexService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,12 +42,15 @@ public class BinaryController {
     @Autowired
     private BlobstoreService blobstoreService;
 
+    @Secured("hasRole([Administrators])")
     @RequestMapping(value = "/entity/{id}/binary", method = RequestMethod.POST, consumes = {"multipart/form-data", "application/x-www-form-urlencoded"})
     @ResponseStatus(HttpStatus.OK)
     public String create(@PathVariable("id") final String entityId, @RequestParam("name") final String name, @RequestParam("binary") final MultipartFile file) throws IOException {
         entityService.createBinary(entityId, name, file.getContentType(), file.getInputStream());
         return "redirect:/entity/" + entityId;
     }
+
+    @Secured("hasRole([Administrators])")
     @RequestMapping(value = "/entity/{id}/binary/{binary-name}/content", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody

@@ -18,6 +18,7 @@ package net.objecthunter.larch.controller;
 import net.objecthunter.larch.model.SearchResult;
 import net.objecthunter.larch.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -31,11 +32,13 @@ public class SearchController {
     private SearchService searchService;
 
     @RequestMapping(method = RequestMethod.POST, produces = {"application/json"})
+    @Secured("hasRole([Administrators])")
     public SearchResult searchMatchFields(@RequestParam("term") final String query) {
         return searchService.searchEntities(query);
     }
 
     @RequestMapping(method = RequestMethod.POST, produces = {"text/html"})
+    @Secured("hasRole([Administrators])")
     public ModelAndView searchMatchFieldsHtml(@RequestParam("term") final String query) {
         return new ModelAndView("search","result",searchMatchFields(query));
     }

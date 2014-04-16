@@ -27,6 +27,7 @@ import net.objecthunter.larch.service.SearchService;
 import net.objecthunter.larch.service.impl.DefaultEntityService;
 import net.objecthunter.larch.service.impl.DefaultExportService;
 import net.objecthunter.larch.service.impl.DefaultRepositoryService;
+import net.objecthunter.larch.service.impl.LarchElasticSearchAuthenticationManager;
 import net.objecthunter.larch.weedfs.WeedFSBlobstoreService;
 import net.objecthunter.larch.weedfs.WeedFsMaster;
 import net.objecthunter.larch.weedfs.WeedFsVolume;
@@ -34,12 +35,20 @@ import org.elasticsearch.client.Client;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.*;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 @EnableAutoConfiguration
 @ComponentScan(basePackages = "net.objecthunter.larch.controller")
 @Configuration
+@EnableGlobalMethodSecurity
 public class LarchServerConfiguration {
+
+    @Bean
+    public AuthenticationManager authenticationManager() {
+        return new LarchElasticSearchAuthenticationManager();
+    }
 
     @Bean
     public SchemaService schemaService() {

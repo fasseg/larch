@@ -22,6 +22,7 @@ import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.service.impl.DefaultEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -43,6 +44,7 @@ public class EntityController {
 
     @RequestMapping(value ="/{id}", method = RequestMethod.PATCH)
     @ResponseStatus(HttpStatus.OK)
+    @Secured("hasRole([Administrators])")
     public void patch(@PathVariable("id") final String id, final InputStream src) throws IOException {
         final JsonNode node = mapper.readTree(src);
         this.entityService.patch(id, node);
@@ -50,6 +52,7 @@ public class EntityController {
     @RequestMapping("/{id}")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
+    @Secured("hasRole([Administrators])")
     public Entity retrieve(@PathVariable("id") final String id) throws IOException {
         return entityService.retrieve(id);
     }
@@ -57,6 +60,7 @@ public class EntityController {
     @RequestMapping(value = "/{id}", produces = "text/html")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
+    @Secured("hasRole([Administrators])")
     public ModelAndView retrieveHtml(@PathVariable("id") final String id) throws IOException {
         return new ModelAndView("entity", "entity", entityService.retrieve(id));
     }
@@ -64,6 +68,7 @@ public class EntityController {
     @RequestMapping("/{id}/version/{version}")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
+    @Secured("hasRole([Administrators])")
     public Entity retrieve(@PathVariable("id") final String id, @PathVariable("version") final int version) throws IOException {
         return entityService.retrieve(id, version);
     }
@@ -71,12 +76,14 @@ public class EntityController {
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces = "text/plain")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
+    @Secured("hasRole([Administrators])")
     public String create(final InputStream src) throws IOException {
         return this.entityService.create(mapper.readValue(src, Entity.class));
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = "application/json")
     @ResponseStatus(HttpStatus.OK)
+    @Secured("hasRole([Administrators])")
     public void update(@PathVariable("id") final String id, final InputStream src) throws IOException {
         final Entity e = mapper.readValue(src, Entity.class);
         if (e.getId() == null) {

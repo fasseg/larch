@@ -18,6 +18,7 @@ package net.objecthunter.larch.controller;
 import net.objecthunter.larch.model.SearchResult;
 import net.objecthunter.larch.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -32,12 +33,14 @@ public class ListController {
 
     @RequestMapping(method = RequestMethod.GET, produces = {"text/html"})
     @ResponseBody
+    @Secured("hasRole([Administrators])")
     public ModelAndView listHtml() {
         return new ModelAndView("list", "result", this.list());
     }
 
     @RequestMapping(method = RequestMethod.GET, produces = {"application/json", "application/xml", "text/xml"})
     @ResponseBody
+    @Secured("hasRole([Administrators])")
     public SearchResult list() {
         return searchService.scanIndex(0);
     }

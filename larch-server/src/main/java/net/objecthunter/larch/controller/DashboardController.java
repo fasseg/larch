@@ -17,6 +17,7 @@ package net.objecthunter.larch.controller;
 
 import net.objecthunter.larch.service.RepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +33,7 @@ public class DashboardController {
     @Autowired
     private RepositoryService repositoryService;
 
+    @Secured("ROLE_ADMIN")
     @RequestMapping(produces = "text/html")
     @ResponseBody
     public ModelAndView dashboardHtml() throws IOException {
