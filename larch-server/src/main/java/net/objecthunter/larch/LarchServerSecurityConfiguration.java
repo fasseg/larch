@@ -15,24 +15,20 @@
 */
 package net.objecthunter.larch;
 
-import net.objecthunter.larch.service.impl.LarchElasticSearchAuthenticationManager;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 public class LarchServerSecurityConfiguration extends WebSecurityConfigurerAdapter {
-
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers("/").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/browse").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/entity").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/list").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/describe").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/state").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/search").hasAnyRole("USER", "ADMIN")
                 .and()
                 .httpBasic();
     }

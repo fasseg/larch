@@ -15,12 +15,15 @@
 */
 package net.objecthunter.larch.controller;
 
+import net.objecthunter.larch.model.security.User;
 import net.objecthunter.larch.model.state.LarchState;
 import net.objecthunter.larch.service.RepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -38,14 +41,17 @@ public class StateController {
     @RequestMapping(method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public LarchState state() throws IOException {
+    public LarchState state(@AuthenticationPrincipal User user) throws IOException {
         return repositoryService.status();
     }
 
     @RequestMapping(method = RequestMethod.GET, produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ModelAndView stateHtml() throws IOException {
-        return new ModelAndView("state", "state", repositoryService.status());
+    public ModelAndView stateHtml(@AuthenticationPrincipal User user) throws IOException {
+        final ModelMap model = new ModelMap();
+        model.addAttribute("state", repositoryService.status());
+        model.addAttribute("user", user);
+        return new ModelAndView("state", model);
     }
 }

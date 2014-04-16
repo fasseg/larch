@@ -16,10 +16,13 @@
 package net.objecthunter.larch.controller;
 
 import net.objecthunter.larch.model.SearchResult;
+import net.objecthunter.larch.model.security.User;
 import net.objecthunter.larch.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -33,13 +36,16 @@ public class ListController {
 
     @RequestMapping(method = RequestMethod.GET, produces = {"text/html"})
     @ResponseBody
-    public ModelAndView listHtml() {
-        return new ModelAndView("list", "result", this.list());
+    public ModelAndView listHtml(@AuthenticationPrincipal User user) {
+        final ModelMap model = new ModelMap();
+        model.addAttribute("result", this.list(user));
+        model.addAttribute("user", user);
+        return new ModelAndView("list", model);
     }
 
     @RequestMapping(method = RequestMethod.GET, produces = {"application/json", "application/xml", "text/xml"})
     @ResponseBody
-    public SearchResult list() {
+    public SearchResult list(@AuthenticationPrincipal User user) {
         return searchService.scanIndex(0);
     }
 

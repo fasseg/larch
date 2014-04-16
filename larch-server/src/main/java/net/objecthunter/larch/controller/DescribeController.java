@@ -16,13 +16,16 @@
 package net.objecthunter.larch.controller;
 
 import net.objecthunter.larch.model.Describe;
+import net.objecthunter.larch.model.security.User;
 import net.objecthunter.larch.service.RepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -49,7 +52,10 @@ public class DescribeController {
 
     @RequestMapping(method = RequestMethod.GET, produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
-    public ModelAndView describeHtml() throws IOException {
-        return new ModelAndView("describe","describe", repositoryService.describe());
+    public ModelAndView describeHtml(@AuthenticationPrincipal User user) throws IOException {
+        final ModelMap model = new ModelMap();
+        model.addAttribute("describe", repositoryService.describe());
+        model.addAttribute("user", user);
+        return new ModelAndView("describe",model);
     }
 }

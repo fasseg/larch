@@ -16,9 +16,12 @@
 package net.objecthunter.larch.controller;
 
 import net.objecthunter.larch.model.SearchResult;
+import net.objecthunter.larch.model.security.User;
 import net.objecthunter.larch.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,37 +37,46 @@ public class BrowseController {
 
     @RequestMapping(value = "/browse", method = RequestMethod.GET)
     @ResponseBody
-    public SearchResult browse() throws IOException {
+    public SearchResult browse(@AuthenticationPrincipal User user) throws IOException {
         return this.searchService.scanIndex(0);
     }
 
     @RequestMapping(value = "/browse/{offset}", method = RequestMethod.GET)
     @ResponseBody
-    public SearchResult browse(@PathVariable("offset") final int offset) throws IOException {
+    public SearchResult browse(@AuthenticationPrincipal User user, @PathVariable("offset") final int offset) throws IOException {
         return this.searchService.scanIndex(offset);
     }
 
     @RequestMapping(value = "/browse/{offset}/{numrecords}", method = RequestMethod.GET)
     @ResponseBody
-    public SearchResult browse(@PathVariable("offset") final int offset, @PathVariable("numrecords") final int numRecords) throws IOException {
+    public SearchResult browse(@AuthenticationPrincipal User user, @PathVariable("offset") final int offset, @PathVariable("numrecords") final int numRecords) throws IOException {
         return this.searchService.scanIndex(offset, numRecords);
     }
 
     @RequestMapping(value = "/browse", method = RequestMethod.GET, produces = "text/html")
     @ResponseBody
-    public ModelAndView browseHtml() throws IOException {
-        return new ModelAndView("browse", "result", this.searchService.scanIndex(0));
+    public ModelAndView browseHtml(@AuthenticationPrincipal User user) throws IOException {
+        final ModelMap model = new ModelMap();
+        model.addAttribute("result", this.searchService.scanIndex(0));
+        model.addAttribute("user", user);
+        return new ModelAndView("browse", model);
     }
 
     @RequestMapping(value = "/browse/{offset}", method = RequestMethod.GET, produces = "text/html")
     @ResponseBody
-    public ModelAndView browseHtml(@PathVariable("offset") final int offset) throws IOException {
-        return new ModelAndView("browse", "result", this.searchService.scanIndex(offset));
+    public ModelAndView browseHtml(@AuthenticationPrincipal User user, @PathVariable("offset") final int offset) throws IOException {
+        final ModelMap model = new ModelMap();
+        model.addAttribute("result", this.searchService.scanIndex(offset));
+        model.addAttribute("user", user);
+        return new ModelAndView("browse", model);
     }
 
     @RequestMapping(value = "/browse/{offset}/{numrecords}", method = RequestMethod.GET, produces = "text/html")
     @ResponseBody
-    public ModelAndView browseHtml(@PathVariable("offset") final int offset, @PathVariable("numrecords") final int numRecords) throws IOException {
-        return new ModelAndView("browse", "result", this.searchService.scanIndex(offset, numRecords));
+    public ModelAndView browseHtml(@AuthenticationPrincipal User user, @PathVariable("offset") final int offset, @PathVariable("numrecords") final int numRecords) throws IOException {
+        final ModelMap model = new ModelMap();
+        model.addAttribute("result", this.searchService.scanIndex(offset, numRecords));
+        model.addAttribute("user", user);
+        return new ModelAndView("browse", model);
     }
 }
