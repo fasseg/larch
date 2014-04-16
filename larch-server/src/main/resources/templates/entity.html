@@ -62,6 +62,17 @@
             <p class="property">Content</p>
             <a th:href="'/entity/' + ${entity.id} + '/binary/' + ${bin.key} + '/content'" th:text="'Download'"></a>
         </div>
+        <div class="panel" th:if="${entity.relations != null}">
+            <p class="panel_title">Relations</p>
+            <div th:each="rel : ${entity.relations}" >
+                <p class="property" th:text="${rel.key}"></p>
+                <div th:each="obj : ${rel.value}">
+                    <p th:if="${#strings.startsWith(obj, '&lt;' + T(net.objecthunter.larch.model.LarchConstants).NAMESPACE_LARCH)}"><a th:href="${#strings.substring(obj, 1 +#strings.length(T(net.objecthunter.larch.model.LarchConstants).NAMESPACE_LARCH) ,  #strings.length(obj) - 1)}" th:text="${obj}"></a></p>
+                    <p th:if="${#strings.startsWith(obj, '&lt;') and not #strings.startsWith(obj, '&lt;' + T(net.objecthunter.larch.model.LarchConstants).NAMESPACE_LARCH)}"><a th:href="${#strings.substring(obj,1,#strings.length(obj) -1)}" th:text="${obj}"></a></p>
+                    <p th:unless="${#strings.startsWith(obj, '&lt;')}" th:text="${obj}"></p>
+                </div>
+            </div>
+        </div>
         <div th:if="${entity.children != null and not #lists.isEmpty(entity.children)}" class="panel">
             <p class="panel_title">Children</p>
             <p th:each="child: ${entity.children}" class="value"><a  th:href="@{'/entity/'} + ${child}" th:text="${child}"></a></p>
@@ -118,7 +129,22 @@
                     <select id="mdType" name="type" title="Select a valid metadata type">
                         <option label="Dublin Core" selected="selected">DC</option>
                     </select>
-                    <input class="button" type="submit" value="Create Metadata"/>
+                    <input class="button" type="submit" value="Create metadata"/>
+                </form>
+            </div>
+            <div class="panel">
+                <script>
+                $(document).ready(function() {
+                    $('#relPredicate').watermark('Predicate', {className: 'inactive'});
+                    $('#relObject').watermark('Object', {className: 'inactive'});
+                 });
+                </script>
+                <p class="panel_title">Create new relation</p>
+                <form enctype="multipart/form-data" method="post"
+                      th:action="@{'~/entity/' + ${entity.id} + '/relation'}">
+                    <input id="relPredicate" type="text" name="predicate" title="Set the predicate of the relation"/>
+                    <input id="relObject" type="text" name="object" title="Set the objet of the relation"/>
+                    <input class="button" type="submit" value="Create relation"/>
                 </form>
             </div>
         </div>

@@ -32,6 +32,15 @@ public class Entity {
     private Map<String, Metadata> metadata;
     private Map<String, Binary> binaries;
     private Map<Integer, String> versionPaths;
+    private Map<String, List<String>> relations;
+
+    public Map<String, List<String>> getRelations() {
+        return relations;
+    }
+
+    public void setRelations(Map<String, List<String>> relations) {
+        this.relations = relations;
+    }
 
     public List<String> getChildren() {
         return children;

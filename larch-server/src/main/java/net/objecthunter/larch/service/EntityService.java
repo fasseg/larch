@@ -37,4 +37,6 @@ public interface EntityService {
     void createBinary(String entityId, String name, String contentType, InputStream inputStream) throws IOException;
 
     void patch(String id, JsonNode node) throws IOException;
+
+    void createRelation(String id, String predicate, String object) throws IOException;
 }

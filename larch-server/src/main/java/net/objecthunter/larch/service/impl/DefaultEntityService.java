@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 import net.objecthunter.larch.elasticsearch.ElasticSearchIndexService;
 import net.objecthunter.larch.model.Binary;
 import net.objecthunter.larch.model.Entity;
+import net.objecthunter.larch.model.LarchConstants;
 import net.objecthunter.larch.model.Metadata;
 import net.objecthunter.larch.model.source.UrlSource;
 import net.objecthunter.larch.service.BlobstoreService;
@@ -34,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
 import javax.annotation.PostConstruct;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
@@ -43,6 +45,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -82,8 +85,8 @@ public class DefaultEntityService implements EntityService {
                 throw new IOException("Entity with id " + e.getId() + " could not be created because it already exists in the index");
             }
         }
-        if(e.getMetadata() != null) {
-            for (final Metadata md: e.getMetadata().values()) {
+        if (e.getMetadata() != null) {
+            for (final Metadata md : e.getMetadata().values()) {
                 md.setUtcCreated(now);
                 md.setUtcLastModified(now);
             }
@@ -148,11 +151,11 @@ public class DefaultEntityService implements EntityService {
         e.setVersion(oldVersion.getVersion() + 1);
         if (oldVersion.getVersionPaths() == null) {
             e.setVersionPaths(new HashMap<>());
-        }else {
+        } else {
             e.setVersionPaths(oldVersion.getVersionPaths());
         }
         if (e.getMetadata() != null) {
-            for (final Metadata md: e.getMetadata().values()) {
+            for (final Metadata md : e.getMetadata().values()) {
                 if (md.getUtcCreated() == null) {
                     md.setUtcCreated(now);
                 }
@@ -205,7 +208,7 @@ public class DefaultEntityService implements EntityService {
     @Override
     public Entity retrieve(String id, int i) throws IOException {
         final Entity e = this.indexService.retrieve(id);
-        if (i == e.getVersion()){
+        if (i == e.getVersion()) {
             return e; // the current version
         }
         if (e.getVersionPaths() == null || !e.getVersionPaths().containsKey(i)) {
@@ -237,7 +240,7 @@ public class DefaultEntityService implements EntityService {
         b.setPath(path);
         b.setUtcCreated(now);
         b.setUtcLastModified(now);
-        if (e.getBinaries()== null) {
+        if (e.getBinaries() == null) {
             e.setBinaries(new HashMap<>(1));
         }
         e.getBinaries().put(name, b);
@@ -262,7 +265,7 @@ public class DefaultEntityService implements EntityService {
             if (field.getValue().getNodeType() != JsonNodeType.STRING) {
                 throw new IOException("The patch data is invalid");
             }
-            switch(field.getKey()) {
+            switch (field.getKey()) {
                 case "label":
                     e.setLabel(field.getValue().asText());
                     break;
@@ -288,6 +291,34 @@ public class DefaultEntityService implements EntityService {
             e.setLabel("Unnamed Entity");
         }
         update(e);
+    }
+
+    @Override
+    public void createRelation(String id, String predicate, String object) throws IOException {
+        if (object.startsWith("<" + LarchConstants.NAMESPACE_LARCH)) {
+            // the object is an internal entity
+            final String objId = object.substring(1 + LarchConstants.NAMESPACE_LARCH.length(), object.length() - 1);
+            if (!this.indexService.exists(objId)) {
+                throw new FileNotFoundException("The entity " + object + " referenced in the object of the relation does not exist in the repository");
+            }
+        }
+        final Entity oldVersion = this.indexService.retrieve(id);
+        final String oldVersionPath = this.blobstoreService.createOldVersionBlob(oldVersion);
+        final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
+        final Entity newVersion = oldVersion;
+        if (newVersion.getVersionPaths() == null) {
+            newVersion.setVersionPaths(new HashMap<>(1));
+        }
+        newVersion.getVersionPaths().put(oldVersion.getVersion(), oldVersionPath);
+        newVersion.setVersion(oldVersion.getVersion() + 1);
+        if (newVersion.getRelations() == null) {
+            newVersion.setRelations(new HashMap<>());
+        }
+        if (newVersion.getRelations().get(predicate) == null) {
+            newVersion.getRelations().put(predicate, new ArrayList<>(1));
+        }
+        newVersion.getRelations().get(predicate).add(object);
+        this.indexService.update(newVersion);
     }
 
 }
