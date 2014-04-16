@@ -306,6 +306,7 @@ public class DefaultEntityService implements EntityService {
         final String oldVersionPath = this.blobstoreService.createOldVersionBlob(oldVersion);
         final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
         final Entity newVersion = oldVersion;
+        newVersion.setUtcLastModified(now);
         if (newVersion.getVersionPaths() == null) {
             newVersion.setVersionPaths(new HashMap<>(1));
         }
