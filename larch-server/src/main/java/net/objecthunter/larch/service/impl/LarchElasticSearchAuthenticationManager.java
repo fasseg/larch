@@ -66,7 +66,8 @@ public class LarchElasticSearchAuthenticationManager implements AuthenticationMa
                     , Group.class);
             final User admin = new User();
             admin.setName("admin");
-            admin.setPwhash(DigestUtils.sha256Hex("admin"));
+            admin.setFirstName("Generic");
+            admin.setLastName("Superuser");
             admin.setGroups(Arrays.asList(g));
             client.prepareIndex(USER_INDEX, "user", admin.getName())
                     .setSource(mapper.writeValueAsBytes(admin))
@@ -125,7 +126,7 @@ public class LarchElasticSearchAuthenticationManager implements AuthenticationMa
                     for (int i = 0; i < roles.length; i++) {
                         roles[i] = u.getGroups().get(i).getName();
                     }
-                    return new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), AuthorityUtils.createAuthorityList(roles));
+                    return new UsernamePasswordAuthenticationToken(u, auth.getCredentials(), AuthorityUtils.createAuthorityList(roles));
                 }
             } catch (IOException e) {
                 throw new BadCredentialsException("Unable to authenticate");

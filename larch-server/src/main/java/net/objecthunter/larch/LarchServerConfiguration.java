@@ -137,6 +137,4 @@ public class LarchServerConfiguration {
     public LarchElasticSearchAuthenticationManager larchElasticSearchAuthenticationManager() {
         return new LarchElasticSearchAuthenticationManager();
     }
-
-
 }
