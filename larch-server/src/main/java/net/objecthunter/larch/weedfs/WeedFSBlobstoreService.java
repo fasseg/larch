@@ -34,6 +34,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Implementation of a {@link net.objecthunter.larch.service.BlobstoreService} built on top of the distributed
+ * file system WeedFS
+ */
 public class WeedFSBlobstoreService implements BlobstoreService {
     private static final Logger log = LoggerFactory.getLogger(WeedFSBlobstoreService.class);
     @Autowired

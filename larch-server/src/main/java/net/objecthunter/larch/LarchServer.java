@@ -17,6 +17,9 @@ package net.objecthunter.larch;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
+/**
+ * Main class for running a Larch server instance from the command line
+ */
 public class LarchServer {
 
     public static void main(String[] args) {

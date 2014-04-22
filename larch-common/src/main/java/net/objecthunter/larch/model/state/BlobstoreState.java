@@ -15,6 +15,9 @@
 */
 package net.objecthunter.larch.model.state;
 
+/**
+ * A DTO for wrapping the state of a Blobstore implementation
+ */
 public abstract class BlobstoreState {
     private final String name;
 

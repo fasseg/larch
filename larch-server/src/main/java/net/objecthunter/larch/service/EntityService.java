@@ -21,6 +21,9 @@ import net.objecthunter.larch.model.Entity;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Service definition for CRUD operations on {@link net.objecthunter.larch.model.Entity} objects
+ */
 public interface EntityService {
     String create(Entity e) throws IOException;
 

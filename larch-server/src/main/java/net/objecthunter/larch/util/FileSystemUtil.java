@@ -21,6 +21,9 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Utility class for various file system operations
+ */
 public abstract class FileSystemUtil {
     private static final Logger log = LoggerFactory.getLogger(FileSystemUtil.class);
     public static void checkAndCreate(File dir) throws IOException {

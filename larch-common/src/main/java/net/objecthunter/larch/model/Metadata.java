@@ -15,6 +15,10 @@
 */
 package net.objecthunter.larch.model;
 
+/**
+ * A DTO for wrapping arbitrary meta data of a larch repository object. The meta data can only be validated if it's
+ * in XML format and a schemaUrl is given for the meta data type
+ */
 public class Metadata {
 
     private String name;

@@ -37,6 +37,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Helper class for starting and monitoring a WeedFs Master node process
+ */
 public class WeedFsMaster{
     private static final Logger log = LoggerFactory.getLogger(WeedFsMaster.class);
 

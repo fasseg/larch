@@ -33,6 +33,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Helper class for starting and monitoring a WeedFs volume server process
+ */
 public class WeedFsVolume {
     private static final Logger log = LoggerFactory.getLogger(WeedFsVolume.class);
 

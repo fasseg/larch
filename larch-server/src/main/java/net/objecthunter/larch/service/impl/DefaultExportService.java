@@ -30,6 +30,10 @@ import java.io.OutputStream;
 
 import static net.objecthunter.larch.util.FileSystemUtil.checkAndCreate;
 
+/**
+ * Default implementation of a {@link net.objecthunter.larch.service.ExportService} which is able to export JSON data
+ * to the File system
+ */
 public class DefaultExportService implements ExportService{
     private File directory;
     @Autowired

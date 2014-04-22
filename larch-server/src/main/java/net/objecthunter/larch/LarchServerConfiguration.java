@@ -38,6 +38,10 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
+/**
+ * General JavaConfig class for the larch repository containing all the necessary beans for a larch
+ * repository except the security context configuration
+ */
 @EnableAutoConfiguration
 @ComponentScan(basePackages = "net.objecthunter.larch.controller")
 @Configuration

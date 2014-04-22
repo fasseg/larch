@@ -34,6 +34,10 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Arrays;
 
+/**
+ * Implementation of a spring-security {@link org.springframework.security.authentication.AuthenticationManager}
+ * which uses ElasticSearch indices as a persistence layer
+ */
 public class LarchElasticSearchAuthenticationManager implements AuthenticationManager {
     public static final String USER_INDEX = "users";
     public static final String GROUP_INDEX = "groups";

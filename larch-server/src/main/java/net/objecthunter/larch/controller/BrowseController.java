@@ -30,6 +30,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 
+/**
+ * Web controller responsible for creating browse views
+ */
 @Controller
 public class BrowseController {
     @Autowired

@@ -28,6 +28,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+/**
+ * Web controller for creating simple list views
+ */
 @Controller
 @RequestMapping("/list")
 public class ListController {

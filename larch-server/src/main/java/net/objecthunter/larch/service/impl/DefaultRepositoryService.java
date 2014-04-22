@@ -20,8 +20,6 @@ import net.objecthunter.larch.model.state.LarchState;
 import net.objecthunter.larch.service.BlobstoreService;
 import net.objecthunter.larch.service.IndexService;
 import net.objecthunter.larch.service.RepositoryService;
-import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
-import org.elasticsearch.action.admin.cluster.state.ClusterStateRequestBuilder;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
 import org.elasticsearch.action.admin.cluster.stats.ClusterStatsResponse;
 import org.elasticsearch.client.Client;
@@ -31,6 +29,11 @@ import org.springframework.security.access.annotation.Secured;
 
 import java.io.IOException;
 
+/**
+ * Default implementation of a {@link net.objecthunter.larch.service.RepositoryService} which is able to fetch state
+ * information from the underlying {@link net.objecthunter.larch.service.IndexService} and {@link net.objecthunter
+ * .larch.service.BlobstoreService} implementations
+ */
 public class DefaultRepositoryService implements RepositoryService {
     @Autowired
     private IndexService indexService;

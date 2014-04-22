@@ -18,6 +18,9 @@ package net.objecthunter.larch;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
+/**
+ * Spring-security JavaConfig class defining the security context of the larch repository
+ */
 public class LarchServerSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {

@@ -15,6 +15,9 @@
 */
 package net.objecthunter.larch.model.security;
 
+/**
+ * A DTO for a {@link User}'s Group
+ */
 public class Group {
     private String name;
 

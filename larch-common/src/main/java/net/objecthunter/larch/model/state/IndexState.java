@@ -15,6 +15,9 @@
 */
 package net.objecthunter.larch.model.state;
 
+/**
+ * A DTO for wrapping the state of a larch Index implementation
+ */
 public class IndexState {
     long storeSize;
     int shardsSize;

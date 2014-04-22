@@ -32,6 +32,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Web controller class responsible for larch {@link net.objecthunter.larch.model.Binary} objects
+ */
 @Controller
 public class BinaryController {
     @Autowired

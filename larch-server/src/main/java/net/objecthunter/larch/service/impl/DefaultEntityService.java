@@ -50,6 +50,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * The default implementation of {@link net.objecthunter.larch.service.EntityService} responsible for perofrming CRUD
+ * operations of {@link net.objecthunter.larch.model.Entity} objects
+ */
 public class DefaultEntityService implements EntityService {
     private static final Logger log = LoggerFactory.getLogger(DefaultEntityService.class);
 

@@ -21,6 +21,9 @@ import net.objecthunter.larch.model.state.BlobstoreState;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Service definition for CRUD operations on Blobs
+ */
 public interface BlobstoreService {
     String create(InputStream src) throws IOException;
     InputStream retrieve(String path) throws IOException;

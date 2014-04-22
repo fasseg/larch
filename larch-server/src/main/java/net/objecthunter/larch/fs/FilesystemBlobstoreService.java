@@ -31,6 +31,10 @@ import java.io.*;
 
 import static net.objecthunter.larch.util.FileSystemUtil.*;
 
+/**
+ * Implementation of a {@link net.objecthunter.larch.service.BlobstoreService} on a Posix file system.
+ * The service gets initialized using two user set directories for saving the content of the repository
+ */
 public class FilesystemBlobstoreService implements BlobstoreService {
 
     private static final Logger log = LoggerFactory.getLogger(FilesystemBlobstoreService.class);

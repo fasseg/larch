@@ -35,6 +35,9 @@ import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * Web controller responsible for interactions on the entity level
+ */
 @Controller
 @RequestMapping("/entity")
 public class EntityController {

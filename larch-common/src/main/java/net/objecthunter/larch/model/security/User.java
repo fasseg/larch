@@ -17,6 +17,9 @@ package net.objecthunter.larch.model.security;
 
 import java.util.List;
 
+/**
+ * A DTO for a larch User
+ */
 public class User {
     private String name;
     private String firstName;

@@ -19,6 +19,11 @@ import net.objecthunter.larch.model.source.UrlSource;
 
 import java.util.Map;
 
+/**
+ * A DTO for a larch repository object which can have binary data attached to it. The actual binary content is
+ * wrapped in a Source object depending on it's location: For example a {@link net.objecthunter.larch.model.source
+ * .UrlSource} for a location reachable by http: {@code http://example.com/image.jpg}
+ */
 public class Binary {
     private String name;
     private long size;

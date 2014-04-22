@@ -34,7 +34,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 
-
+/**
+ * Web controller class responsible for creating {@link net.objecthunter.larch.model.Describe} views
+ */
 @Controller
 @RequestMapping("/describe")
 @Component

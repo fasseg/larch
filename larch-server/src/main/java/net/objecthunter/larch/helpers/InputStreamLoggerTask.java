@@ -24,6 +24,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.concurrent.Callable;
 
+/**
+ * This class allows to run a container managed background task which captures the output of an arbitrary
+ * {@link java.io.InputStream} and prints it out using the slf4j framework used in Java. This is for example used to
+ * capture the output of a WeedFs process run in the background
+ */
 public class InputStreamLoggerTask implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(InputStreamLoggerTask.class);
 

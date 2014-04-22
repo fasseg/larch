@@ -20,6 +20,9 @@ import net.objecthunter.larch.model.state.IndexState;
 
 import java.io.IOException;
 
+/**
+ * Service definition for CRUD operations on index operations
+ */
 public interface IndexService {
     String create(Entity e) throws IOException;
 

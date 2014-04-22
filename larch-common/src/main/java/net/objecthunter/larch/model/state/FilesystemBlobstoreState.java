@@ -15,6 +15,9 @@
 */
 package net.objecthunter.larch.model.state;
 
+/**
+ * A DTO for wrapping the state of a simple POSIX File System Blobstore implementation
+ */
 public class FilesystemBlobstoreState extends BlobstoreState {
     private String path;
     private long totalSpace;

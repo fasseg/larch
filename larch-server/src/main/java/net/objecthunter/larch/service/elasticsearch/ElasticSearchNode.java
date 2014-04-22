@@ -25,6 +25,9 @@ import org.springframework.core.env.Environment;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+/**
+ * A Spring bean for starting a ElasticSearch node as an internal process in the same JVM
+ */
 public class ElasticSearchNode {
 
     private Node node;

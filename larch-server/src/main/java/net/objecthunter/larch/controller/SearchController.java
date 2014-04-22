@@ -27,6 +27,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+/**
+ * Web controller responsible for search views
+ */
 @Controller
 @RequestMapping("/search")
 public class SearchController {

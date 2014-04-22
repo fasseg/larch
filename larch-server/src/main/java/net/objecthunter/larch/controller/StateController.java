@@ -32,6 +32,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 
+/**
+ * Web controller responsible for creating repository state views
+ */
 @Controller
 @RequestMapping("/state")
 public class StateController {

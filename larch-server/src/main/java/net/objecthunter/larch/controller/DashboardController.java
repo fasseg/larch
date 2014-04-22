@@ -27,6 +27,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 
+/**
+ * Web controller class responsible for the dashboard overview of the larch repository
+ */
 @Controller
 @RequestMapping("/")
 public class DashboardController {

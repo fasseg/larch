@@ -18,6 +18,10 @@ package net.objecthunter.larch.model;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A DTO for a top level larch repository object. Creating any object in the larch repository normally starts with
+ * creating an {@link Entity} and adding content/metadata to it.
+ */
 public class Entity {
     private int version;
     private String id;

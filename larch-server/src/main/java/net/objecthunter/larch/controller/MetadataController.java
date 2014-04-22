@@ -37,6 +37,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 
+/**
+ * Web controller responsible for interaction on the meta data level
+ */
 @Controller
 public class MetadataController {
     @Autowired

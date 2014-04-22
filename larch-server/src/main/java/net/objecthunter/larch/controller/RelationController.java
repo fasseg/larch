@@ -26,6 +26,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
+/**
+ * Web controller responsible for interactions on the relation level
+ */
 @Controller
 public class RelationController {
     @Autowired

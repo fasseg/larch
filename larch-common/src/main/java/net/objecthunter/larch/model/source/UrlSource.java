@@ -21,7 +21,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
-public class UrlSource{
+/**
+ * This class is intended for passing the location information of a {@link net.objecthunter.larch.model.Binary}'s
+ * actual data. If for example a {@link net.objecthunter.larch.model.Binary} is ingested a UrlSource object is used
+ * to reference the actual content on disk using a {@code file://}
+ */
+public class UrlSource {
     private final URI uri;
     private final boolean internal;
 

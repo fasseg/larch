@@ -15,6 +15,9 @@
 */
 package net.objecthunter.larch.service;
 
+/**
+ * Service for getting the associated schemaUrl for a given meta data type
+ */
 public class SchemaService {
 
     public String getSchemUrlForType(String type) {

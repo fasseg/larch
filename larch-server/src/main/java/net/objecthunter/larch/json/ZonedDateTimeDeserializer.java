@@ -24,6 +24,9 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * A simple helper class for deserializing ZoneDateTime objects
+ */
 public class ZonedDateTimeDeserializer extends JsonDeserializer<ZonedDateTime>{
     @Override
     public ZonedDateTime deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {

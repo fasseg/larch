@@ -43,6 +43,9 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * An {@link net.objecthunter.larch.service.IndexService} implementation built on top of ElasticSearch.
+ */
 public class ElasticSearchIndexService implements IndexService {
     public static final String INDEX_ENTITIES = "entities";
     public static final String INDEX_ENTITY_TYPE = "entity";

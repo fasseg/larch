@@ -15,6 +15,9 @@
 */
 package net.objecthunter.larch.model.state;
 
+/**
+ * A DTO for wrapping the state of the larch repository server
+ */
 public class LarchState {
     private IndexState indexState;
     private BlobstoreState blobstoreState;

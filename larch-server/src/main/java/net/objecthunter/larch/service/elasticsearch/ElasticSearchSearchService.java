@@ -33,6 +33,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * An implementation of a {@link net.objecthunter.larch.service.SearchService} built on top of ElasticSearch
+ */
 public class ElasticSearchSearchService implements SearchService {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticSearchSearchService.class);
 
