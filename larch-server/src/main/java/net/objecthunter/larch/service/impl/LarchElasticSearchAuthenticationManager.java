@@ -69,6 +69,7 @@ public class LarchElasticSearchAuthenticationManager implements AuthenticationMa
                     .getSourceAsBytes()
                     , Group.class);
             final User admin = new User();
+            admin.setPwhash(DigestUtils.sha256Hex("admin"));
             admin.setName("admin");
             admin.setFirstName("Generic");
             admin.setLastName("Superuser");

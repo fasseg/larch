@@ -31,6 +31,8 @@
             <p class="value" th:text="${entity.utcCreated}"></p>
             <p class="property">Last modified</p>
             <p class="value" th:text="${entity.utcLastModified}"></p>
+            <p class="property">Audit record</p>
+            <a th:text="'Click to view'" th:href="@{'/entity/'} + ${entity.id} + '/audit'"></a>
         </div>
         <div th:each="md : ${entity.metadata}" class="panel">
             <p class="panel_title" th:text="'Metadata: ' + ${md.key}"></p>

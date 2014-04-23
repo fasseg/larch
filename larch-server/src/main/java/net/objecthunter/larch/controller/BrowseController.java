@@ -40,46 +40,43 @@ public class BrowseController {
 
     @RequestMapping(value = "/browse", method = RequestMethod.GET)
     @ResponseBody
-    public SearchResult browse(@AuthenticationPrincipal User user) throws IOException {
+    public SearchResult browse() throws IOException {
         return this.searchService.scanIndex(0);
     }
 
     @RequestMapping(value = "/browse/{offset}", method = RequestMethod.GET)
     @ResponseBody
-    public SearchResult browse(@AuthenticationPrincipal User user, @PathVariable("offset") final int offset) throws IOException {
+    public SearchResult browse(@PathVariable("offset") final int offset) throws IOException {
         return this.searchService.scanIndex(offset);
     }
 
     @RequestMapping(value = "/browse/{offset}/{numrecords}", method = RequestMethod.GET)
     @ResponseBody
-    public SearchResult browse(@AuthenticationPrincipal User user, @PathVariable("offset") final int offset, @PathVariable("numrecords") final int numRecords) throws IOException {
+    public SearchResult browse(@PathVariable("offset") final int offset, @PathVariable("numrecords") final int numRecords) throws IOException {
         return this.searchService.scanIndex(offset, numRecords);
     }
 
     @RequestMapping(value = "/browse", method = RequestMethod.GET, produces = "text/html")
     @ResponseBody
-    public ModelAndView browseHtml(@AuthenticationPrincipal User user) throws IOException {
+    public ModelAndView browseHtml() throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("result", this.searchService.scanIndex(0));
-        model.addAttribute("user", user);
         return new ModelAndView("browse", model);
     }
 
     @RequestMapping(value = "/browse/{offset}", method = RequestMethod.GET, produces = "text/html")
     @ResponseBody
-    public ModelAndView browseHtml(@AuthenticationPrincipal User user, @PathVariable("offset") final int offset) throws IOException {
+    public ModelAndView browseHtml(@PathVariable("offset") final int offset) throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("result", this.searchService.scanIndex(offset));
-        model.addAttribute("user", user);
         return new ModelAndView("browse", model);
     }
 
     @RequestMapping(value = "/browse/{offset}/{numrecords}", method = RequestMethod.GET, produces = "text/html")
     @ResponseBody
-    public ModelAndView browseHtml(@AuthenticationPrincipal User user, @PathVariable("offset") final int offset, @PathVariable("numrecords") final int numRecords) throws IOException {
+    public ModelAndView browseHtml(@PathVariable("offset") final int offset, @PathVariable("numrecords") final int numRecords) throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("result", this.searchService.scanIndex(offset, numRecords));
-        model.addAttribute("user", user);
         return new ModelAndView("browse", model);
     }
 }

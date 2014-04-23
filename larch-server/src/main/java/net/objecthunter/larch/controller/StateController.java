@@ -44,17 +44,16 @@ public class StateController {
     @RequestMapping(method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public LarchState state(@AuthenticationPrincipal User user) throws IOException {
+    public LarchState state() throws IOException {
         return repositoryService.status();
     }
 
     @RequestMapping(method = RequestMethod.GET, produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ModelAndView stateHtml(@AuthenticationPrincipal User user) throws IOException {
+    public ModelAndView stateHtml() throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("state", repositoryService.status());
-        model.addAttribute("user", user);
         return new ModelAndView("state", model);
     }
 }

@@ -18,9 +18,11 @@ package net.objecthunter.larch;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import net.objecthunter.larch.fs.FilesystemBlobstoreService;
+import net.objecthunter.larch.service.AuditService;
 import net.objecthunter.larch.service.ExportService;
 import net.objecthunter.larch.service.SchemaService;
 import net.objecthunter.larch.service.SearchService;
+import net.objecthunter.larch.service.elasticsearch.ElasticSearchAuditService;
 import net.objecthunter.larch.service.elasticsearch.ElasticSearchIndexService;
 import net.objecthunter.larch.service.elasticsearch.ElasticSearchNode;
 import net.objecthunter.larch.service.elasticsearch.ElasticSearchSearchService;
@@ -46,6 +48,11 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 @ComponentScan(basePackages = "net.objecthunter.larch.controller")
 @Configuration
 public class LarchServerConfiguration {
+
+    @Bean
+    public AuditService auditService() {
+        return new ElasticSearchAuditService();
+    }
 
     @Bean
     public SchemaService schemaService() {

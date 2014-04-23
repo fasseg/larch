@@ -30,7 +30,7 @@ import java.util.concurrent.Callable;
  * capture the output of a WeedFs process run in the background
  */
 public class InputStreamLoggerTask implements Runnable {
-    private static final Logger log = LoggerFactory.getLogger(InputStreamLoggerTask.class);
+    private static final Logger log = LoggerFactory.getLogger("weedfs");
 
     private final BufferedReader reader;
 

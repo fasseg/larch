@@ -11,14 +11,21 @@ function createEntity(id, type, label, tags, parentId) {
         'parentId' : parentId,
         'tags' : tagList
     };
+    var csrf_token = $("meta[name='_csrf']").attr("content");
     $.ajax ({
+        xhrFields: {
+           withCredentials: true
+        },
+        headers: {
+            "X-CSRF-TOKEN" : csrf_token
+        },
         url: "/entity",
         type: "POST",
         data: JSON.stringify(entity),
         dataType: "text",
         contentType: "application/json; charset=utf-8",
         success: function(createdId){
-        document.location.href = '/entity/' + createdId;
+            document.location.href = '/entity/' + createdId;
         }
     });
 }

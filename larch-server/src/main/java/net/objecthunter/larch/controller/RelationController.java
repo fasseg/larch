@@ -36,13 +36,13 @@ public class RelationController {
 
     @RequestMapping(value="/entity/{id}/relation", method= RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@AuthenticationPrincipal User user,@PathVariable("id") final String id, @RequestParam("predicate") final String predicate, @RequestParam("object") final String object) throws IOException {
+    public void create(@PathVariable("id") final String id, @RequestParam("predicate") final String predicate, @RequestParam("object") final String object) throws IOException {
         entityService.createRelation(id, predicate, object);
     }
 
     @RequestMapping(value="/entity/{id}/relation", method= RequestMethod.POST, produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
-    public String createHtml(@AuthenticationPrincipal User user,@PathVariable("id") final String id, @RequestParam("predicate") final String predicate, @RequestParam("object") final String object) throws IOException {
+    public String createHtml(@PathVariable("id") final String id, @RequestParam("predicate") final String predicate, @RequestParam("object") final String object) throws IOException {
         entityService.createRelation(id, predicate, object);
         return "redirect:/entity/" + id;
     }

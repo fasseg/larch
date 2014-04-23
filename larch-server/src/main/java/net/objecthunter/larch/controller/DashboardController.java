@@ -39,10 +39,9 @@ public class DashboardController {
 
     @RequestMapping(produces = "text/html")
     @ResponseBody
-    public ModelAndView dashboardHtml(@AuthenticationPrincipal User user) throws IOException {
+    public ModelAndView dashboardHtml() throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("describe", repositoryService.describe());
-        model.addAttribute("user", user);
         return new ModelAndView("dashboard", model);
     }
 }

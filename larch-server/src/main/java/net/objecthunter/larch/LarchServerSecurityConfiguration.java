@@ -15,24 +15,29 @@
 */
 package net.objecthunter.larch;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * Spring-security JavaConfig class defining the security context of the larch repository
  */
 public class LarchServerSecurityConfiguration extends WebSecurityConfigurerAdapter {
+    @Autowired
+    private Environment env;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .antMatchers("/").hasAnyRole("USER", "ADMIN")
-                .antMatchers("/browse").hasAnyRole("USER", "ADMIN")
-                .antMatchers("/entity").hasAnyRole("USER", "ADMIN")
-                .antMatchers("/list").hasAnyRole("USER", "ADMIN")
-                .antMatchers("/describe").hasAnyRole("USER", "ADMIN")
-                .antMatchers("/state").hasAnyRole("USER", "ADMIN")
-                .antMatchers("/search").hasAnyRole("USER", "ADMIN")
-                .and()
-                .httpBasic();
+        http
+            .authorizeRequests()
+            .requestMatchers(new AntPathRequestMatcher("/", "GET")).hasAnyRole("USER", "ADMIN")
+            .requestMatchers(new AntPathRequestMatcher("/entity", "POST")).hasAnyRole("USER", "ADMIN")
+            .and()
+            .httpBasic();
+        if (!Boolean.valueOf(env.getProperty("larch.security.csrf.enabled", "true"))) {
+            http.csrf().disable();
+        }
     }
 }

@@ -54,10 +54,9 @@ public class DescribeController {
 
     @RequestMapping(method = RequestMethod.GET, produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
-    public ModelAndView describeHtml(@AuthenticationPrincipal User user) throws IOException {
+    public ModelAndView describeHtml() throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("describe", repositoryService.describe());
-        model.addAttribute("user", user);
         return new ModelAndView("describe",model);
     }
 }

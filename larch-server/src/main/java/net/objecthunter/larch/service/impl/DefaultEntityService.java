@@ -18,16 +18,10 @@ package net.objecthunter.larch.service.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
+import net.objecthunter.larch.model.*;
+import net.objecthunter.larch.service.*;
 import net.objecthunter.larch.service.elasticsearch.ElasticSearchIndexService;
-import net.objecthunter.larch.model.Binary;
-import net.objecthunter.larch.model.Entity;
-import net.objecthunter.larch.model.LarchConstants;
-import net.objecthunter.larch.model.Metadata;
 import net.objecthunter.larch.model.source.UrlSource;
-import net.objecthunter.larch.service.BlobstoreService;
-import net.objecthunter.larch.service.EntityService;
-import net.objecthunter.larch.service.ExportService;
-import net.objecthunter.larch.service.IndexService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +65,9 @@ public class DefaultEntityService implements EntityService {
     @Autowired
     private Environment env;
 
+    @Autowired
+    private AuditService auditService;
+
     private boolean autoExport;
 
     @PostConstruct
@@ -109,6 +106,17 @@ public class DefaultEntityService implements EntityService {
         e.setUtcLastModified(now);
         final String id = this.indexService.create(e);
         log.debug("finished creating Entity {}", id);
+
+        /* create an audit record */
+        final AuditRecord audit = new AuditRecord();
+        audit.setTimestamp(now);
+        audit.setAction(AuditRecord.ACTION_CREATE);
+        audit.setAgentName("anonymous");
+        audit.setEntityId(e.getId());
+
+        final String auditId= auditService.create(audit);
+        log.debug("added audit record {}",auditId);
+
         if (autoExport) {
             exportService.export(e);
             log.debug("exported entity {} ", id);
