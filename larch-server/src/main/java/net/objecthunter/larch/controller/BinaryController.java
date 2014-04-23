@@ -15,8 +15,11 @@
 */
 package net.objecthunter.larch.controller;
 
+import net.objecthunter.larch.helpers.AuditRecords;
+import net.objecthunter.larch.model.AuditRecord;
 import net.objecthunter.larch.model.Binary;
 import net.objecthunter.larch.model.Entity;
+import net.objecthunter.larch.service.AuditService;
 import net.objecthunter.larch.service.BlobstoreService;
 import net.objecthunter.larch.service.EntityService;
 import net.objecthunter.larch.service.IndexService;
@@ -42,12 +45,16 @@ public class BinaryController extends AbstractLarchController {
     private IndexService indexService;
 
     @Autowired
+    private AuditService auditService;
+
+    @Autowired
     private BlobstoreService blobstoreService;
 
     @RequestMapping(value = "/entity/{id}/binary", method = RequestMethod.POST, consumes = {"multipart/form-data", "application/x-www-form-urlencoded"})
     @ResponseStatus(HttpStatus.OK)
     public String create(@PathVariable("id") final String entityId, @RequestParam("name") final String name, @RequestParam("binary") final MultipartFile file) throws IOException {
         entityService.createBinary(entityId, name, file.getContentType(), file.getInputStream());
+        this.auditService.create(AuditRecords.createBinaryRecord(entityId));
         return "redirect:/entity/" + entityId;
     }
 

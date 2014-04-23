@@ -15,20 +15,18 @@
 */
 package net.objecthunter.larch.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import net.objecthunter.larch.helpers.AuditRecords;
+import net.objecthunter.larch.model.AuditRecord;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.Metadata;
-import net.objecthunter.larch.model.security.User;
+import net.objecthunter.larch.service.AuditService;
 import net.objecthunter.larch.service.EntityService;
 import net.objecthunter.larch.service.IndexService;
 import net.objecthunter.larch.service.SchemaService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,6 +50,9 @@ public class MetadataController extends AbstractLarchController {
     private IndexService indexService;
 
     @Autowired
+    private AuditService auditService;
+
+    @Autowired
     private ObjectMapper mapper;
 
     @RequestMapping(value = "/entity/{id}/metadata", method= RequestMethod.POST, consumes = "multipart/form-data")
@@ -72,6 +73,7 @@ public class MetadataController extends AbstractLarchController {
         md.setOriginalFilename(file.getOriginalFilename());
         e.getMetadata().put(mdName, md);
         entityService.update(e);
+        this.auditService.create(AuditRecords.createMetadataRecord(entityId));
         return "redirect:/entity/" + entityId;
     }
 

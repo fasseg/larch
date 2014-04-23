@@ -111,7 +111,8 @@
                  });
                 </script>
                 <p class="panel_title">Create new binary</p>
-                <form th:action="@{'~/entity/' + ${entity.id} + '/binary'}" method="post" enctype="multipart/form-data">
+                <form th:action="@{'~/entity/' + ${entity.id} + '/binary'} + '?_csrf=' + ${_csrf.token}" method="post"
+                      enctype="multipart/form-data">
                     <input id="binName" type="text" name="name" title="Set the name of the binary"/>
                     <input id="binFile" type="file" name="binary" title="Select a file for upload"/>
                     <input class="button" type="submit" value="Create new binary"/>
@@ -125,7 +126,7 @@
                 </script>
                 <p class="panel_title">Create new metadata</p>
                 <form enctype="multipart/form-data" method="post"
-                      th:action="@{'~/entity/' + ${entity.id} + '/metadata'}">
+                      th:action="@{'~/entity/' + ${entity.id} + '/metadata'} + '?_csrf=' + ${_csrf.token}">
                     <input id="mdName" type="text" name="name" title="Set the name of the metadata"/>
                     <input id="mdFile" type="file" name="metadata" title="Select a metadata file for upload"/>
                     <select id="mdType" name="type" title="Select a valid metadata type">
@@ -143,7 +144,7 @@
                 </script>
                 <p class="panel_title">Create new relation</p>
                 <form enctype="multipart/form-data" method="post"
-                      th:action="@{'~/entity/' + ${entity.id} + '/relation'}">
+                      th:action="@{'~/entity/' + ${entity.id} + '/relation'} + '?_csrf=' + ${_csrf.token}">
                     <input id="relPredicate" type="text" name="predicate" title="Set the predicate of the relation"/>
                     <input id="relObject" type="text" name="object" title="Set the objet of the relation"/>
                     <input class="button" type="submit" value="Create relation"/>

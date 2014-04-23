@@ -16,10 +16,12 @@
 package net.objecthunter.larch;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.multipart.support.MultipartFilter;
 
 /**
  * Spring-security JavaConfig class defining the security context of the larch repository

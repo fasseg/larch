@@ -15,12 +15,11 @@
 */
 package net.objecthunter.larch.controller;
 
-import net.objecthunter.larch.model.security.User;
+import net.objecthunter.larch.helpers.AuditRecords;
+import net.objecthunter.larch.service.AuditService;
 import net.objecthunter.larch.service.EntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,13 +33,17 @@ public class RelationController extends AbstractLarchController {
     @Autowired
     private EntityService entityService;
 
-    @RequestMapping(value="/entity/{id}/relation", method= RequestMethod.POST)
+    @Autowired
+    private AuditService auditService;
+
+    @RequestMapping(value = "/entity/{id}/relation", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public void create(@PathVariable("id") final String id, @RequestParam("predicate") final String predicate, @RequestParam("object") final String object) throws IOException {
         entityService.createRelation(id, predicate, object);
+        this.auditService.create(AuditRecords.createRelationRecord(id));
     }
 
-    @RequestMapping(value="/entity/{id}/relation", method= RequestMethod.POST, produces = "text/html")
+    @RequestMapping(value = "/entity/{id}/relation", method = RequestMethod.POST, produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
     public String createHtml(@PathVariable("id") final String id, @RequestParam("predicate") final String predicate, @RequestParam("object") final String object) throws IOException {
         entityService.createRelation(id, predicate, object);

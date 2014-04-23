@@ -17,9 +17,10 @@ package net.objecthunter.larch.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.objecthunter.larch.helpers.Audit;
+import net.objecthunter.larch.helpers.AuditRecords;
 import net.objecthunter.larch.model.AuditRecord;
 import net.objecthunter.larch.model.Entity;
+import net.objecthunter.larch.service.AuditService;
 import net.objecthunter.larch.service.impl.DefaultEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -42,6 +43,9 @@ public class EntityController extends AbstractLarchController {
     private DefaultEntityService entityService;
 
     @Autowired
+    private AuditService auditService;
+
+    @Autowired
     private ObjectMapper mapper;
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
@@ -49,6 +53,7 @@ public class EntityController extends AbstractLarchController {
     public void patch(@PathVariable("id") final String id, final InputStream src) throws IOException {
         final JsonNode node = mapper.readTree(src);
         this.entityService.patch(id, node);
+        this.auditService.create(AuditRecords.updateEntityRecord(id));
     }
 
     @RequestMapping("/{id}")
@@ -77,9 +82,10 @@ public class EntityController extends AbstractLarchController {
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces = "text/plain")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    @Audit(AuditRecord.ACTION_CREATE)
     public String create(final InputStream src) throws IOException {
-        return this.entityService.create(mapper.readValue(src, Entity.class));
+        final String id = this.entityService.create(mapper.readValue(src, Entity.class));
+        this.auditService.create(AuditRecords.createEntityRecord(id));
+        return id;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = "application/json")
@@ -92,5 +98,6 @@ public class EntityController extends AbstractLarchController {
             throw new IOException("The id of the Entity and the id used in the PUT request are not the same");
         }
         this.entityService.update(e);
+        this.auditService.create(AuditRecords.updateEntityRecord(id));
     }
 }

@@ -19,13 +19,19 @@ package net.objecthunter.larch.model;
  * DTO class for wrapping audit information
  */
 public class AuditRecord {
-    public static final String ACTION_CREATE = "Create entity";
-    public static final String ACTION_ADD_BINARY = "Add binary";
-    public static final String ACTION_ADD_METADATA = "Add metadata";
-    public static final String ACTION_UPDATE = "Update entity";
-    public static final String ACTION_DELETE_BINARY = "Delete binary";
-    public static final String ACTION_DELETE_METADATA = "Delete metadata";
-    public static final String ACTION_PUBLISH = "Publish entity";
+    public static final String EVENT_CREATE_ENTITY = "Create entity";
+    public static final String EVENT_UPDATE_ENTITY = "Update entity";
+    public static final String EVENT_PUBLISH_ENTITY = "Publish entity";
+    public static final String EVENT_CREATE_BINARY = "Create binary";
+    public static final String EVENT_DELETE_BINARY = "Delete binary";
+    public static final String EVENT_CREATE_METADATA = "Create metadata";
+    public static final String EVENT_DELETE_METADATA = "Delete metadata";
+    public static final String EVENT_CREATE_RELATION = "Add relation";
+    public static final String EVENT_DELETE_RELATION = "Delete relation";
+    public static final String EVENT_DELETE_ENTITY = "Delete entity";
+    public static final String EVENT_UPDATE_BINARY = "Update binary";
+    public static final String EVENT_UPDATE_RELATION = "Update relation";
+    public static final String EVENT_UPDATE_METADATA = "Update metadata";
 
     private String id;
     private String entityId;
@@ -75,6 +81,6 @@ public class AuditRecord {
 
     @Override
     public String toString() {
-        return "ID:" + this.id + ", TS:" + this.timestamp + ", ACTION:" + this.action + ", ENTITY:" + this.entityId;
+        return "ID:" + this.id + ", TS:" + this.timestamp + ", EVENT:" + this.action + ", ENTITY:" + this.entityId;
     }
 }

@@ -59,6 +59,7 @@ public class DefaultEntityService implements EntityService {
 
     @Autowired
     private ObjectMapper mapper;
+
     @Autowired
     private ExportService exportService;
 
