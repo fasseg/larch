@@ -17,6 +17,8 @@ package net.objecthunter.larch.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.objecthunter.larch.helpers.Audit;
+import net.objecthunter.larch.model.AuditRecord;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.service.impl.DefaultEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +36,7 @@ import java.io.InputStream;
  */
 @Controller
 @RequestMapping("/entity")
-public class EntityController {
+public class EntityController extends AbstractLarchController {
 
     @Autowired
     private DefaultEntityService entityService;
@@ -75,6 +77,7 @@ public class EntityController {
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces = "text/plain")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
+    @Audit(AuditRecord.ACTION_CREATE)
     public String create(final InputStream src) throws IOException {
         return this.entityService.create(mapper.readValue(src, Entity.class));
     }

@@ -40,7 +40,7 @@ import java.io.IOException;
 @Controller
 @RequestMapping("/describe")
 @Component
-public class DescribeController {
+public class DescribeController extends AbstractLarchController {
 
     @Autowired
     private RepositoryService repositoryService;

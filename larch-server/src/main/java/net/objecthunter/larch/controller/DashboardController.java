@@ -32,7 +32,7 @@ import java.io.IOException;
  */
 @Controller
 @RequestMapping("/")
-public class DashboardController {
+public class DashboardController extends AbstractLarchController {
 
     @Autowired
     private RepositoryService repositoryService;

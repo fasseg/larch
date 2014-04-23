@@ -65,9 +65,6 @@ public class DefaultEntityService implements EntityService {
     @Autowired
     private Environment env;
 
-    @Autowired
-    private AuditService auditService;
-
     private boolean autoExport;
 
     @PostConstruct
@@ -106,16 +103,6 @@ public class DefaultEntityService implements EntityService {
         e.setUtcLastModified(now);
         final String id = this.indexService.create(e);
         log.debug("finished creating Entity {}", id);
-
-        /* create an audit record */
-        final AuditRecord audit = new AuditRecord();
-        audit.setTimestamp(now);
-        audit.setAction(AuditRecord.ACTION_CREATE);
-        audit.setAgentName("anonymous");
-        audit.setEntityId(e.getId());
-
-        final String auditId= auditService.create(audit);
-        log.debug("added audit record {}",auditId);
 
         if (autoExport) {
             exportService.export(e);

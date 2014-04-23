@@ -37,7 +37,7 @@ import java.io.IOException;
  */
 @Controller
 @RequestMapping("/state")
-public class StateController {
+public class StateController extends AbstractLarchController {
     @Autowired
     private RepositoryService repositoryService;
 

@@ -30,7 +30,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @Controller
 @RequestMapping("/search")
-public class SearchController {
+public class SearchController extends AbstractLarchController {
     @Autowired
     private SearchService searchService;
 

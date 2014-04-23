@@ -41,7 +41,7 @@ import java.util.HashMap;
  * Web controller responsible for interaction on the meta data level
  */
 @Controller
-public class MetadataController {
+public class MetadataController extends AbstractLarchController {
     @Autowired
     private EntityService entityService;
 

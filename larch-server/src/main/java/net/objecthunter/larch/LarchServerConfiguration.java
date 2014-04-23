@@ -18,6 +18,7 @@ package net.objecthunter.larch;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import net.objecthunter.larch.fs.FilesystemBlobstoreService;
+import net.objecthunter.larch.helpers.AuditAdvice;
 import net.objecthunter.larch.service.AuditService;
 import net.objecthunter.larch.service.ExportService;
 import net.objecthunter.larch.service.SchemaService;
@@ -47,7 +48,13 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 @EnableAutoConfiguration
 @ComponentScan(basePackages = "net.objecthunter.larch.controller")
 @Configuration
+@EnableAspectJAutoProxy
 public class LarchServerConfiguration {
+
+    @Bean
+    public AuditAdvice auditAdvice() {
+        return new AuditAdvice();
+    }
 
     @Bean
     public AuditService auditService() {

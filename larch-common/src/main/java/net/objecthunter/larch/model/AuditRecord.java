@@ -19,13 +19,13 @@ package net.objecthunter.larch.model;
  * DTO class for wrapping audit information
  */
 public class AuditRecord {
-    public static final String ACTION_CREATE="Create entity";
-    public static final String ACTION_ADD_BINARY="Add binary";
-    public static final String ACTION_ADD_METADATA="Add metadata";
-    public static final String ACTION_UPDATE="Update entity";
-    public static final String ACTION_DELETE_BINARY="Delete binary";
-    public static final String ACTION_DELETE_METADATA="Delete metadata";
-    public static final String ACTION_PUBLISH="Publish entity";
+    public static final String ACTION_CREATE = "Create entity";
+    public static final String ACTION_ADD_BINARY = "Add binary";
+    public static final String ACTION_ADD_METADATA = "Add metadata";
+    public static final String ACTION_UPDATE = "Update entity";
+    public static final String ACTION_DELETE_BINARY = "Delete binary";
+    public static final String ACTION_DELETE_METADATA = "Delete metadata";
+    public static final String ACTION_PUBLISH = "Publish entity";
 
     private String id;
     private String entityId;
@@ -71,5 +71,10 @@ public class AuditRecord {
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
+    }
+
+    @Override
+    public String toString() {
+        return "ID:" + this.id + ", TS:" + this.timestamp + ", ACTION:" + this.action + ", ENTITY:" + this.entityId;
     }
 }

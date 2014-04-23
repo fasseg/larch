@@ -34,7 +34,7 @@ import java.io.IOException;
  * Web controller class responsible for larch {@link net.objecthunter.larch.model.Binary} objects
  */
 @Controller
-public class BinaryController {
+public class BinaryController extends AbstractLarchController {
     @Autowired
     private EntityService entityService;
 

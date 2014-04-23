@@ -34,7 +34,7 @@ import java.io.IOException;
  * Web controller responsible for creating browse views
  */
 @Controller
-public class BrowseController {
+public class BrowseController extends AbstractLarchController {
     @Autowired
     private SearchService searchService;
 

@@ -30,7 +30,7 @@ import java.io.IOException;
  * Web controller responsible for interactions on the relation level
  */
 @Controller
-public class RelationController {
+public class RelationController extends AbstractLarchController {
     @Autowired
     private EntityService entityService;
 
