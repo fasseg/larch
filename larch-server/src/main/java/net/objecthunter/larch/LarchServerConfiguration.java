@@ -40,7 +40,6 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 @EnableAutoConfiguration
 @ComponentScan(basePackages = "net.objecthunter.larch.controller")
 @Configuration
-@EnableAspectJAutoProxy
 public class LarchServerConfiguration {
 
     @Bean
