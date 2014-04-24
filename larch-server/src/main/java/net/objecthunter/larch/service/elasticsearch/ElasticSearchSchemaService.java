@@ -15,13 +15,16 @@
 */
 package net.objecthunter.larch.service.elasticsearch;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.objecthunter.larch.model.Entity;
+import net.objecthunter.larch.model.Metadata;
 import net.objecthunter.larch.model.MetadataType;
+import net.objecthunter.larch.model.MetadataValidationResult;
 import net.objecthunter.larch.service.SchemaService;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
+import org.elasticsearch.action.count.CountResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
@@ -32,9 +35,20 @@ import org.elasticsearch.search.SearchHit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.xml.sax.SAXException;
 
 import javax.annotation.PostConstruct;
+import javax.xml.XMLConstants;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URL;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -123,6 +137,66 @@ public class ElasticSearchSchemaService implements SchemaService {
                 .actionGet();
         this.refreshIndex(INDEX_MD_SCHEMATA);
         return resp.getId();
+    }
+
+    @Override
+    public void deleteMetadataType(String name) throws IOException {
+        /* first check if the type is still used by Entities or Binaries */
+        final CountResponse count = this.client.prepareCount(ElasticSearchIndexService.INDEX_ENTITIES)
+                .setQuery(QueryBuilders.nestedQuery("metadata",QueryBuilders.matchQuery("type",name)))
+                .execute()
+                .actionGet();
+        if (count.getCount() > 0) {
+            throw new IOException("Unable to delete metadata type ' " + name + "' since it's still in use");
+        }
+        /* the metadata type is safe to delete, since it's no longer used */
+        log.debug("deleting meta data type {} ", name);
+    }
+
+    @Override
+    public MetadataValidationResult validate(String id, String metadataName) throws IOException {
+        /* fetch the entity first */
+        final GetResponse resp = this.client.prepareGet(ElasticSearchIndexService
+                        .INDEX_ENTITIES,
+                ElasticSearchIndexService.INDEX_ENTITY_TYPE, id
+        )
+                .execute()
+                .actionGet();
+        if (!resp.isExists())  {
+            throw new IOException("The entity '" + id + "' does not exist");
+        }
+        /* fetch the named metadata which will be validatet */
+        final Entity e = mapper.readValue(resp.getSourceAsBytes(), Entity.class);
+        if (e.getMetadata() == null || !e.getMetadata().containsKey(metadataName)) {
+            throw new IOException("The entity '" + id  + "' has no meta data record named '" + metadataName);
+        }
+        final Metadata md = e.getMetadata().get(metadataName);
+        final String schemaUrl = this.getSchemUrlForType(md.getType());
+
+        /* validate the schema against the given URL */
+        final MetadataValidationResult result = new MetadataValidationResult();
+        try {
+            final URL schemaFile = new URL(schemaUrl);
+            final Source xmlFile = new StreamSource(new ByteArrayInputStream(md.getData().getBytes()));
+            final SchemaFactory schemaFactory = SchemaFactory
+                    .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            final Schema schema = schemaFactory.newSchema(schemaFile);
+            final Validator validator = schema.newValidator();
+            try {
+                validator.validate(xmlFile);
+                result.setSuccess(true);
+                result.setTimestamp(ZonedDateTime.now(ZoneOffset.UTC).toString());
+                result.setDetails("Validation successful");
+                return result;
+            }catch (SAXException validationException) {
+                result.setSuccess(false);
+                result.setTimestamp(ZonedDateTime.now(ZoneOffset.UTC).toString());
+                result.setDetails(validationException.getMessage());
+                return result;
+            }
+        }catch(SAXException se) {
+            throw new IOException(se);
+        }
     }
 
 }

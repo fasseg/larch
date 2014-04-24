@@ -21,6 +21,7 @@ import net.objecthunter.larch.helpers.AuditRecords;
 import net.objecthunter.larch.model.AuditRecord;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.service.AuditService;
+import net.objecthunter.larch.service.SchemaService;
 import net.objecthunter.larch.service.impl.DefaultEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -48,6 +49,9 @@ public class EntityController extends AbstractLarchController {
     @Autowired
     private ObjectMapper mapper;
 
+    @Autowired
+    private SchemaService schemaService;
+
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     @ResponseStatus(HttpStatus.OK)
     public void patch(@PathVariable("id") final String id, final InputStream src) throws IOException {
@@ -69,6 +73,7 @@ public class EntityController extends AbstractLarchController {
     public ModelAndView retrieveHtml(@PathVariable("id") final String id) throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("entity", entityService.retrieve(id));
+        model.addAttribute("metadataTypes", this.schemaService.getSchemaTypes());
         return new ModelAndView("entity", model);
     }
 

@@ -17,6 +17,7 @@ package net.objecthunter.larch.controller;
 
 import net.objecthunter.larch.model.security.User;
 import net.objecthunter.larch.service.RepositoryService;
+import net.objecthunter.larch.service.SchemaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;

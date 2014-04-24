@@ -24,12 +24,15 @@
                     $('#mdtSchemaUrl').watermark('Schema URL', {className: 'inactive'});
                  });
             </script>
-            <form method="POST" enctype="multipart/form-data"
-                  th:action="@{'~/metadatatype'} + '?_csrf=' + ${_csrf.token}">
-                <input id="mdtName" type="text" name="name" title="Set the name of the meta data type"/>
-                <input id="mdtSchemaUrl" type="text" name="schemaUrl" title="The URL of the meta data schema"/>
-                <input type="submit" class="button" value="Create meta data type"/>
-            </form>
+            <div class="panel">
+                <p class="panel_title">Create new meta data type</p>
+                <form method="POST" enctype="multipart/form-data"
+                      th:action="@{'~/metadatatype'} + '?_csrf=' + ${_csrf.token}">
+                    <input id="mdtName" type="text" name="name" title="Set the name of the meta data type"/>
+                    <input id="mdtSchemaUrl" type="text" name="schemaUrl" title="The URL of the meta data schema"/>
+                    <input type="submit" class="button" value="Create meta data type"/>
+                </form>
+            </div>
         </div>
     </div>
 </div>

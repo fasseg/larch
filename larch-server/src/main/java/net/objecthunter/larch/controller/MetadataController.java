@@ -15,13 +15,9 @@
 */
 package net.objecthunter.larch.controller;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.helpers.AuditRecords;
-import net.objecthunter.larch.model.AuditRecord;
-import net.objecthunter.larch.model.Entity;
-import net.objecthunter.larch.model.Metadata;
-import net.objecthunter.larch.model.MetadataType;
+import net.objecthunter.larch.model.*;
 import net.objecthunter.larch.service.AuditService;
 import net.objecthunter.larch.service.EntityService;
 import net.objecthunter.larch.service.IndexService;
@@ -30,7 +26,6 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,6 +34,8 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 
@@ -92,6 +89,15 @@ public class MetadataController extends AbstractLarchController {
         final String data = indexService.retrieve(id).getMetadata().get(metadataName).getData();
         IOUtils.write(data, resp.getOutputStream());
         resp.flushBuffer();
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/entity/{id}/metadata/{metadata-name}/validate",
+            produces = {"application/json"})
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public MetadataValidationResult validate(@PathVariable("id") final String id,
+                                             @PathVariable("metadata-name") final String metadataName) throws IOException {
+        return this.schemaService.validate(id, metadataName);
     }
 
     @RequestMapping(method = RequestMethod.GET, value="/metadatatype", produces = "application/json")

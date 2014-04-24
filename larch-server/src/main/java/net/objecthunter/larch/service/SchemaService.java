@@ -29,4 +29,8 @@ public interface SchemaService {
     String getSchemUrlForType(String type) throws IOException;
     List<MetadataType> getSchemaTypes() throws IOException;
     String createSchemaType(MetadataType type) throws IOException;
+
+    void deleteMetadataType(String name) throws IOException;
+
+    net.objecthunter.larch.model.MetadataValidationResult validate(String id, String metadataName) throws IOException;
 }
