@@ -39,10 +39,16 @@ public class SearchController extends AbstractLarchController {
         return searchService.searchEntities(query);
     }
 
+    @RequestMapping(method = RequestMethod.GET, produces = "text/html")
+    public ModelAndView searchHtml() {
+        final ModelMap model = new ModelMap();
+        return new ModelAndView("search", model);
+    }
+
     @RequestMapping(method = RequestMethod.POST, produces = {"text/html"})
     public ModelAndView searchMatchFieldsHtml(@RequestParam("term") final String query) {
         final ModelMap model = new ModelMap();
         model.addAttribute("result", searchMatchFields(query));
-        return new ModelAndView("search", model);
+        return new ModelAndView("searchresult", model);
     }
 }
