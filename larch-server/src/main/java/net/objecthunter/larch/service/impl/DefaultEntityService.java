@@ -18,6 +18,7 @@ package net.objecthunter.larch.service.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
+import net.objecthunter.larch.helpers.SizeCalculatingDigestInputStream;
 import net.objecthunter.larch.model.*;
 import net.objecthunter.larch.service.*;
 import net.objecthunter.larch.service.elasticsearch.ElasticSearchIndexService;
@@ -119,12 +120,13 @@ public class DefaultEntityService implements EntityService {
         } catch (NoSuchAlgorithmException e) {
             throw new IOException(e);
         }
-        try (final DigestInputStream src = new DigestInputStream(b.getSource().getInputStream(), digest)) {
+        try (final SizeCalculatingDigestInputStream src = new SizeCalculatingDigestInputStream(b.getSource().getInputStream(),
+                digest)) {
             final ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
             final String path = this.blobstoreService.create(src);
             final String checksum = new BigInteger(1, digest.digest()).toString(16);
             b.setChecksum(checksum);
-            b.setSize(digest.getDigestLength());
+            b.setSize(src.getBytesRead());
             b.setChecksumType(digest.getAlgorithm());
             b.setPath(path);
             b.setSource(new UrlSource(URI.create("http://localhost:8080/entity/" + entityId + "/binary/" + b.getName() + "/content"), true));
@@ -227,29 +229,32 @@ public class DefaultEntityService implements EntityService {
         } catch (NoSuchAlgorithmException e1) {
             throw new IOException(e1);
         }
-        final String path = blobstoreService.create(new DigestInputStream(inputStream, digest));
-        final Binary b = new Binary();
-        final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
-        b.setUtcCreated(now);
-        b.setUtcLastModified(now);
-        b.setName(name);
-        b.setMimetype(contentType);
-        b.setChecksum(new BigInteger(1, digest.digest()).toString(16));
-        b.setChecksumType("MD5");
-        b.setSource(new UrlSource(URI.create("http://localhost:8080/entity/" + entityId + "/binary/" + name + "/content"), true));
-        b.setPath(path);
-        b.setUtcCreated(now);
-        b.setUtcLastModified(now);
-        if (e.getBinaries() == null) {
-            e.setBinaries(new HashMap<>(1));
+        try (final SizeCalculatingDigestInputStream src =new SizeCalculatingDigestInputStream(inputStream, digest)) {
+            final String path = blobstoreService.create(src);
+            final Binary b = new Binary();
+            final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
+            b.setUtcCreated(now);
+            b.setUtcLastModified(now);
+            b.setName(name);
+            b.setMimetype(contentType);
+            b.setChecksum(new BigInteger(1, digest.digest()).toString(16));
+            b.setChecksumType("MD5");
+            b.setSize(src.getBytesRead());
+            b.setSource(new UrlSource(URI.create("http://localhost:8080/entity/" + entityId + "/binary/" + name + "/content"), true));
+            b.setPath(path);
+            b.setUtcCreated(now);
+            b.setUtcLastModified(now);
+            if (e.getBinaries() == null) {
+                e.setBinaries(new HashMap<>(1));
+            }
+            e.getBinaries().put(name, b);
+            if (e.getVersionPaths() == null) {
+                e.setVersionPaths(new HashMap<>());
+            }
+            e.getVersionPaths().put(e.getVersion(), oldVersionPath);
+            e.setVersion(e.getVersion() + 1);
+            this.indexService.update(e);
         }
-        e.getBinaries().put(name, b);
-        if (e.getVersionPaths() == null) {
-            e.setVersionPaths(new HashMap<>());
-        }
-        e.getVersionPaths().put(e.getVersion(), oldVersionPath);
-        e.setVersion(e.getVersion() + 1);
-        this.indexService.update(e);
         if (autoExport) {
             exportService.export(e);
             log.debug("exported entity {} ", e.getId());
