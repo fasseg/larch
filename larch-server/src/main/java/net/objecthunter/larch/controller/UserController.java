@@ -21,8 +21,10 @@ import net.objecthunter.larch.service.CredentialsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 import java.util.List;
@@ -40,6 +42,16 @@ public class UserController extends AbstractLarchController {
     @ResponseBody
     public List<User> retrieveUsers() throws IOException {
         return credentialsService.retrieveUsers();
+    }
+
+    @RequestMapping(value = "/credentials", method = RequestMethod.GET, produces = "text/html")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public ModelAndView retrieveCredentials() throws IOException {
+        final ModelMap model = new ModelMap();
+        model.addAttribute("users", this.credentialsService.retrieveUsers());
+        model.addAttribute("groups", this.credentialsService.retrieveGroups());
+        return new ModelAndView("credentials", model);
     }
 
     @RequestMapping(value = "/group", method = RequestMethod.GET, produces = "application/json")

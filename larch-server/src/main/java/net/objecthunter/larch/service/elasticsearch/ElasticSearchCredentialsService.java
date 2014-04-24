@@ -74,7 +74,7 @@ public class ElasticSearchCredentialsService implements AuthenticationManager, C
                 .getCount();
         if (count == 0) {
             // create default user
-            final Group g = mapper.readValue(client.prepareGet(INDEX_GROUPS, INDEX_USERS_TYPE, "ROLE_ADMIN")
+            final Group g = mapper.readValue(client.prepareGet(INDEX_GROUPS, INDEX_GROUPS_TYPE, "ROLE_ADMIN")
                     .execute()
                     .actionGet()
                     .getSourceAsBytes()
