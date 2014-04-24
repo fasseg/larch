@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.SerializationConfig;
 import net.objecthunter.larch.fs.FilesystemBlobstoreService;
 import net.objecthunter.larch.service.*;
 import net.objecthunter.larch.service.elasticsearch.*;
+import net.objecthunter.larch.service.elasticsearch.ElasticSearchCredentialsService;
 import net.objecthunter.larch.service.impl.DefaultEntityService;
 import net.objecthunter.larch.service.impl.DefaultExportService;
 import net.objecthunter.larch.service.impl.DefaultRepositoryService;
@@ -138,7 +139,7 @@ public class LarchServerConfiguration {
 
     @Bean
     @Order(Ordered.LOWEST_PRECEDENCE - 9)
-    public ElasticSearchAuthenticationManager larchElasticSearchAuthenticationManager() {
-        return new ElasticSearchAuthenticationManager();
+    public ElasticSearchCredentialsService larchElasticSearchAuthenticationManager() {
+        return new ElasticSearchCredentialsService();
     }
 }
