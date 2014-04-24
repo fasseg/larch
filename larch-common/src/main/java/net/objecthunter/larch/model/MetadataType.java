@@ -13,20 +13,25 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.service;
+package net.objecthunter.larch.model;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import net.objecthunter.larch.model.MetadataType;
+public class MetadataType {
+    private String name;
+    private String schemaUrl;
 
-import java.io.IOException;
-import java.util.List;
+    public String getName() {
+        return name;
+    }
 
-/**
- * Service definition for getting the associated schemaUrl for a given meta data type
- */
-public interface SchemaService {
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    String getSchemUrlForType(String type) throws IOException;
-    List<MetadataType> getSchemaTypes() throws IOException;
-    String createSchemaType(MetadataType type) throws IOException;
+    public String getSchemaUrl() {
+        return schemaUrl;
+    }
+
+    public void setSchemaUrl(String schemaUrl) {
+        this.schemaUrl = schemaUrl;
+    }
 }

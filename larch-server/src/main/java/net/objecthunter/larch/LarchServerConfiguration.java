@@ -18,18 +18,11 @@ package net.objecthunter.larch;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import net.objecthunter.larch.fs.FilesystemBlobstoreService;
-import net.objecthunter.larch.service.AuditService;
-import net.objecthunter.larch.service.ExportService;
-import net.objecthunter.larch.service.SchemaService;
-import net.objecthunter.larch.service.SearchService;
-import net.objecthunter.larch.service.elasticsearch.ElasticSearchAuditService;
-import net.objecthunter.larch.service.elasticsearch.ElasticSearchIndexService;
-import net.objecthunter.larch.service.elasticsearch.ElasticSearchNode;
-import net.objecthunter.larch.service.elasticsearch.ElasticSearchSearchService;
+import net.objecthunter.larch.service.*;
+import net.objecthunter.larch.service.elasticsearch.*;
 import net.objecthunter.larch.service.impl.DefaultEntityService;
 import net.objecthunter.larch.service.impl.DefaultExportService;
 import net.objecthunter.larch.service.impl.DefaultRepositoryService;
-import net.objecthunter.larch.service.impl.LarchElasticSearchAuthenticationManager;
 import net.objecthunter.larch.weedfs.WeedFSBlobstoreService;
 import net.objecthunter.larch.weedfs.WeedFsMaster;
 import net.objecthunter.larch.weedfs.WeedFsVolume;
@@ -57,21 +50,21 @@ public class LarchServerConfiguration {
 
     @Bean
     public SchemaService schemaService() {
-        return new SchemaService();
+        return new ElasticSearchSchemaService();
     }
 
     @Bean
-    public DefaultEntityService defaultEntityService() {
+    public EntityService defaultEntityService() {
         return new DefaultEntityService();
     }
 
     @Bean
-    public DefaultRepositoryService defaultRepositoryService() {
+    public RepositoryService defaultRepositoryService() {
         return new DefaultRepositoryService();
     }
 
     @Bean
-    public ElasticSearchIndexService elasticSearchIndexService() {
+    public IndexService elasticSearchIndexService() {
         return new ElasticSearchIndexService();
     }
 
@@ -146,7 +139,7 @@ public class LarchServerConfiguration {
 
     @Bean
     @Order(Ordered.LOWEST_PRECEDENCE - 9)
-    public LarchElasticSearchAuthenticationManager larchElasticSearchAuthenticationManager() {
-        return new LarchElasticSearchAuthenticationManager();
+    public ElasticSearchAuthenticationManager larchElasticSearchAuthenticationManager() {
+        return new ElasticSearchAuthenticationManager();
     }
 }

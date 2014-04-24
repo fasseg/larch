@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.service.impl;
+package net.objecthunter.larch.service.elasticsearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.model.security.Group;
@@ -38,7 +38,7 @@ import java.util.Arrays;
  * Implementation of a spring-security {@link org.springframework.security.authentication.AuthenticationManager}
  * which uses ElasticSearch indices as a persistence layer
  */
-public class LarchElasticSearchAuthenticationManager implements AuthenticationManager {
+public class ElasticSearchAuthenticationManager implements AuthenticationManager {
     public static final String USER_INDEX = "users";
     public static final String GROUP_INDEX = "groups";
 
