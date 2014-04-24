@@ -70,7 +70,6 @@ public class MetadataController extends AbstractLarchController {
         }
         final Metadata md = new Metadata();
         md.setName(mdName);
-        md.setSchemaUrl(schemaService.getSchemUrlForType(type));
         md.setData(IOUtils.toString(file.getInputStream()));
         md.setMimetype(file.getContentType());
         md.setType(type);

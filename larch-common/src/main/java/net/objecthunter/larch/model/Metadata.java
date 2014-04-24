@@ -23,7 +23,6 @@ public class Metadata {
 
     private String name;
     private String type;
-    private String schemaUrl;
     private String data;
     private String mimetype;
     private String originalFilename;
@@ -76,14 +75,6 @@ public class Metadata {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public String getSchemaUrl() {
-        return schemaUrl;
-    }
-
-    public void setSchemaUrl(String schemaUrl) {
-        this.schemaUrl = schemaUrl;
     }
 
     public String getData() {
