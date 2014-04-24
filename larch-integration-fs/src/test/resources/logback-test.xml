@@ -23,7 +23,7 @@
         </encoder>
     </appender>
 
-    <logger name="net.objecthunter.larch" level="DEBUG" additivity="false">
+    <logger name="net.objecthunter.larch" level="INFO" additivity="false">
         <appender-ref ref="LARCH-STDOUT"/>
     </logger>
 
@@ -35,7 +35,7 @@
         <appender-ref ref="SPRING-STDOUT"/>
     </logger>
 
-    <logger name="org.springframework.security" level="DEBUG">
+    <logger name="org.springframework.security" level="INFO">
         <appender-ref ref="SPRING-STDOUT"/>
     </logger>
 
