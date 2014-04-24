@@ -119,8 +119,10 @@ public class ElasticSearchSearchService implements SearchService {
             e.setLabel(label);
 
             final List<String> tags = new ArrayList<>();
-            for (Object o : hit.field("tags").values()) {
-                tags.add((String) o);
+            if (hit.field("tags") != null) {
+                for (Object o : hit.field("tags").values()) {
+                    tags.add((String) o);
+                }
             }
             e.setTags(tags);
             entities.add(e);

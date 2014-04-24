@@ -22,7 +22,8 @@
         $('#search').watermark('Search', {className: 'inactive'});
     });
     </script>
-    <form method="post" action="/search" enctype="multipart/form-data"><input type="text" id="search" name="term"/></form>
+    <form method="post" th:action="'/search?_csrf=' + ${_csrf.token}" enctype="multipart/form-data"><input
+            type="text" id="search" name="term"/></form>
 </div>
 
 <div th:fragment="left">
