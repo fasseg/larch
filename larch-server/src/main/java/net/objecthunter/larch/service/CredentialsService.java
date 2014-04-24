@@ -15,10 +15,12 @@
 */
 package net.objecthunter.larch.service;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import net.objecthunter.larch.model.security.Group;
 import net.objecthunter.larch.model.security.User;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface CredentialsService {
     void createUser(User u) throws IOException;
@@ -40,4 +42,8 @@ public interface CredentialsService {
     User retrieveUser(String name) throws IOException;
 
     Group retrieveGroup(String name) throws IOException;
+
+    List<User> retrieveUsers() throws IOException;
+
+    List<Group> retrieveGroups() throws IOException;
 }

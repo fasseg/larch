@@ -15,6 +15,7 @@
 */
 package net.objecthunter.larch.service.elasticsearch;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.model.security.Group;
 import net.objecthunter.larch.model.security.User;
@@ -24,7 +25,10 @@ import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRespon
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -37,6 +41,7 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Implementation of a spring-security {@link org.springframework.security.authentication.AuthenticationManager}
@@ -293,5 +298,31 @@ public class ElasticSearchCredentialsService implements AuthenticationManager, C
             throw new IOException("Group '" + name + "' is not valid");
         }
         return mapper.readValue(get.getSourceAsBytes(), Group.class);
+    }
+
+    @Override
+    public List<User> retrieveUsers() throws IOException {
+        final SearchResponse resp = this.client.prepareSearch(INDEX_USERS)
+                .setQuery(QueryBuilders.matchAllQuery())
+                .execute()
+                .actionGet();
+        final List<User> users = new ArrayList<>(resp.getHits().getHits().length);
+        for (SearchHit hit: resp.getHits()) {
+            users.add(mapper.readValue(hit.getSourceAsString(),User.class));
+        }
+        return users;
+    }
+
+    @Override
+    public List<Group> retrieveGroups() throws IOException {
+        final SearchResponse resp = this.client.prepareSearch(INDEX_GROUPS)
+                .setQuery(QueryBuilders.matchAllQuery())
+                .execute()
+                .actionGet();
+        final List<Group> groups = new ArrayList<>(resp.getHits().getHits().length);
+        for (SearchHit hit: resp.getHits()) {
+            groups.add(mapper.readValue(hit.getSourceAsString(), Group.class));
+        }
+        return groups;
     }
 }
