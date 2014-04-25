@@ -280,7 +280,7 @@ public class ElasticSearchCredentialsService implements AuthenticationManager, C
 
     @Override
     public User retrieveUser(String name) throws IOException {
-        final GetResponse get = this.client.prepareGet(INDEX_USERS, null, name)
+        final GetResponse get = this.client.prepareGet(INDEX_USERS, INDEX_USERS_TYPE, name)
                 .execute()
                 .actionGet();
         if (!get.isExists()) {
@@ -291,7 +291,7 @@ public class ElasticSearchCredentialsService implements AuthenticationManager, C
 
     @Override
     public Group retrieveGroup(String name) throws IOException {
-        final GetResponse get = this.client.prepareGet(INDEX_GROUPS, null, name)
+        final GetResponse get = this.client.prepareGet(INDEX_GROUPS, INDEX_GROUPS_TYPE, name)
                 .execute()
                 .actionGet();
         if (!get.isExists()) {

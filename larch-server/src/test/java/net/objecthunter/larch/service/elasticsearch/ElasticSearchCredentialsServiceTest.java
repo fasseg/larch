@@ -191,7 +191,49 @@ public class ElasticSearchCredentialsServiceTest {
 
     @Test
     public void testAddUserToGroup() throws Exception {
+        User u = Fixtures.createUser();
+        Group g = Fixtures.createGroup();
+        g.setName("ROLE_TEST2");
 
+        GetResponse mockGetResponse = createMock(GetResponse.class);
+        GetRequestBuilder mockGetRequestBuilder = createMock(GetRequestBuilder.class);
+        ListenableActionFuture mockFuture = createMock(ListenableActionFuture.class);
+        IndexRequestBuilder mockIndexRequestBuilder = createMock(IndexRequestBuilder.class);
+
+        /* retrieve user */
+        expect(mockClient.prepareGet(ElasticSearchCredentialsService.INDEX_USERS,
+                ElasticSearchCredentialsService.INDEX_USERS_TYPE, u.getName())).andReturn(mockGetRequestBuilder);
+        expect(mockGetRequestBuilder.execute()).andReturn(mockFuture);
+        expect(mockFuture.actionGet()).andReturn(mockGetResponse);
+        expect(mockGetResponse.getSourceAsBytes()).andReturn(mapper.writeValueAsBytes(u));
+
+        /* retrieve group */
+        expect(mockClient.prepareGet(ElasticSearchCredentialsService.INDEX_GROUPS,
+                ElasticSearchCredentialsService.INDEX_GROUPS_TYPE, g.getName())).andReturn(mockGetRequestBuilder);
+        expect(mockGetRequestBuilder.execute()).andReturn(mockFuture);
+        expect(mockFuture.actionGet()).andReturn(mockGetResponse);
+        expect(mockGetResponse.isExists()).andReturn(true);
+        expect(mockGetResponse.getSourceAsBytes()).andReturn(mapper.writeValueAsBytes(g));
+
+        /* existence check */
+        expect(mockClient.prepareGet(ElasticSearchCredentialsService.INDEX_USERS,
+                ElasticSearchCredentialsService.INDEX_USERS_TYPE, u.getName())).andReturn(mockGetRequestBuilder);
+        expect(mockGetRequestBuilder.execute()).andReturn(mockFuture);
+        expect(mockFuture.actionGet()).andReturn(mockGetResponse);
+        expect(mockGetResponse.isExists()).andReturn(true);
+
+        /* user indexing */
+        expect(mockClient.prepareIndex(ElasticSearchCredentialsService.INDEX_USERS,
+                ElasticSearchCredentialsService.INDEX_USERS_TYPE,
+                u.getName())).andReturn(mockIndexRequestBuilder);
+        expect(mockIndexRequestBuilder.setSource((byte[]) anyObject())).andReturn(mockIndexRequestBuilder);
+        expect(mockIndexRequestBuilder.execute()).andReturn(mockFuture);
+        expect(mockGetResponse.isExists()).andReturn(true);
+        expect(mockFuture.actionGet()).andReturn(null);
+
+        replay(mockClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
+        this.credentialsService.addUserToGroup("test",g.getName());
+        verify(mockClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
     }
 
     @Test
