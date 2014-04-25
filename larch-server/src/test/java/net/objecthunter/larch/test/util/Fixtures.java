@@ -15,10 +15,16 @@
 */
 package net.objecthunter.larch.test.util;
 
+import net.objecthunter.larch.model.Binary;
+import net.objecthunter.larch.model.Entity;
+import net.objecthunter.larch.model.Metadata;
 import net.objecthunter.larch.model.security.Group;
 import net.objecthunter.larch.model.security.User;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public abstract class Fixtures {
     public static User createUser() {
@@ -33,5 +39,53 @@ public abstract class Fixtures {
         Group g = new Group();
         g.setName("ROLE_TEST");
         return g;
+    }
+
+    public static Entity createEntity() {
+        Entity e = new Entity();
+        e.setId("testid");
+        e.setLabel("Test label");
+        e.setType("Test type");
+        e.setTags(Arrays.asList("tag1", "tag2"));
+        e.setMetadata(createMetadataMap());
+        e.setBinaries(createBinaryMap());
+        e.setRelations(createRelations());
+        return e;
+    }
+
+    public static Map<String,List<String>> createRelations() {
+        Map<String, List<String>> relations = new HashMap<>();
+        relations.put("testpredicate", Arrays.asList("object1", "object2"));
+        return relations;
+    }
+
+    public static Map<String, Binary> createBinaryMap() {
+        Map<String, Binary> bins =new HashMap<>(1);
+        Binary bin = createBinary();
+        bins.put(bin.getName(), bin);
+        return bins;
+    }
+
+    public static Binary createBinary() {
+        Binary bin = new Binary();
+        bin.setSize(1);
+        bin.setMimetype("text/plain");
+        bin.setName("BINARY-1");
+        return bin;
+    }
+
+    public static Map<String, Metadata> createMetadataMap() {
+        Map<String, Metadata> metadataMap = new HashMap<>(1);
+        Metadata md = creatMetadata();
+        metadataMap.put(md.getName(), md);
+        return metadataMap;
+    }
+
+    public static Metadata creatMetadata() {
+        Metadata data = new Metadata();
+        data.setName("DC");
+        data.setType("Dublin Core");
+        data.setData("<empty/>");
+        return data;
     }
 }
