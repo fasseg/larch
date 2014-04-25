@@ -418,6 +418,29 @@ public class ElasticSearchCredentialsServiceTest {
 
     @Test
     public void testRetrieveGroups() throws Exception {
+        Group g = Fixtures.createGroup();
+        SearchResponse mockSearchResponse = createMock(SearchResponse.class);
+        SearchRequestBuilder mockSearchRequestBuilder = createMock(SearchRequestBuilder.class);
+        ListenableActionFuture mockFuture = createMock(ListenableActionFuture.class);
+        SearchHit[] hitArray = new SearchHit[1];
+        SearchHit mockHit = createMock(SearchHit.class);
+        hitArray[0] = mockHit;
+        SearchHits mockHits = createMock(SearchHits.class);
 
+
+        expect(mockClient.prepareSearch(ElasticSearchCredentialsService.INDEX_GROUPS)).andReturn(mockSearchRequestBuilder);
+        expect(mockSearchRequestBuilder.setQuery(anyObject(QueryBuilder.class))).andReturn(mockSearchRequestBuilder);
+        expect(mockSearchRequestBuilder.execute()).andReturn(mockFuture);
+        expect(mockFuture.actionGet()).andReturn(mockSearchResponse);
+        expect(mockSearchResponse.getHits()).andReturn(mockHits).times(2);
+        expect(mockHits.getHits()).andReturn(hitArray);
+        expect(mockHits.iterator()).andReturn(Arrays.asList(hitArray).iterator());
+        expect(mockHit.getSourceAsString()).andReturn(mapper.writeValueAsString(g));
+
+        replay(mockClient, mockSearchRequestBuilder, mockSearchResponse, mockFuture, mockHits, mockHit);
+        List<Group> groups = this.credentialsService.retrieveGroups();
+        verify(mockClient, mockSearchRequestBuilder, mockSearchResponse, mockFuture, mockHits, mockHit);
+        assertEquals(1, groups.size());
+        assertEquals(g.getName(), groups.get(0).getName());
     }
 }
