@@ -17,8 +17,11 @@ package net.objecthunter.larch.service.elasticsearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.model.Entity;
+import net.objecthunter.larch.model.state.IndexState;
 import net.objecthunter.larch.test.util.Fixtures;
 import org.elasticsearch.action.ListenableActionFuture;
+import org.elasticsearch.action.admin.indices.stats.IndicesStatsResponse;
+import org.elasticsearch.action.admin.indices.status.*;
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequestBuilder;
@@ -29,16 +32,22 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
+import org.elasticsearch.common.unit.ByteSizeValue;
+import org.elasticsearch.index.flush.FlushStats;
+import org.elasticsearch.index.merge.MergeStats;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.refresh.RefreshStats;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.easymock.EasyMock.*;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertTrue;
 
 public class ElasticSearchIndexServiceTest {
     private ElasticSearchIndexService indexService;
@@ -186,11 +195,68 @@ public class ElasticSearchIndexServiceTest {
 
     @Test
     public void testStatus() throws Exception {
+        IndicesStatsResponse mockStats = createMock(IndicesStatsResponse.class);
+        IndicesStatusResponse mockStatusResponse = createMock(IndicesStatusResponse.class);
+        ListenableActionFuture mockFuture = createMock(ListenableActionFuture.class);
+        IndexStatus mockIndexStatus = createMock(IndexStatus.class);
+        ByteSizeValue mockByteSize = createMock(ByteSizeValue.class);
+        IndexShardStatus mockShardStatus = createMock(IndexShardStatus.class);
+        DocsStatus mockDocStatus = createMock(DocsStatus.class);
+        FlushStats mockFlushStats = createMock(FlushStats.class);
+        MergeStats mockMergeStats = createMock(MergeStats.class);
+        RefreshStats mockRefreshStats = createMock(RefreshStats.class);
 
+
+        Map<String, IndexStatus> indexStates = new HashMap<>();
+        indexStates.put(ElasticSearchIndexService.INDEX_ENTITIES, mockIndexStatus);
+        Map<Integer, IndexShardStatus> shardStates = new HashMap<>();
+        shardStates.put(0, mockShardStatus);
+
+
+        expect(mockClient.admin()).andReturn(mockAdminClient);
+        expect(mockAdminClient.indices()).andReturn(mockIndicesAdminClient);
+        expect(mockIndicesAdminClient.status(anyObject(IndicesStatusRequest.class))).andReturn(mockFuture);
+        expect(mockFuture.actionGet()).andReturn(mockStatusResponse);
+        expect(mockStatusResponse.getIndices()).andReturn(indexStates);
+        expect(mockIndexStatus.getStoreSize()).andReturn(mockByteSize);
+        expect(mockByteSize.getBytes()).andReturn(0l);
+        expect(mockIndexStatus.getShards()).andReturn(shardStates);
+        expect(mockIndexStatus.getDocs()).andReturn(mockDocStatus).times(2);
+        expect(mockDocStatus.getNumDocs()).andReturn(0l);
+        expect(mockDocStatus.getMaxDoc()).andReturn(0l);
+        expect(mockIndexStatus.getFlushStats()).andReturn(mockFlushStats);
+        expect(mockFlushStats.getTotalTimeInMillis()).andReturn(0l);
+        expect(mockIndexStatus.getMergeStats()).andReturn(mockMergeStats).times(3);
+        expect(mockMergeStats.getTotalTimeInMillis()).andReturn(0l);
+        expect(mockMergeStats.getCurrentNumDocs()).andReturn(0l);
+        expect(mockMergeStats.getTotalSizeInBytes()).andReturn(0l);
+        expect(mockIndexStatus.getRefreshStats()).andReturn(mockRefreshStats);
+        expect(mockRefreshStats.getTotalTimeInMillis()).andReturn(0l);
+
+
+        replay(mockClient, mockAdminClient, mockIndicesAdminClient, mockStats, mockFuture, mockIndexStatus,
+                mockStatusResponse, mockByteSize, mockDocStatus, mockFlushStats, mockMergeStats, mockRefreshStats);
+        IndexState state = this.indexService.status();
+        verify(mockClient, mockAdminClient, mockIndicesAdminClient, mockStats, mockFuture, mockIndexStatus,
+                mockStatusResponse, mockByteSize, mockDocStatus, mockFlushStats, mockMergeStats, mockRefreshStats);
     }
 
     @Test
     public void testExists() throws Exception {
+        Entity e = Fixtures.createEntity();
+        GetResponse mockGetResponse = createMock(GetResponse.class);
+        GetRequestBuilder mockGetRequestBuilder = createMock(GetRequestBuilder.class);
+        ListenableActionFuture mockFuture = createMock(ListenableActionFuture.class);
 
+        /* existence check */
+        expect(mockClient.prepareGet(ElasticSearchIndexService.INDEX_ENTITIES,
+                ElasticSearchIndexService.INDEX_ENTITY_TYPE, e.getId())).andReturn(mockGetRequestBuilder);
+        expect(mockGetRequestBuilder.execute()).andReturn(mockFuture);
+        expect(mockFuture.actionGet()).andReturn(mockGetResponse);
+        expect(mockGetResponse.isExists()).andReturn(true);
+
+        replay(mockClient, mockGetResponse, mockGetRequestBuilder, mockFuture);
+        assertTrue(this.indexService.exists(e.getId()));
+        verify(mockClient, mockGetResponse, mockGetRequestBuilder, mockFuture);
     }
 }
