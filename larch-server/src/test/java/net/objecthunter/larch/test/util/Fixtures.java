@@ -18,6 +18,7 @@ package net.objecthunter.larch.test.util;
 import net.objecthunter.larch.model.Binary;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.Metadata;
+import net.objecthunter.larch.model.MetadataType;
 import net.objecthunter.larch.model.security.Group;
 import net.objecthunter.larch.model.security.User;
 
@@ -53,14 +54,14 @@ public abstract class Fixtures {
         return e;
     }
 
-    public static Map<String,List<String>> createRelations() {
+    public static Map<String, List<String>> createRelations() {
         Map<String, List<String>> relations = new HashMap<>();
         relations.put("testpredicate", Arrays.asList("object1", "object2"));
         return relations;
     }
 
     public static Map<String, Binary> createBinaryMap() {
-        Map<String, Binary> bins =new HashMap<>(1);
+        Map<String, Binary> bins = new HashMap<>(1);
         Binary bin = createBinary();
         bins.put(bin.getName(), bin);
         return bins;
@@ -87,5 +88,12 @@ public abstract class Fixtures {
         data.setType("Dublin Core");
         data.setData("<empty/>");
         return data;
+    }
+
+    public static MetadataType createMetadataType() {
+        MetadataType type = new MetadataType();
+        type.setName("Dublin Core");
+        type.setSchemaUrl("http://example.com");
+        return type;
     }
 }

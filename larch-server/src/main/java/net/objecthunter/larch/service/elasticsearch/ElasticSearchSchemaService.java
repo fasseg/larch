@@ -25,6 +25,8 @@ import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.count.CountResponse;
+import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
@@ -130,9 +132,8 @@ public class ElasticSearchSchemaService implements SchemaService {
             throw new IOException("Metadata type " + newType.getName() + " already exists");
         }
         /* add the new type to the index */
-        final IndexResponse resp = this.client.prepareIndex(INDEX_MD_SCHEMATA, INDEX_MD_SCHEMATA_TYPE, null)
+        final IndexResponse resp = this.client.prepareIndex(INDEX_MD_SCHEMATA, INDEX_MD_SCHEMATA_TYPE, newType.getName())
                 .setSource(mapper.writeValueAsBytes(newType))
-                .setId(newType.getName())
                 .execute()
                 .actionGet();
         this.refreshIndex(INDEX_MD_SCHEMATA);
@@ -143,7 +144,7 @@ public class ElasticSearchSchemaService implements SchemaService {
     public void deleteMetadataType(String name) throws IOException {
         /* first check if the type is still used by Entities or Binaries */
         final CountResponse count = this.client.prepareCount(ElasticSearchIndexService.INDEX_ENTITIES)
-                .setQuery(QueryBuilders.nestedQuery("metadata",QueryBuilders.matchQuery("type",name)))
+                .setQuery(QueryBuilders.nestedQuery("metadata", QueryBuilders.matchQuery("type", name)))
                 .execute()
                 .actionGet();
         if (count.getCount() > 0) {
@@ -151,6 +152,10 @@ public class ElasticSearchSchemaService implements SchemaService {
         }
         /* the metadata type is safe to delete, since it's no longer used */
         log.debug("deleting meta data type {} ", name);
+        final DeleteResponse delete = this.client.prepareDelete(ElasticSearchSchemaService.INDEX_MD_SCHEMATA,
+                INDEX_MD_SCHEMATA_TYPE,name)
+                .execute()
+                .actionGet();
     }
 
     @Override
@@ -162,13 +167,13 @@ public class ElasticSearchSchemaService implements SchemaService {
         )
                 .execute()
                 .actionGet();
-        if (!resp.isExists())  {
+        if (!resp.isExists()) {
             throw new IOException("The entity '" + id + "' does not exist");
         }
         /* fetch the named metadata which will be validatet */
         final Entity e = mapper.readValue(resp.getSourceAsBytes(), Entity.class);
         if (e.getMetadata() == null || !e.getMetadata().containsKey(metadataName)) {
-            throw new IOException("The entity '" + id  + "' has no meta data record named '" + metadataName);
+            throw new IOException("The entity '" + id + "' has no meta data record named '" + metadataName);
         }
         final Metadata md = e.getMetadata().get(metadataName);
         final String schemaUrl = this.getSchemUrlForType(md.getType());
@@ -188,13 +193,13 @@ public class ElasticSearchSchemaService implements SchemaService {
                 result.setTimestamp(ZonedDateTime.now(ZoneOffset.UTC).toString());
                 result.setDetails("Validation successful");
                 return result;
-            }catch (SAXException validationException) {
+            } catch (SAXException validationException) {
                 result.setSuccess(false);
                 result.setTimestamp(ZonedDateTime.now(ZoneOffset.UTC).toString());
                 result.setDetails(validationException.getMessage());
                 return result;
             }
-        }catch(SAXException se) {
+        } catch (SAXException se) {
             throw new IOException(se);
         }
     }
