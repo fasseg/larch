@@ -17,6 +17,8 @@ package net.objecthunter.larch.service.elasticsearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.helpers.AuditRecords;
+import net.objecthunter.larch.model.AuditRecord;
+import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.security.User;
 import org.easymock.EasyMock;
 import org.elasticsearch.action.ListenableActionFuture;
@@ -38,8 +40,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.easymock.EasyMock.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class ElasticSearchAuditServiceTest {
 
@@ -82,11 +87,19 @@ public class ElasticSearchAuditServiceTest {
         expect(mockFuture.actionGet()).andReturn(mockResponse);
         expect(mockResponse.getHits()).andReturn(mockHits);
         expect(mockHits.iterator()).andReturn(Arrays.asList(hitArray).iterator());
-        expect(hitMock.getSourceAsString()).andReturn("{}");
+        String json = new ObjectMapper().writeValueAsString(AuditRecords
+                        .createEntityRecord("id"));
+        expect(hitMock.getSourceAsString()).andReturn(json);
 
         replay(mockClient, mockSearchRequestBuilder, mockFuture, mockHits, mockResponse, hitMock);
-        this.auditService.retrieve("id", 0, 0);
+        List<AuditRecord> records = this.auditService.retrieve("id", 0, 0);
         verify(mockClient, mockSearchRequestBuilder, mockFuture, mockHits, mockResponse, hitMock);
+
+        assertEquals(1, records.size());
+        assertEquals("id", records.get(0).getEntityId());
+        assertEquals(AuditRecord.EVENT_CREATE_ENTITY, records.get(0).getAction());
+        assertEquals("test", records.get(0).getAgentName());
+        assertNotNull(records.get(0).getTimestamp());
     }
 
     @Test
