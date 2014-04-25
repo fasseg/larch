@@ -19,6 +19,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.test.util.Fixtures;
 import org.elasticsearch.action.ListenableActionFuture;
+import org.elasticsearch.action.delete.DeleteRequestBuilder;
+import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequestBuilder;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
@@ -34,9 +36,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.Arrays;
-
 import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 public class ElasticSearchIndexServiceTest {
     private ElasticSearchIndexService indexService;
@@ -152,18 +154,34 @@ public class ElasticSearchIndexServiceTest {
         expect(mockSearchResponse.getHits()).andReturn(mockHits);
         expect(mockHits.getTotalHits()).andReturn(0l);
 
-        replay(mockClient,mockHits, mockSearchRequestBuilder, mockSearchResponse, mockGetResponse,
-                mockGetRequestBuilder,
-                mockFuture);
+        replay(mockClient, mockHits, mockSearchRequestBuilder, mockSearchResponse, mockGetResponse,
+                mockGetRequestBuilder, mockFuture);
         this.indexService.retrieve(e.getId());
-        verify(mockClient,mockHits, mockSearchRequestBuilder, mockSearchResponse,  mockGetRequestBuilder,
-                mockGetResponse,
-                mockFuture);
+        verify(mockClient, mockHits, mockSearchRequestBuilder, mockSearchResponse, mockGetRequestBuilder,
+                mockGetResponse, mockFuture);
     }
 
     @Test
     public void testDelete() throws Exception {
+        Entity e = Fixtures.createEntity();
+        DeleteResponse mockDeleteResponse = createMock(DeleteResponse.class);
+        DeleteRequestBuilder mockDeleteRequest = createMock(DeleteRequestBuilder.class);
+        ListenableActionFuture mockFuture = createMock(ListenableActionFuture.class);
 
+        expect(mockClient.prepareDelete(ElasticSearchIndexService.INDEX_ENTITIES,
+                ElasticSearchIndexService.INDEX_ENTITY_TYPE, e.getId())).andReturn(mockDeleteRequest);
+        expect(mockDeleteRequest.execute()).andReturn(mockFuture);
+        expect(mockFuture.actionGet()).andReturn(mockDeleteResponse);
+
+        /* index refresh */
+        expect(mockClient.admin()).andReturn(mockAdminClient);
+        expect(mockAdminClient.indices()).andReturn(mockIndicesAdminClient);
+        expect(mockIndicesAdminClient.refresh(anyObject())).andReturn(mockFuture);
+        expect(mockFuture.actionGet()).andReturn(null);
+
+        replay(mockClient, mockAdminClient, mockIndicesAdminClient, mockDeleteRequest, mockDeleteResponse, mockFuture);
+        this.indexService.delete(e.getId());
+        verify(mockClient, mockAdminClient, mockIndicesAdminClient, mockDeleteRequest, mockDeleteResponse, mockFuture);
     }
 
     @Test
