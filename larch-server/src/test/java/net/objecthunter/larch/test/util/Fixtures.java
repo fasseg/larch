@@ -21,13 +21,17 @@ import net.objecthunter.larch.model.security.User;
 import java.util.Arrays;
 
 public abstract class Fixtures {
-    public static User getUser() {
+    public static User createUser() {
         User u = new User();
-        Group g = new Group();
-        g.setName("ROLE_TEST");
-        u.setGroups(Arrays.asList(g));
+        u.setGroups(Arrays.asList(createGroup()));
         u.setName("test");
         u.setPwhash("9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"); //sha256 hash for pw 'test'
         return u;
+    }
+
+    public static Group createGroup() {
+        Group g = new Group();
+        g.setName("ROLE_TEST");
+        return g;
     }
 }

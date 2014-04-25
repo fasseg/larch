@@ -16,13 +16,13 @@
 package net.objecthunter.larch.service.elasticsearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.objecthunter.larch.model.security.Group;
 import net.objecthunter.larch.model.security.User;
 import net.objecthunter.larch.test.util.Fixtures;
 import org.elasticsearch.action.ListenableActionFuture;
 import org.elasticsearch.action.get.GetRequestBuilder;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,7 +50,7 @@ public class ElasticSearchCredentialsServiceTest {
 
     @Test
     public void testAuthenticate() throws Exception {
-        User u = Fixtures.getUser();
+        User u = Fixtures.createUser();
         GetResponse mockResponse = createMock(GetResponse.class);
         GetRequestBuilder mockGetRequestBuilder = createMock(GetRequestBuilder.class);
         ListenableActionFuture mockFuture = createMock(ListenableActionFuture.class);
@@ -74,7 +74,7 @@ public class ElasticSearchCredentialsServiceTest {
 
     @Test
     public void testCreateUser() throws Exception {
-        User u = Fixtures.getUser();
+        User u = Fixtures.createUser();
         GetResponse mockGetResponse = createMock(GetResponse.class);
         GetRequestBuilder mockGetRequestBuilder = createMock(GetRequestBuilder.class);
         ListenableActionFuture mockFuture = createMock(ListenableActionFuture.class);
@@ -103,7 +103,31 @@ public class ElasticSearchCredentialsServiceTest {
 
     @Test
     public void testCreateGroup() throws Exception {
+        Group g = Fixtures.createGroup();
+        GetResponse mockGetResponse = createMock(GetResponse.class);
+        GetRequestBuilder mockGetRequestBuilder = createMock(GetRequestBuilder.class);
+        ListenableActionFuture mockFuture = createMock(ListenableActionFuture.class);
+        IndexRequestBuilder mockIndexRequestBuilder = createMock(IndexRequestBuilder.class);
 
+        /* existence check */
+        expect(mockClient.prepareGet(ElasticSearchCredentialsService.INDEX_GROUPS,
+                ElasticSearchCredentialsService.INDEX_GROUPS_TYPE, g.getName())).andReturn(mockGetRequestBuilder);
+        expect(mockGetRequestBuilder.execute()).andReturn(mockFuture);
+        expect(mockFuture.actionGet()).andReturn(mockGetResponse);
+        expect(mockGetResponse.isExists()).andReturn(false);
+
+        /* group indexing */
+        expect(mockClient.prepareIndex(ElasticSearchCredentialsService.INDEX_GROUPS,
+                ElasticSearchCredentialsService.INDEX_GROUPS_TYPE,
+                g.getName())).andReturn(mockIndexRequestBuilder);
+        expect(mockIndexRequestBuilder.setSource((byte[]) anyObject())).andReturn(mockIndexRequestBuilder);
+        expect(mockIndexRequestBuilder.execute()).andReturn(mockFuture);
+        expect(mockFuture.actionGet()).andReturn(null);
+
+
+        replay(mockClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
+        this.credentialsService.createGroup(g);
+        verify(mockClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
     }
 
     @Test
