@@ -132,12 +132,61 @@ public class ElasticSearchCredentialsServiceTest {
 
     @Test
     public void testUpdateUser() throws Exception {
+        User u = Fixtures.createUser();
+        u.setFirstName("foo");
+        GetResponse mockGetResponse = createMock(GetResponse.class);
+        GetRequestBuilder mockGetRequestBuilder = createMock(GetRequestBuilder.class);
+        ListenableActionFuture mockFuture = createMock(ListenableActionFuture.class);
+        IndexRequestBuilder mockIndexRequestBuilder = createMock(IndexRequestBuilder.class);
 
+        /* existence check */
+        expect(mockClient.prepareGet(ElasticSearchCredentialsService.INDEX_USERS,
+                ElasticSearchCredentialsService.INDEX_USERS_TYPE, u.getName())).andReturn(mockGetRequestBuilder);
+        expect(mockGetRequestBuilder.execute()).andReturn(mockFuture);
+        expect(mockFuture.actionGet()).andReturn(mockGetResponse);
+        expect(mockGetResponse.isExists()).andReturn(true);
+
+        /* user indexing */
+        expect(mockClient.prepareIndex(ElasticSearchCredentialsService.INDEX_USERS,
+                ElasticSearchCredentialsService.INDEX_USERS_TYPE,
+                u.getName())).andReturn(mockIndexRequestBuilder);
+        expect(mockIndexRequestBuilder.setSource((byte[]) anyObject())).andReturn(mockIndexRequestBuilder);
+        expect(mockIndexRequestBuilder.execute()).andReturn(mockFuture);
+        expect(mockFuture.actionGet()).andReturn(null);
+
+
+        replay(mockClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
+        this.credentialsService.updateUser(u);
+        verify(mockClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
     }
 
     @Test
     public void testUpdateGroup() throws Exception {
+        Group g = Fixtures.createGroup();
+        GetResponse mockGetResponse = createMock(GetResponse.class);
+        GetRequestBuilder mockGetRequestBuilder = createMock(GetRequestBuilder.class);
+        ListenableActionFuture mockFuture = createMock(ListenableActionFuture.class);
+        IndexRequestBuilder mockIndexRequestBuilder = createMock(IndexRequestBuilder.class);
 
+        /* existence check */
+        expect(mockClient.prepareGet(ElasticSearchCredentialsService.INDEX_GROUPS,
+                ElasticSearchCredentialsService.INDEX_GROUPS_TYPE, g.getName())).andReturn(mockGetRequestBuilder);
+        expect(mockGetRequestBuilder.execute()).andReturn(mockFuture);
+        expect(mockFuture.actionGet()).andReturn(mockGetResponse);
+        expect(mockGetResponse.isExists()).andReturn(true);
+
+        /* group indexing */
+        expect(mockClient.prepareIndex(ElasticSearchCredentialsService.INDEX_GROUPS,
+                ElasticSearchCredentialsService.INDEX_GROUPS_TYPE,
+                g.getName())).andReturn(mockIndexRequestBuilder);
+        expect(mockIndexRequestBuilder.setSource((byte[]) anyObject())).andReturn(mockIndexRequestBuilder);
+        expect(mockIndexRequestBuilder.execute()).andReturn(mockFuture);
+        expect(mockFuture.actionGet()).andReturn(null);
+
+
+        replay(mockClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
+        this.credentialsService.updateGroup(g);
+        verify(mockClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
     }
 
     @Test
