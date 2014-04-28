@@ -158,6 +158,16 @@ public class DefaultEntityServiceTest {
 
     @Test
     public void testCreateRelation() throws Exception {
+        Entity e = Fixtures.createEntity();
+
+        expect(mockIndexService.retrieve(e.getId())).andReturn(e);
+        expect(mockBlobstoreService.createOldVersionBlob(e)).andReturn("oldpath");
+        mockIndexService.update(e);
+        expectLastCall();
+
+        replay(mockIndexService, mockExportService, mockBlobstoreService);
+        this.entityService.createRelation(e.getId(), "<http://example.com/hasType>", "test");
+        verify(mockIndexService, mockExportService, mockBlobstoreService);
 
     }
 }
