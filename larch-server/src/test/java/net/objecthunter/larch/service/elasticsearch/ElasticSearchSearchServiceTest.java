@@ -53,7 +53,7 @@ public class ElasticSearchSearchServiceTest {
     }
 
     @Test
-    public void testScanIndex() throws Exception {
+    public void testScanIndexWithNumRecords() throws Exception {
         SearchResponse mockSearchResponse = createMock(SearchResponse.class);
         SearchRequestBuilder mockSearchRequestBuilder = createMock(SearchRequestBuilder.class);
         ListenableActionFuture mockFuture = createMock(ListenableActionFuture.class);
@@ -134,7 +134,39 @@ public class ElasticSearchSearchServiceTest {
     }
 
     @Test
-    public void testScanIndex1() throws Exception {
+    public void testScanIndexDefaultNumRecords() throws Exception {
+        SearchResponse mockSearchResponse = createMock(SearchResponse.class);
+        SearchRequestBuilder mockSearchRequestBuilder = createMock(SearchRequestBuilder.class);
+        ListenableActionFuture mockFuture = createMock(ListenableActionFuture.class);
+        SearchHit[] hitArray = new SearchHit[1];
+        SearchHit mockHit = createMock(SearchHit.class);
+        hitArray[0] = mockHit;
+        SearchHitField mockField = createMock(SearchHitField.class);
+        SearchHits mockHits = createMock(SearchHits.class);
 
+        expect(mockClient.prepareSearch(ElasticSearchIndexService.INDEX_ENTITIES)).andReturn(mockSearchRequestBuilder);
+        expect(mockSearchRequestBuilder.setQuery(anyObject(QueryBuilder.class))).andReturn(mockSearchRequestBuilder);
+        expect(mockSearchRequestBuilder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)).andReturn(mockSearchRequestBuilder);
+        expect(mockSearchRequestBuilder.setFrom(0)).andReturn(mockSearchRequestBuilder);
+        expect(mockSearchRequestBuilder.setSize(50)).andReturn(mockSearchRequestBuilder);
+        expect(mockSearchRequestBuilder.addFields("id", "label", "type", "tags")).andReturn(mockSearchRequestBuilder);
+        expect(mockSearchRequestBuilder.execute()).andReturn(mockFuture);
+        expect(mockFuture.actionGet()).andReturn(mockSearchResponse);
+        expect(mockSearchResponse.getHits()).andReturn(mockHits).times(3);
+        expect(mockHits.getHits()).andReturn(hitArray);
+        expect(mockHits.getTotalHits()).andReturn((long) hitArray.length);
+        expect(mockHits.iterator()).andReturn(Arrays.asList(hitArray).iterator());
+        expect(mockHit.field("label")).andReturn(mockField).times(2);
+        expect(mockField.getValue()).andReturn("test label");
+        expect(mockHit.field("type")).andReturn(mockField).times(2);
+        expect(mockField.getValue()).andReturn("test type");
+        expect(mockHit.field("id")).andReturn(mockField);
+        expect(mockField.getValue()).andReturn("testid");
+        expect(mockHit.field("tags")).andReturn(mockField).times(2);
+        expect(mockField.values()).andReturn(Arrays.asList("testtag1", "testtag2"));
+
+        replay(mockClient, mockSearchRequestBuilder, mockFuture, mockSearchResponse, mockHits, mockHit, mockField);
+        SearchResult result = searchService.scanIndex(0);
+        verify(mockClient, mockSearchRequestBuilder, mockFuture, mockSearchResponse, mockHits, mockHit, mockField);
     }
 }
