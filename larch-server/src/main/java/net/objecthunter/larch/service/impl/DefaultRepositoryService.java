@@ -71,7 +71,7 @@ public class DefaultRepositoryService implements RepositoryService {
                 .actionGet();
         desc.setEsMasterNodeName(state.getState().getNodes().getMasterNodeId());
         desc.setEsNumDataNodes(state.getState().getNodes().getDataNodes().size());
-        desc.setEsMasterNodeAddress(state.getState().getNodes().getMasterNode().address().toString());
+        desc.setEsMasterNodeAddress(state.getState().getNodes().getMasterNode().getAddress().toString());
         desc.setEsNodeName(state.getState().getNodes().getLocalNodeId());
         final ClusterStatsResponse stats = client.admin().cluster().prepareClusterStats()
                 .execute()
