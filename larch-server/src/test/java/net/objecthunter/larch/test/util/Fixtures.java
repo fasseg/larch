@@ -72,6 +72,7 @@ public abstract class Fixtures {
         bin.setSize(1);
         bin.setMimetype("text/plain");
         bin.setName("BINARY-1");
+        bin.setPath("/path/to/testbinary");
         return bin;
     }
 

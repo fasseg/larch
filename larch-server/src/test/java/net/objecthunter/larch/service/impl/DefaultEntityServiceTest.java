@@ -16,6 +16,7 @@
 package net.objecthunter.larch.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.objecthunter.larch.model.Binary;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.service.BlobstoreService;
 import net.objecthunter.larch.service.ExportService;
@@ -24,6 +25,8 @@ import net.objecthunter.larch.test.util.Fixtures;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import java.io.ByteArrayInputStream;
 
 import static org.easymock.EasyMock.*;
 
@@ -97,7 +100,15 @@ public class DefaultEntityServiceTest {
 
     @Test
     public void testGetContent() throws Exception {
+        Entity e = Fixtures.createEntity();
+        Binary b = Fixtures.createBinary();
 
+        expect(mockIndexService.retrieve(e.getId())).andReturn(e);
+        expect(mockBlobstoreService.retrieve(b.getPath())).andReturn(new ByteArrayInputStream(new byte[3]));
+
+        replay(mockIndexService, mockExportService, mockBlobstoreService);
+        this.entityService.getContent(e.getId(),"BINARY-1");
+        verify(mockIndexService, mockExportService, mockBlobstoreService);
     }
 
     @Test
