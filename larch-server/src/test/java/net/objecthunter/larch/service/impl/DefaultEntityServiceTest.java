@@ -143,6 +143,16 @@ public class DefaultEntityServiceTest {
 
     @Test
     public void testPatch() throws Exception {
+        Entity e = Fixtures.createEntity();
+
+        expect(mockIndexService.retrieve(e.getId())).andReturn(e).times(2);
+        expect(mockBlobstoreService.createOldVersionBlob(e)).andReturn("oldpath");
+        mockIndexService.update(e);
+        expectLastCall();
+
+        replay(mockIndexService, mockExportService, mockBlobstoreService);
+        this.entityService.patch(e.getId(), new ObjectMapper().readTree("{\"label\": \"label update\"}"));
+        verify(mockIndexService, mockExportService, mockBlobstoreService);
 
     }
 
