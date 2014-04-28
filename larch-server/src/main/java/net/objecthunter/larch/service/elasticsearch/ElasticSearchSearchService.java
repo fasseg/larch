@@ -112,7 +112,7 @@ public class ElasticSearchSearchService implements SearchService {
         final List<Entity> entities = new ArrayList<>();
         for (final SearchHit hit : resp.getHits()) {
             String label = hit.field("label") != null ? hit.field("label").getValue() : "";
-            String type = hit.field("type") != null ? hit.field("type").value() : "";
+            String type = hit.field("type") != null ? hit.field("type").getValue() : "";
             final Entity e = new Entity();
             e.setId(hit.field("id").getValue());
             e.setType(type);
@@ -130,7 +130,7 @@ public class ElasticSearchSearchService implements SearchService {
         result.setData(entities);
         result.setTotalHits(resp.getHits().getTotalHits());
         result.setMaxRecords(maxRecords);
-        result.setHits(resp.getHits().hits().length);
+        result.setHits(resp.getHits().getHits().length);
         result.setNumRecords(numRecords);
         result.setOffset(0);
         result.setTerm(terms);
