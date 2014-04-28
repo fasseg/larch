@@ -84,7 +84,15 @@ public class DefaultEntityServiceTest {
 
     @Test
     public void testDelete() throws Exception {
+        Entity e = Fixtures.createEntity();
 
+        expect(mockIndexService.retrieve(e.getId())).andReturn(e);
+        mockIndexService.delete(e.getId());
+        expectLastCall();
+
+        replay(mockIndexService, mockExportService, mockBlobstoreService);
+        this.entityService.delete(e.getId());
+        verify(mockIndexService, mockExportService, mockBlobstoreService);
     }
 
     @Test

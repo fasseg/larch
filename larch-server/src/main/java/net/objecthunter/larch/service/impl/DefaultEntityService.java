@@ -204,8 +204,11 @@ public class DefaultEntityService implements EntityService {
     public void delete(String id) throws IOException {
         final Entity e = indexService.retrieve(id);
         for (Binary b : e.getBinaries().values()) {
-            blobstoreService.delete(b.getPath());
+            if (b.getPath() != null && !b.getPath().isEmpty()) {
+                blobstoreService.delete(b.getPath());
+            }
         }
+        this.indexService.delete(id);
     }
 
     @Override
