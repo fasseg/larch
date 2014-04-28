@@ -93,6 +93,8 @@ public class DefaultEntityServiceTest {
         expect(mockIndexService.retrieve(e.getId())).andReturn(e);
         mockIndexService.delete(e.getId());
         expectLastCall();
+        mockBlobstoreService.delete(e.getBinaries().entrySet().iterator().next().getValue().getPath());
+        expectLastCall();
 
         replay(mockIndexService, mockExportService, mockBlobstoreService);
         this.entityService.delete(e.getId());
