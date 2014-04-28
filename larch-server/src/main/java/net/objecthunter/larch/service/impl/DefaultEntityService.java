@@ -114,6 +114,10 @@ public class DefaultEntityService implements EntityService {
     }
 
     private void createAndMutateBinary(String entityId, Binary b) throws IOException {
+        if (b.getSource() == null) {
+            log.warn("No source is set for binary '{}' of entity '{}' nothing to ingest", b.getName(), entityId);
+            return;
+        }
         final MessageDigest digest;
         try {
             digest = MessageDigest.getInstance("MD5");
