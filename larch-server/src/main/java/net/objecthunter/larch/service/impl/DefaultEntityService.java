@@ -176,6 +176,10 @@ public class DefaultEntityService implements EntityService {
         }
         if (e.getBinaries() != null) {
             for (final Binary b : e.getBinaries().values()) {
+                if (b.getSource() == null) {
+                    log.warn("No source on binary '{}' of entity '{}'", b.getName(), e.getId());
+                    continue;
+                }
                 if (b.getSource().isInternal()) {
                     b.setUtcLastModified(oldVersion.getBinaries().get(b.getName()).getUtcLastModified());
                     b.setUtcCreated(oldVersion.getBinaries().get(b.getName()).getUtcCreated());

@@ -59,12 +59,27 @@ public class DefaultEntityServiceTest {
 
     @Test
     public void testUpdate() throws Exception {
+        Entity e = Fixtures.createEntity();
 
+        mockIndexService.update(e);
+        expectLastCall();
+        expect(mockIndexService.retrieve(e.getId())).andReturn(e);
+        expect(mockBlobstoreService.createOldVersionBlob(e)).andReturn("oldversionpath");
+
+        replay(mockIndexService, mockExportService, mockBlobstoreService);
+        this.entityService.update(e);
+        verify(mockIndexService, mockExportService, mockBlobstoreService);
     }
 
     @Test
     public void testRetrieve() throws Exception {
+        Entity e = Fixtures.createEntity();
 
+        expect(mockIndexService.retrieve(e.getId())).andReturn(e);
+
+        replay(mockIndexService, mockExportService, mockBlobstoreService);
+        this.entityService.retrieve(e.getId());
+        verify(mockIndexService, mockExportService, mockBlobstoreService);
     }
 
     @Test
