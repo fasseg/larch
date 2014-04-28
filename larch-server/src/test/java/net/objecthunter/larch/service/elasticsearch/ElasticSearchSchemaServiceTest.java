@@ -180,6 +180,6 @@ public class ElasticSearchSchemaServiceTest {
     @Test
     @Ignore
     public void testValidate() throws Exception {
-        //TODO implment validation test
+        //TODO implement validation test
     }
 }
