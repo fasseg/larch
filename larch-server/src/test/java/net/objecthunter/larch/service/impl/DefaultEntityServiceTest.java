@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 import static org.easymock.EasyMock.*;
 
@@ -113,12 +114,31 @@ public class DefaultEntityServiceTest {
 
     @Test
     public void testRetrieve1() throws Exception {
+        Entity e = Fixtures.createEntity();
 
+        expect(mockIndexService.retrieve(e.getId())).andReturn(e);
+
+        replay(mockIndexService, mockExportService, mockBlobstoreService);
+        this.entityService.retrieve(e.getId());
+        verify(mockIndexService, mockExportService, mockBlobstoreService);
     }
 
     @Test
     public void testCreateBinary() throws Exception {
+        Entity e = Fixtures.createEntity();
+        Binary b = Fixtures.createBinary();
+        b.setName("BINARY_CREATE");
 
+        expect(mockBlobstoreService.createOldVersionBlob(e)).andReturn("oldpath");
+        expect(mockIndexService.retrieve(e.getId())).andReturn(e);
+        expect(mockBlobstoreService.create(anyObject(InputStream.class))).andReturn("/path/to/bin");
+        mockIndexService.update(e);
+        expectLastCall();
+
+        replay(mockIndexService, mockExportService, mockBlobstoreService);
+        this.entityService.createBinary(e.getId(), b.getName(), "application/octet-stream",
+                new ByteArrayInputStream(new byte[3]));
+        verify(mockIndexService, mockExportService, mockBlobstoreService);
     }
 
     @Test
