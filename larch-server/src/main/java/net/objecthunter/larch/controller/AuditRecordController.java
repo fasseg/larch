@@ -33,10 +33,21 @@ import java.util.List;
  * Web controller for interaction with {@link net.objecthunter.larch.model.AuditRecord} objects
  */
 @Controller
-public class AuditRecordController extends AbstractLarchController{
+public class AuditRecordController extends AbstractLarchController {
     @Autowired
     private AuditService auditService;
 
+    /**
+     * Controller method for HTTP GET requests of audit records from the repository,
+     * describing the provenance of an {@link net.objecthunter.larch.model.Entity}
+     *
+     * @param entityId The entity's id for which the {@link net.objecthunter.larch.model.AuditRecord}s should be
+     *                 returned
+     * @param offset   The offset for {@link net.objecthunter.larch.helpers.AuditRecords} returned from the repository
+     * @param count    The max number of {@link net.objecthunter.larch.helpers.AuditRecords} returned from the repository
+     * @return A {@link java.util.List} of {@link net.objecthunter.larch.model.AuditRecord} objects.
+     * @throws IOException
+     */
     @RequestMapping(value = "/entity/{entity-id}/audit", method = RequestMethod.GET)
     public List<AuditRecord> retrieve(@PathVariable("entity-id") final String entityId,
                                       @RequestParam(value = "offset", defaultValue = "0") final int offset,
@@ -45,6 +56,16 @@ public class AuditRecordController extends AbstractLarchController{
         return auditService.retrieve(entityId, offset, count);
     }
 
+    /**
+     * Controller method for HTTP GET requests that procudes an HTML view.
+     *
+     * @param entityId The entity's id for which the {@link net.objecthunter.larch.model.AuditRecord}s should be
+     *                 returned
+     * @param offset   The offset for {@link net.objecthunter.larch.helpers.AuditRecords} returned from the repository
+     * @param count    The max number of {@link net.objecthunter.larch.helpers.AuditRecords} returned from the repository
+     * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} object used to render the HTML view
+     * @throws IOException
+     */
     @RequestMapping(value = "/entity/{entity-id}/audit", method = RequestMethod.GET, produces = "text/html")
     public ModelAndView retrieveHtml(@PathVariable("entity-id") final String entityId,
                                      @RequestParam(value = "offset", defaultValue = "0") final int offset,

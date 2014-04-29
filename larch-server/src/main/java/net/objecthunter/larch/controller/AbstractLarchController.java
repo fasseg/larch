@@ -20,6 +20,13 @@ import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 public abstract class AbstractLarchController {
+    /**
+     * A method to which adds the current {@link net.objecthunter.larch.model.security.User} object to the Spring
+     * MVC model which s passed to the corresponding templates
+     * @param user The argument used for the user injection
+     * @return The  {@link net.objecthunter.larch.model.security.User} object which gets added to the model by
+     * SpringMVC
+     */
     @ModelAttribute("user")
     public User getUserName(@AuthenticationPrincipal User user) {
         return user;

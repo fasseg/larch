@@ -51,6 +51,16 @@ public class BinaryController extends AbstractLarchController {
     @Autowired
     private BlobstoreService blobstoreService;
 
+    /**
+     * Controller method for adding a {@link net.objecthunter.larch.model.Binary} to an existing {@link net
+     * .objecthunter.larch.model.Entity} using a multipart/form-data encoded HTTP POST
+     *
+     * @param entityId The {@link net.objecthunter.larch.model.Entity}'s to which the created Binary should get added.
+     * @param name     The name of the Binary
+     * @param file     A {@link org.springframework.web.multipart.MultipartFile} containing the multipart encoded file
+     * @return The redirect address to view the updated Entity
+     * @throws IOException
+     */
     @RequestMapping(value = "/entity/{id}/binary", method = RequestMethod.POST, consumes = {"multipart/form-data", "application/x-www-form-urlencoded"})
     @ResponseStatus(HttpStatus.OK)
     public String create(@PathVariable("id") final String entityId, @RequestParam("name") final String name, @RequestParam("binary") final MultipartFile file) throws IOException {
@@ -59,6 +69,15 @@ public class BinaryController extends AbstractLarchController {
         return "redirect:/entity/" + entityId;
     }
 
+    /**
+     * Controller method to retrieve a JSON representation of a {@link net.objecthunter.larch.model.Binary} from the
+     * repository
+     *
+     * @param entityId The {@link net.objecthunter.larch.model.Entity}'s id, which contains the requested Binary
+     * @param name     The name of the Binary
+     * @return The Binary object requested
+     * @throws IOException
+     */
     @RequestMapping(value = "/entity/{id}/binary/{name}", method = RequestMethod.GET, produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -70,6 +89,14 @@ public class BinaryController extends AbstractLarchController {
         return e.getBinaries().get(name);
     }
 
+    /**
+     * Controller method to retrieve the HTML representation of a {@link net.objecthunter.larch.model.Binary}
+     *
+     * @param entityId The {@link net.objecthunter.larch.model.Entity}'s id, which contains the requested Binary
+     * @param name     The name of the Binary
+     * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} object used for rendering the HTML view
+     * @throws IOException
+     */
     @RequestMapping(value = "/entity/{id}/binary/{name}", method = RequestMethod.GET, produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -82,6 +109,16 @@ public class BinaryController extends AbstractLarchController {
         return new ModelAndView("binary", model);
     }
 
+    /**
+     * Controller method for downloading the content (i.e. The actual bytes) of a {@link net.objecthunter.larch.model
+     * .Binary}.
+     *
+     * @param id       The {@link net.objecthunter.larch.model.Entity}'s id, which contains the requested Binary
+     * @param name     The name of the Binary
+     * @param response The {@link javax.servlet.http.HttpServletResponse} which gets injected by Spring MVC. This is
+     *                 used to write the actual byte stream to the client.
+     * @throws IOException
+     */
     @RequestMapping(value = "/entity/{id}/binary/{binary-name}/content", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody

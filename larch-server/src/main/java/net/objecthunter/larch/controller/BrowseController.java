@@ -16,10 +16,8 @@
 package net.objecthunter.larch.controller;
 
 import net.objecthunter.larch.model.SearchResult;
-import net.objecthunter.larch.model.security.User;
 import net.objecthunter.larch.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,24 +36,55 @@ public class BrowseController extends AbstractLarchController {
     @Autowired
     private SearchService searchService;
 
+    /**
+     * Controller method for getting {@link net.objecthunter.larch.model.SearchResult} containing all stored {@link
+     * net.objecthunter.larch.model.Entity}s
+     *
+     * @return A SearchResult containing {@link net.objecthunter.larch.model.Entity}'s  identifiers
+     * @throws IOException
+     */
     @RequestMapping(value = "/browse", method = RequestMethod.GET)
     @ResponseBody
     public SearchResult browse() throws IOException {
         return this.searchService.scanIndex(0);
     }
 
+    /**
+     * Controller method for getting {@link net.objecthunter.larch.model.SearchResult} containing all stored {@link
+     * net.objecthunter.larch.model.Entity}s from a given offset.
+     *
+     * @param offset The offset to use when creating the {@link net.objecthunter.larch.model.SearchResult}
+     * @return A SearchResult containing {@link net.objecthunter.larch.model.Entity}'s  identifiers
+     * @throws IOException
+     */
     @RequestMapping(value = "/browse/{offset}", method = RequestMethod.GET)
     @ResponseBody
     public SearchResult browse(@PathVariable("offset") final int offset) throws IOException {
         return this.searchService.scanIndex(offset);
     }
 
+    /**
+     * Controller method for getting {@link net.objecthunter.larch.model.SearchResult} containing a given number of
+     * stored {@link net.objecthunter.larch.model.Entity}s from a given offset.
+     *
+     * @param offset The offset to use when creating the {@link net.objecthunter.larch.model.SearchResult}
+     * @param numRecords The maximal number of records to return
+     * @return A SearchResult containing {@link net.objecthunter.larch.model.Entity}'s  identifiers
+     * @throws IOException
+     */
     @RequestMapping(value = "/browse/{offset}/{numrecords}", method = RequestMethod.GET)
     @ResponseBody
     public SearchResult browse(@PathVariable("offset") final int offset, @PathVariable("numrecords") final int numRecords) throws IOException {
         return this.searchService.scanIndex(offset, numRecords);
     }
 
+    /**
+     * Controller method for getting a HTML View using Spring MVC templating mechanism containing
+     * stored {@link net.objecthunter.larch.model.Entity}s.
+     *
+     * @return A {@link org.springframework.web.servlet.ModelAndView} showing the browse result
+     * @throws IOException
+     */
     @RequestMapping(value = "/browse", method = RequestMethod.GET, produces = "text/html")
     @ResponseBody
     public ModelAndView browseHtml() throws IOException {
@@ -64,6 +93,14 @@ public class BrowseController extends AbstractLarchController {
         return new ModelAndView("browse", model);
     }
 
+    /**
+     * Controller method for getting a HTML View using Spring MVC templating mechanism containing
+     * stored {@link net.objecthunter.larch.model.Entity}s from a given offset.
+     *
+     * @param offset The offset to use when creating the {@link net.objecthunter.larch.model.SearchResult}
+     * @return A {@link org.springframework.web.servlet.ModelAndView} showing the browse result
+     * @throws IOException
+     */
     @RequestMapping(value = "/browse/{offset}", method = RequestMethod.GET, produces = "text/html")
     @ResponseBody
     public ModelAndView browseHtml(@PathVariable("offset") final int offset) throws IOException {
@@ -72,6 +109,15 @@ public class BrowseController extends AbstractLarchController {
         return new ModelAndView("browse", model);
     }
 
+    /**
+     * Controller method for getting a HTML View using Spring MVC templating mechanism containing a given number of
+     * stored {@link net.objecthunter.larch.model.Entity}s from a given offset.
+     *
+     * @param offset The offset to use when creating the {@link net.objecthunter.larch.model.SearchResult}
+     * @param numRecords The maximal number of records to return
+     * @return A {@link org.springframework.web.servlet.ModelAndView} showing the browse result
+     * @throws IOException
+     */
     @RequestMapping(value = "/browse/{offset}/{numrecords}", method = RequestMethod.GET, produces = "text/html")
     @ResponseBody
     public ModelAndView browseHtml(@PathVariable("offset") final int offset, @PathVariable("numrecords") final int numRecords) throws IOException {
