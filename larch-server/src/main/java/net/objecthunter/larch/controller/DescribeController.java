@@ -45,6 +45,12 @@ public class DescribeController extends AbstractLarchController {
     @Autowired
     private RepositoryService repositoryService;
 
+    /**
+     * Controller method which creates a JSON response of a {@link net.objecthunter.larch.model.Describe} object
+     * containing some information about the repository state
+     * @return A Describe object which gets converted to a JSON string by Spring MVC
+     * @throws IOException
+     */
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
@@ -52,6 +58,11 @@ public class DescribeController extends AbstractLarchController {
         return repositoryService.describe();
     }
 
+    /**
+     * Controller method which creates a HTML representation of a {@link net.objecthunter.larch.model.Describe} object
+     * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} used to render the HTML view
+     * @throws IOException
+     */
     @RequestMapping(method = RequestMethod.GET, produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
     public ModelAndView describeHtml() throws IOException {

@@ -38,6 +38,11 @@ public class DashboardController extends AbstractLarchController {
     @Autowired
     private RepositoryService repositoryService;
 
+    /**
+     * Controller method for creating a HTML view using Spring MVC templating mechanism showing a dashboard
+     * @return a Spring MVC {@link org.springframework.web.servlet.ModelAndView} used for rendering the HTML view.
+     * @throws IOException
+     */
     @RequestMapping(produces = "text/html")
     @ResponseBody
     public ModelAndView dashboardHtml() throws IOException {

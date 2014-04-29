@@ -36,6 +36,14 @@ public class RelationController extends AbstractLarchController {
     @Autowired
     private AuditService auditService;
 
+    /**
+     * Controller method for adding a new triple relating an {@link net.objecthunter.larch.model.Entity} via a
+     * predicate to an object using a HTTP POST
+     * @param id the id of the Entity which should be the subject of this relation
+     * @param predicate the predicate of the relation
+     * @param object the object of the relation
+     * @throws IOException
+     */
     @RequestMapping(value = "/entity/{id}/relation", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public void create(@PathVariable("id") final String id, @RequestParam("predicate") final String predicate, @RequestParam("object") final String object) throws IOException {
@@ -43,6 +51,14 @@ public class RelationController extends AbstractLarchController {
         this.auditService.create(AuditRecords.createRelationRecord(id));
     }
 
+    /**
+     * Controller method for adding a new triple relating an {@link net.objecthunter.larch.model.Entity} via a
+     * predicate to an object using a HTTP POSTm that redirects to an HTML view of the {@link net.objecthunter.larch.model.Entity}
+     * @param id the id of the Entity which should be the subject of this relation
+     * @param predicate the predicate of the relation
+     * @param object the object of the relation
+     * @throws IOException
+     */
     @RequestMapping(value = "/entity/{id}/relation", method = RequestMethod.POST, produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
     public String createHtml(@PathVariable("id") final String id, @RequestParam("predicate") final String predicate, @RequestParam("object") final String object) throws IOException {

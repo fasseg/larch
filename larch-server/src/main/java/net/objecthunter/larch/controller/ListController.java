@@ -34,6 +34,11 @@ public class ListController extends AbstractLarchController {
     @Autowired
     private SearchService searchService;
 
+    /**
+     * Controller method for a retrieving a HTML view using a HTTP GET containing a list of {@link net.objecthunter
+     * .larch.model.Entity}s
+     * @return a Spring MVC {@link org.springframework.web.servlet.ModelAndView} for rendering the HTML view
+     */
     @RequestMapping(method = RequestMethod.GET, produces = {"text/html"})
     @ResponseBody
     public ModelAndView listHtml() {
@@ -42,6 +47,11 @@ public class ListController extends AbstractLarchController {
         return new ModelAndView("list", model);
     }
 
+    /**
+     * Controller method to receive a JSON representation using an HTTP GET of a {@link net.objecthunter.larch.model
+     * .SearchResult} object
+     * @return A SearchResult containing the Entities
+     */
     @RequestMapping(method = RequestMethod.GET, produces = {"application/json", "application/xml", "text/xml"})
     @ResponseBody
     public SearchResult list() {

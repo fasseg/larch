@@ -41,6 +41,12 @@ public class StateController extends AbstractLarchController {
     @Autowired
     private RepositoryService repositoryService;
 
+    /**
+     * Controller method for retrieving a {@link net.objecthunter.larch.model.state.LarchState} object describing the
+     * repository state using a HTTP GET, that returns a JSON representation
+     * @return a JSON representation of the repository's {@link net.objecthunter.larch.model.state.LarchState}
+     * @throws IOException
+     */
     @RequestMapping(method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -48,6 +54,12 @@ public class StateController extends AbstractLarchController {
         return repositoryService.status();
     }
 
+    /**
+     * Controller method for retrieving a {@link net.objecthunter.larch.model.state.LarchState} object describing the
+     * repository state using a HTTP GET, that returns a HTML ciew
+     * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView}
+     * @throws IOException
+     */
     @RequestMapping(method = RequestMethod.GET, produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody

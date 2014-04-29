@@ -59,6 +59,16 @@ public class MetadataController extends AbstractLarchController {
     @Autowired
     private ObjectMapper mapper;
 
+    /**
+     * Controller method for adding {@link net.objecthunter.larch.model.Metadata} with a given name to an {@link net
+     * .objecthunter.larch.model.Entity} using a HTTP POST with multipart/form-data
+     * @param entityId The is of the Entity to which the Metadata should be added
+     * @param mdName The name of the Metadata
+     * @param type The type of the Metadata
+     * @param file The Spring MVC injected MutlipartFile containing the actual data from a html form submission
+     * @return a redirection to the Entity to which the Metadata was added
+     * @throws IOException
+     */
     @RequestMapping(value = "/entity/{id}/metadata", method= RequestMethod.POST, consumes = "multipart/form-data")
     @ResponseStatus(HttpStatus.CREATED)
     public String addMetadata(@PathVariable("id") final String entityId, @RequestParam("name") final String mdName, @RequestParam("type") final String type, @RequestParam("metadata") final MultipartFile file) throws IOException {
@@ -80,6 +90,16 @@ public class MetadataController extends AbstractLarchController {
         return "redirect:/entity/" + entityId;
     }
 
+    /**
+     * Controller method to retrieve the XML data of a {@link net.objecthunter.larch.model.Metadata} object of an
+     * {@link net.objecthunter.larch.model.Entity} using a HTTP GET
+     * @param id The id of the Entity
+     * @param metadataName The name of the Metadata to retrieve
+     * @param accept the Spring MVC injected accept header of the HTTP GET request
+     * @param resp the Spting MVC injected {@link javax.servlet.http.HttpServletResponse} to which the XML gets
+     *             directly written
+     * @throws IOException
+     */
     @RequestMapping(method = RequestMethod.GET, value = "/entity/{id}/metadata/{metadata-name}/content", produces = {"application/xml", "text/xml"})
     @ResponseStatus(HttpStatus.OK)
     public void retrieveXml(@PathVariable("id") final String id, @PathVariable("metadata-name") final String metadataName, @RequestHeader("Accept") final String accept, final HttpServletResponse resp) throws IOException {
@@ -90,6 +110,14 @@ public class MetadataController extends AbstractLarchController {
         resp.flushBuffer();
     }
 
+    /**
+     * Controller method to request the validation result for a {@link net.objecthunter.larch.model.Metadata} object
+     * of a given {@link net.objecthunter.larch.model.Entity}
+     * @param id the is of the Entity
+     * @param metadataName the name of the Metadata
+     * @return A JSON representation of a {@link net.objecthunter.larch.model.MetadataValidationResult}
+     * @throws IOException
+     */
     @RequestMapping(method = RequestMethod.GET, value = "/entity/{id}/metadata/{metadata-name}/validate",
             produces = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
@@ -99,6 +127,12 @@ public class MetadataController extends AbstractLarchController {
         return this.schemaService.validate(id, metadataName);
     }
 
+    /**
+     * Controller method to retrieve the available {@link net.objecthunter.larch.model.MetadataType}s in the
+     * repository as a JSON representation
+     * @return A JSON representation of a list of MetadataType objects
+     * @throws IOException
+     */
     @RequestMapping(method = RequestMethod.GET, value="/metadatatype", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -106,6 +140,12 @@ public class MetadataController extends AbstractLarchController {
         return this.schemaService.getSchemaTypes();
     }
 
+    /**
+     * Controller method to retrieve the available {@link net.objecthunter.larch.model.MetadataType}s in the
+     * repository in a HTML view
+     * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} used to render the HTML view
+     * @throws IOException
+     */
     @RequestMapping(method = RequestMethod.GET, value="/metadatatype", produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -115,6 +155,12 @@ public class MetadataController extends AbstractLarchController {
         return new ModelAndView("metadatatype", model);
     }
 
+    /**
+     * Add a new {@link net.objecthunter.larch.model.MetadataType} to the repository that can be used to validate
+     * different kind of Metadata objects.
+     * @param src A JSON representation of the new {@link net.objecthunter.larch.model.MetadataType}
+     * @throws IOException
+     */
     @RequestMapping(method = RequestMethod.POST, value="/metadatatype", consumes = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
     public void addSchemaType(final InputStream src) throws IOException {
@@ -122,6 +168,12 @@ public class MetadataController extends AbstractLarchController {
         this.schemaService.createSchemaType(newType);
     }
 
+    /**
+     * Add a new {@link net.objecthunter.larch.model.MetadataType} to the repository that can be used to validate
+     * different kind of Metadata objects, using a HTML form
+     * @param name The name of the new {@link net.objecthunter.larch.model.MetadataType}
+     * @throws IOException
+     */
     @RequestMapping(method = RequestMethod.POST, value="/metadatatype", consumes = "multipart/form-data",
             produces ="text/html")
     @ResponseStatus(HttpStatus.CREATED)

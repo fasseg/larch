@@ -34,17 +34,38 @@ public class SearchController extends AbstractLarchController {
     @Autowired
     private SearchService searchService;
 
+    /**
+     * Controller method for searching {@link net.objecthunter.larch.model.Entity}s in the repository using an HTTP
+     * POST which returns a JSON representation of the {@link net.objecthunter.larch.model.SearchResult}
+     *
+     * @param query The search query
+     * @return A {@link net.objecthunter.larch.model.SearchResult} containing the found {@link net.objecthunter.larch
+     * .model.Entity}s as s JSON representation
+     */
     @RequestMapping(method = RequestMethod.POST, produces = {"application/json"})
     public SearchResult searchMatchFields(@RequestParam("term") final String query) {
         return searchService.searchEntities(query);
     }
 
+
+    /**
+     * Controller method for displaying a HTML search page
+     *
+     * @return a Spring MVC {@link org.springframework.web.servlet.ModelAndView} used to render the HTML view
+     */
     @RequestMapping(method = RequestMethod.GET, produces = "text/html")
     public ModelAndView searchHtml() {
         final ModelMap model = new ModelMap();
         return new ModelAndView("search", model);
     }
 
+    /**
+     * Controller method for searching {@link net.objecthunter.larch.model.Entity}s in the repository using an HTTP
+     * POST which returns a HTML view of the {@link net.objecthunter.larch.model.SearchResult}
+     *
+     * @param query The search query
+     * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} used to render the HTML view
+     */
     @RequestMapping(method = RequestMethod.POST, produces = {"text/html"})
     public ModelAndView searchMatchFieldsHtml(@RequestParam("term") final String query) {
         final ModelMap model = new ModelMap();
