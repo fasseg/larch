@@ -15,6 +15,12 @@
 */
 package net.objecthunter.larch.model;
 
+/**
+ * Calss for holding general constants of the larch repository
+ */
 public abstract class LarchConstants {
+    /**
+     * The namespace used by the larch repository for internal URLs
+     */
     public static final String NAMESPACE_LARCH = "larch:larch/";
 }

@@ -15,22 +15,43 @@
 */
 package net.objecthunter.larch.model;
 
+/**
+ * DTO class for the type of a Metadata object
+ */
 public class MetadataType {
+
     private String name;
+
     private String schemaUrl;
 
+    /**
+     * Get the name of the metadata type
+     * @return the name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Set the name of the metadata type
+     * @param name the name to set
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Get the schema URL from the meta data type
+     * @return the schema url
+     */
     public String getSchemaUrl() {
         return schemaUrl;
     }
 
+    /**
+     * Set the schema URL for the meta data type
+     * @param schemaUrl the url to set
+     */
     public void setSchemaUrl(String schemaUrl) {
         this.schemaUrl = schemaUrl;
     }

@@ -15,32 +15,65 @@
 */
 package net.objecthunter.larch.model;
 
+/**
+ * DTO class for holding a validation resukt
+ */
 public class MetadataValidationResult {
+
     private String timestamp;
     private boolean success;
     private String details;
 
+    /**
+     * Get the details of of validation result
+     *
+     * @return the details
+     */
     public String getDetails() {
         return details;
     }
 
+    /**
+     * Set the details of a validation result
+     *
+     * @param details the details to set
+     */
     public void setDetails(String details) {
         this.details = details;
     }
 
+    /**
+     * Check if a validation was successful
+     *
+     * @return true is successful false otherwise
+     */
     public boolean isSuccess() {
         return success;
     }
 
+    /**
+     * Set the success of the validation result
+     *
+     * @param success the boolean to set
+     */
     public void setSuccess(boolean success) {
         this.success = success;
     }
 
+    /**
+     * Get the timestamp of the validation result
+     *
+     * @return the timestamp
+     */
     public String getTimestamp() {
-
         return timestamp;
     }
 
+    /**
+     * Set the timestamp of a validation result
+     *
+     * @param timestamp the timestamp
+     */
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
