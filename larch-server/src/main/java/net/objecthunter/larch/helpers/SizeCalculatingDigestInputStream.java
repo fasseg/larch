@@ -20,9 +20,19 @@ import java.io.InputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 
+/**
+ * An {@link java.io.InputStream} implementaion which keeps track of the number of bytes read from it and is able to
+ * calculate a Checksum while streaming
+ */
 public class SizeCalculatingDigestInputStream extends DigestInputStream {
     private long bytesRead = 0;
 
+    /**
+     * Create a SizeCalculatingDigestInputStream instance
+     *
+     * @param stream the Stream to wrap this SizeCalculatingDigestInputStream around
+     * @param digest the {@link java.security.MessageDigest} to use for the checksum calculation
+     */
     public SizeCalculatingDigestInputStream(InputStream stream, MessageDigest digest) {
         super(stream, digest);
     }
@@ -49,6 +59,7 @@ public class SizeCalculatingDigestInputStream extends DigestInputStream {
 
     /**
      * returns the number of bytes produced by this {@link java.io.InputStream}
+     *
      * @return
      */
     public long getBytesRead() {

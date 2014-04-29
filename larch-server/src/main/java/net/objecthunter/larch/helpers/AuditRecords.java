@@ -22,7 +22,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
+/**
+ * A Factory class for creating different kinds of {@link net.objecthunter.larch.model.AuditRecord} objects
+ */
 public abstract class AuditRecords {
+    /**
+     * Create an almost empty {@link net.objecthunter.larch.model.AuditRecord}
+     *
+     * @param entityId the id of the Entity this {@link net.objecthunter.larch.model.AuditRecord} will be associated
+     *                 with
+     * @return An almost empty {@link net.objecthunter.larch.model.AuditRecord} ready to be further filled
+     */
     public static AuditRecord skeletonRecord(String entityId) {
         final AuditRecord record = new AuditRecord();
         record.setEntityId(entityId);
@@ -32,61 +42,147 @@ public abstract class AuditRecords {
         return record;
     }
 
+    /**
+     * Create an {@link net.objecthunter.larch.model.AuditRecord} for a "Create Entity" event
+     *
+     * @param entityId the id of the entity created
+     * @return the AuditRecord
+     */
     public static AuditRecord createEntityRecord(String entityId) {
         final AuditRecord record = skeletonRecord(entityId);
         record.setAction(AuditRecord.EVENT_CREATE_ENTITY);
         return record;
     }
+
+    /**
+     * Create an {@link net.objecthunter.larch.model.AuditRecord} event for an "Update Entity" event
+     *
+     * @param entityId the id of the updated entity
+     * @return
+     */
     public static AuditRecord updateEntityRecord(String entityId) {
         final AuditRecord record = skeletonRecord(entityId);
-        record.setAction(AuditRecord.EVENT_CREATE_ENTITY);
+        record.setAction(AuditRecord.EVENT_UPDATE_ENTITY);
         return record;
     }
+
+    /**
+     * Create a {@link net.objecthunter.larch.model.AuditRecord} for a "Delete Entity" event
+     *
+     * @param entityId the id of the Entity deleted
+     * @return
+     */
     public static AuditRecord deleteEntityRecord(String entityId) {
         final AuditRecord record = skeletonRecord(entityId);
         record.setAction(AuditRecord.EVENT_CREATE_ENTITY);
         return record;
     }
+
+    /**
+     * Create an {@link net.objecthunter.larch.model.AuditRecord} for a "Create Binary" event
+     *
+     * @param entityId the id of the entity the binary got created on
+     * @return
+     */
     public static AuditRecord createBinaryRecord(String entityId) {
         final AuditRecord record = skeletonRecord(entityId);
         record.setAction(AuditRecord.EVENT_CREATE_BINARY);
         return record;
     }
+
+    /**
+     * create an {@link net.objecthunter.larch.model.AuditRecord} for an "Update Binary" event
+     *
+     * @param entityId The id of the entity on which the {@link net.objecthunter.larch.model.Binary} got updated
+     * @return
+     */
     public static AuditRecord updateBinaryRecord(String entityId) {
         final AuditRecord record = skeletonRecord(entityId);
         record.setAction(AuditRecord.EVENT_UPDATE_BINARY);
         return record;
     }
+
+    /**
+     * Create an {@link net.objecthunter.larch.model.AuditRecord} for an "Delete Binary" event
+     *
+     * @param entityId the id the entity which's Binary got deleted
+     * @return
+     */
     public static AuditRecord deleteBinaryRecord(String entityId) {
         final AuditRecord record = skeletonRecord(entityId);
         record.setAction(AuditRecord.EVENT_DELETE_BINARY);
         return record;
     }
+
+    /**
+     * Create an {@link net.objecthunter.larch.model.AuditRecord} for a "Create Relation" event
+     *
+     * @param entityId the id of the entity the relation is created on
+     * @return
+     */
     public static AuditRecord createRelationRecord(String entityId) {
         final AuditRecord record = skeletonRecord(entityId);
         record.setAction(AuditRecord.EVENT_CREATE_RELATION);
         return record;
     }
+
+    /**
+     * Create an {@link net.objecthunter.larch.model.AuditRecord} for a "Update Relation" event
+     *
+     * @param entityId the is of the {@link net.objecthunter.larch.model.Entity} on which a relation got updated
+     * @return
+     */
     public static AuditRecord updateRelationRecord(String entityId) {
         final AuditRecord record = skeletonRecord(entityId);
         record.setAction(AuditRecord.EVENT_UPDATE_RELATION);
         return record;
     }
+
+    /**
+     * Create an {@link net.objecthunter.larch.model.AuditRecord} for a "Delete Relation" event
+     *
+     * @param entityId the id of the {@link net.objecthunter.larch.model.Entity} on which a relation got deleted
+     * @return
+     */
     public static AuditRecord deleteRelationRecord(String entityId) {
         final AuditRecord record = skeletonRecord(entityId);
         record.setAction(AuditRecord.EVENT_DELETE_RELATION);
         return record;
     }
+
+    /**
+     * Create an {@link net.objecthunter.larch.model.AuditRecord} for a "Create Metadata" event
+     *
+     * @param entityId the id of the {@link net.objecthunter.larch.model.Entity} on which the {@link net.objecthunter
+     *                 .larch.model.Metadata} gets created
+     * @return
+     */
     public static AuditRecord createMetadataRecord(String entityId) {
         final AuditRecord record = skeletonRecord(entityId);
         record.setAction(AuditRecord.EVENT_CREATE_METADATA);
         return record;
     }
+
+    /**
+     * Create an {@link net.objecthunter.larch.model.AuditRecord} for a "Update Metadata" event
+     *
+     * @param entityId the id of the {@link net.objecthunter.larch.model.Entity} on which the {@link net.objecthunter
+     *                 .larch.model.Metadata} gets updated
+     * @return
+     */
     public static AuditRecord updateMetadataRecord(String entityId) {
         final AuditRecord record = skeletonRecord(entityId);
         record.setAction(AuditRecord.EVENT_UPDATE_METADATA);
         return record;
     }
+
+    /**
+     * Create an {@link net.objecthunter.larch.model.AuditRecord} for a "Delete Metadata" event
+     *
+     * @param entityId the id of the {@link net.objecthunter.larch.model.Entity} on which the {@link net.objecthunter
+     *                 .larch.model.Metadata} got deleted
+     * @return
+     */
     public static AuditRecord deleteMetadataRecord(String entityId) {
         final AuditRecord record = skeletonRecord(entityId);
         record.setAction(AuditRecord.EVENT_DELETE_METADATA);
