@@ -15,7 +15,6 @@
 */
 package net.objecthunter.larch.service;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import net.objecthunter.larch.model.MetadataType;
 
 import java.io.IOException;
@@ -25,12 +24,49 @@ import java.util.List;
  * Service definition for getting the associated schemaUrl for a given meta data type
  */
 public interface SchemaService {
-
+    /**
+     * Get the XML schema's url for a given {@link net.objecthunter.larch.model.MetadataType} name
+     *
+     * @param type The name of the {@link net.objecthunter.larch.model.MetadataType}
+     * @return A String contianing the schema's url
+     * @throws IOException
+     */
     String getSchemUrlForType(String type) throws IOException;
+
+    /**
+     * Retrieve the known Schema types from the repository
+     *
+     * @return a list of {@link net.objecthunter.larch.model.MetadataType}s
+     * @throws IOException
+     */
     List<MetadataType> getSchemaTypes() throws IOException;
+
+    /**
+     * Create a new {@link net.objecthunter.larch.model.MetadataType} in the repository
+     *
+     * @param type the  {@link net.objecthunter.larch.model.MetadataType} to store
+     * @return the id of the stored {@link net.objecthunter.larch.model.MetadataType}
+     * @throws IOException
+     */
     String createSchemaType(MetadataType type) throws IOException;
 
+    /**
+     * Delete a {@link net.objecthunter.larch.model.MetadataType} from the repository. <b>Implementaitions of this
+     * method have to make sure that the {@link net.objecthunter.larch.model.MetadataType} is not used anymore by
+     * any {@link net.objecthunter.larch.model.Entity} or {@link net.objecthunter.larch.model.Binary}</b>
+     *
+     * @param name the name of the {@link net.objecthunter.larch.model.MetadataType} to delete
+     * @throws IOException
+     */
     void deleteMetadataType(String name) throws IOException;
 
+    /**
+     * Retrieve the validation result for a given {@link net.objecthunter.larch.model.Metadata} of an {@link net.objecthunter.larch.model.Entity}
+     *
+     * @param id           The id of the {@link net.objecthunter.larch.model.Entity}
+     * @param metadataName The name of the {@link net.objecthunter.larch.model.Metadata}
+     * @return a {@link net.objecthunter.larch.model.MetadataValidationResult} containing the result of the validation
+     * @throws IOException
+     */
     net.objecthunter.larch.model.MetadataValidationResult validate(String id, String metadataName) throws IOException;
 }

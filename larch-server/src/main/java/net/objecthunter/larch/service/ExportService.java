@@ -19,6 +19,15 @@ import net.objecthunter.larch.model.Entity;
 
 import java.io.IOException;
 
+/**
+ * Service definition for the export service which allows to write JSON representation of an {@link net.objecthunter
+ * .larch.model.Entity} to a given target
+ */
 public interface ExportService {
+    /**
+     * Export the Entity to a target like a FileSystem or a Database depending on the implementation
+     * @param e The {@link net.objecthunter.larch.model.Entity} to export
+     * @throws IOException
+     */
     void export(Entity e) throws IOException;
 }

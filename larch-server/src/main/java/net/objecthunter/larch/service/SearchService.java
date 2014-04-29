@@ -17,11 +17,36 @@ package net.objecthunter.larch.service;
 
 import net.objecthunter.larch.model.SearchResult;
 
+/**
+ * Search service definition allowing for different searches in the repository
+ */
 public interface SearchService {
 
+    /**
+     * Retrieve a {@link net.objecthunter.larch.model.SearchResult} containing all {@link net.objecthunter.larch.model
+     * .Entity}s from the index from a given offset with a given
+     * maximum number of {@link net.objecthunter.larch.model.Entity}s returned
+     *
+     * @param offset     the offset from which to return {@link net.objecthunter.larch.model.Entity}s from
+     * @param numRecords the number of {@link net.objecthunter.larch.model.Entity}s to return
+     * @return a list of {@link net.objecthunter.larch.model.Entity}s available in the repository
+     */
     SearchResult scanIndex(int offset, int numRecords);
 
+    /**
+     * Search {@link net.objecthunter.larch.model.Entity}s in the repository using a simple terms query
+     *
+     * @param terms the terms query to use for the search
+     * @return A {@link net.objecthunter.larch.model.SearchResult} containig the search hits
+     */
     SearchResult searchEntities(String terms);
 
+    /**
+     * Retrieve a {@link net.objecthunter.larch.model.SearchResult} containing all {@link net.objecthunter.larch.model
+     * .Entity}s from the index from a given offset with the default number of {@link net.objecthunter.larch.model.Entity}s returned
+     *
+     * @param offset the offset from which to return {@link net.objecthunter.larch.model.Entity}s from
+     * @return a list of {@link net.objecthunter.larch.model.Entity}s available in the repository
+     */
     SearchResult scanIndex(int offset);
 }

@@ -20,8 +20,22 @@ import net.objecthunter.larch.model.state.LarchState;
 
 import java.io.IOException;
 
+/**
+ * Service definition for the repository service responsible for getting the state of a repository
+ */
 public interface RepositoryService {
+    /**
+     * Retrieve the current {@link net.objecthunter.larch.model.state.LarchState} form the repository containing
+     * status information about the index and the blob store
+     * @return a {@link net.objecthunter.larch.model.state.LarchState} containing the stats
+     * @throws IOException
+     */
     LarchState status() throws IOException;
 
+    /**
+     * Retrieve a {@link net.objecthunter.larch.model.Describe} object from the repository containing e.g. cluster
+     * name and node information
+     * @return A {@link net.objecthunter.larch.model.Describe} object containing the requested data
+     */
     Describe describe();
 }

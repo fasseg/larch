@@ -24,6 +24,21 @@ import java.util.List;
  * Service definition for interactions of {@link net.objecthunter.larch.model.AuditRecord} objects
  */
 public interface AuditService {
+    /**
+     * Retrieve a list of {@link net.objecthunter.larch.helpers.AuditRecord} form the repository for a given Entity
+     * @param entityId The id of the {@link net.objecthunter.larch.model.Entity}
+     * @param offset The offset from which to get {@link net.objecthunter.larch.helpers.AuditRecord}s from
+     * @param numRecords The number of AuditRecords to return
+     * @return A list of AuditRecords for the given Entity
+     * @throws IOException
+     */
     List<AuditRecord> retrieve(String entityId, int offset, int numRecords) throws IOException;
+
+    /**
+     * Create a new {@link net.objecthunter.larch.model.AuditRecord} and store it in the repository
+     * @param rec The AuditRecord to store
+     * @return The id of the stored AuditRecord
+     * @throws IOException
+     */
     String create(AuditRecord rec) throws IOException;
 }

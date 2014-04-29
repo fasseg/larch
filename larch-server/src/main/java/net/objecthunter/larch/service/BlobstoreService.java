@@ -25,11 +25,59 @@ import java.io.InputStream;
  * Service definition for CRUD operations on Blobs
  */
 public interface BlobstoreService {
+    /**
+     * Store the contents of an {@link java.io.InputStream} in the blob store
+     * @param src The {@link java.io.InputStream} containing the data to be stored
+     * @return The path to the stored data
+     * @throws IOException
+     */
     String create(InputStream src) throws IOException;
+
+    /**
+     * Retrieve a blob as an {@link java.io.InputStream} form the blob store
+     * @param path The path to the requested blob
+     * @return An {@link java.io.InputStream} of the blob's content
+     * @throws IOException
+     */
     InputStream retrieve(String path) throws IOException;
+
+    /**
+     * Delete a blob in the blob store
+     * @param path the path of the blob to delete
+     * @throws IOException
+     */
     void delete(String path) throws IOException;
+
+    /**
+     * Update the contents of a blob in the blob store
+     * @param path the path to the blob to update
+     * @param src the {@link java.io.InputStream} containing the new content
+     * @throws IOException
+     */
     void update(String path, InputStream src) throws IOException;
+
+    /**
+     * Retrieve a {@link net.objecthunter.larch.model.state.BlobstoreState} containing information about the current
+     * state of the blob store
+     * @return the current state wrappend in a {@link net.objecthunter.larch.model.state.BlobstoreState} object
+     * @throws IOException
+     */
     BlobstoreState status() throws IOException;
+
+    /**
+     * Create a new blob for an old version of an {@link net.objecthunter.larch.model.Entity}. Old versions get
+     * removed from the ElasticSearchIndex and the plain JSON is stored as blob in the blob store
+     * @param oldVersion The {@link net.objecthunter.larch.model.Entity} representing the old version for storage
+     * @return the path to the old version blob
+     * @throws IOException
+     */
     String createOldVersionBlob(Entity oldVersion) throws IOException;
+
+    /**
+     * Retrieve an old version of an {@link net.objecthunter.larch.model.Entity} stored as a blob in the store
+     * @param path the path to the old version
+     * @return An {@link java.io.InputStream} for the {@link net.objecthunter.larch.model.Entity}'s old version blob
+     * @throws IOException
+     */
     InputStream retrieveOldVersionBlob(String path) throws IOException;
 }
