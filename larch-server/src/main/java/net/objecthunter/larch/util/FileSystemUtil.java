@@ -26,6 +26,13 @@ import java.io.IOException;
  */
 public abstract class FileSystemUtil {
     private static final Logger log = LoggerFactory.getLogger(FileSystemUtil.class);
+
+    /**
+     * Check if a directory on the file system exists and create it if it does not
+     *
+     * @param dir the directory to check and create
+     * @throws IOException
+     */
     public static void checkAndCreate(File dir) throws IOException {
         if (!dir.exists()) {
             log.info("Creating non existing data directory {}", dir.getAbsolutePath());

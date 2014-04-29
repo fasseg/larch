@@ -22,6 +22,11 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
  */
 public class LarchServer {
 
+    /**
+     * The main entry point of the application when started from the Command line
+     *
+     * @param args the args passed on the command line
+     */
     public static void main(String[] args) {
         new SpringApplicationBuilder()
                 .showBanner(false)
