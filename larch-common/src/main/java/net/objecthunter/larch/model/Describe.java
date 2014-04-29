@@ -15,7 +15,9 @@
 */
 package net.objecthunter.larch.model;
 
-
+/**
+ * DTO class containing general repository state information
+ */
 public class Describe {
     private String larchVersion;
     private String larchHost;
@@ -27,74 +29,164 @@ public class Describe {
     private int esNumDataNodes;
     private long esNumIndexedRecords;
 
+    /**
+     * Get the number of indexed Documents in ElasticSearch
+     *
+     * @return the number of records
+     */
     public long getEsNumIndexedRecords() {
         return esNumIndexedRecords;
     }
 
+    /**
+     * Set the number of records in ElasticSearch
+     *
+     * @param esNumIndexedRecords the number of records to set
+     */
     public void setEsNumIndexedRecords(long esNumIndexedRecords) {
         this.esNumIndexedRecords = esNumIndexedRecords;
     }
 
+    /**
+     * Get the ElasticSearch master node address
+     *
+     * @return the master node address
+     */
     public String getEsMasterNodeAddress() {
         return esMasterNodeAddress;
     }
 
+    /**
+     * Set the ElasticSearch master node address
+     *
+     * @param esMasterNodeAddress the address to set
+     */
     public void setEsMasterNodeAddress(String esMasterNodeAddress) {
         this.esMasterNodeAddress = esMasterNodeAddress;
     }
 
+    /**
+     * Get the number of ElasticSearch data nodes
+     *
+     * @return the number of data nodes
+     */
     public int getEsNumDataNodes() {
         return esNumDataNodes;
     }
 
+    /**
+     * Set the number of ElasticSearch data nodes
+     *
+     * @param esNumDataNodes the number of data nodes to set
+     */
     public void setEsNumDataNodes(int esNumDataNodes) {
         this.esNumDataNodes = esNumDataNodes;
     }
 
+    /**
+     * Get the current node's name
+     *
+     * @return the name of the current node
+     */
     public String getEsNodeName() {
         return esNodeName;
     }
 
+    /**
+     * Set the current node's name
+     *
+     * @param esNodeName the name to set
+     */
     public void setEsNodeName(String esNodeName) {
         this.esNodeName = esNodeName;
     }
 
+    /**
+     * Get the ElasticSearch version
+     *
+     * @return the version of ElasticSearch
+     */
     public String getEsVersion() {
         return esVersion;
     }
 
+    /**
+     * Set the ElasticSearch version
+     *
+     * @param esVersion the version to set
+     */
     public void setEsVersion(String esVersion) {
         this.esVersion = esVersion;
     }
 
+    /**
+     * Get the ElasticSearch master node's name
+     *
+     * @return the name of the master node
+     */
     public String getEsMasterNodeName() {
         return esMasterNodeName;
     }
 
+    /**
+     * Set the ElasticSearch master node's name
+     *
+     * @param esMasterNodeName the name to set
+     */
     public void setEsMasterNodeName(String esMasterNodeName) {
         this.esMasterNodeName = esMasterNodeName;
     }
 
+    /**
+     * Get the larch cluster name
+     *
+     * @return the cluster name
+     */
     public String getLarchClusterName() {
         return larchClusterName;
     }
 
+    /**
+     * Set the larch cluster name
+     *
+     * @param larchClusterName the name to set
+     */
     public void setLarchClusterName(String larchClusterName) {
         this.larchClusterName = larchClusterName;
     }
 
+    /**
+     * Get the current host name
+     *
+     * @return the host name
+     */
     public String getLarchHost() {
         return larchHost;
     }
 
+    /**
+     * Set the current host name
+     *
+     * @param larchHost the host name to set
+     */
     public void setLarchHost(String larchHost) {
         this.larchHost = larchHost;
     }
 
+    /**
+     * Get the larch version
+     *
+     * @return the larch version
+     */
     public String getLarchVersion() {
         return larchVersion;
     }
 
+    /**
+     * Set the larch version
+     *
+     * @param larchVersion the version to set
+     */
     public void setLarchVersion(String larchVersion) {
         this.larchVersion = larchVersion;
     }

@@ -30,34 +30,69 @@ public class UrlSource {
     private final URI uri;
     private final boolean internal;
 
+    /**
+     * Create a new empty UrlSource
+     */
     private UrlSource() {
         this.uri = null;
         this.internal = false;
     }
 
+    /**
+     * Create an UrlSource form a given URI
+     *
+     * @param uri      the URI of the source file
+     * @param internal whether the URI is larch internal or external (e.g. from the web)
+     */
     public UrlSource(URI uri, boolean internal) {
         this.uri = uri;
         this.internal = internal;
     }
 
+    /**
+     * Create an UrlSource form a given URI
+     *
+     * @param uri the URI of the source file
+     */
     public UrlSource(URI uri) {
         this.uri = uri;
         this.internal = false;
     }
 
+    /**
+     * Create an UrlSource form a given URI
+     *
+     * @param url the URL of the source file
+     */
     public UrlSource(String url) {
         this.internal = false;
         this.uri = URI.create(url);
     }
 
+    /**
+     * get the URI of the source
+     *
+     * @return the URI
+     */
     public URI getUri() {
         return uri;
     }
 
+    /**
+     * Check if a URI is internal to the larch repository
+     *
+     * @return false if the URI is not internal, true is the URI is inside the repository
+     */
     public boolean isInternal() {
         return internal;
     }
 
+    /**
+     * Open an retrieve an Inputstream from the URL source
+     *
+     * @return An InputStream
+     * @throws IOException
+     */
     @JsonIgnore
     public InputStream getInputStream() throws IOException {
         return uri.toURL().openStream();

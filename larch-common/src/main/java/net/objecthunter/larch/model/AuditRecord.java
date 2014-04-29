@@ -17,6 +17,7 @@ package net.objecthunter.larch.model;
 
 /**
  * DTO class for wrapping audit information
+ *
  */
 public class AuditRecord {
     public static final String EVENT_CREATE_ENTITY = "Create entity";
@@ -39,42 +40,83 @@ public class AuditRecord {
     private String action;
     private String timestamp;
 
+    /**
+     * Get the id of the AuditRecord
+     *
+     * @return the id
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Set the id of the AuditRecord
+     * @param id the id to set
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * Get the Entity id
+     * @return the id ofthe Entity
+     */
     public String getEntityId() {
         return entityId;
     }
 
+    /**
+     * Ste the entity if of the AuditRecord
+     * @param entityId the entity id to set
+     */
     public void setEntityId(String entityId) {
         this.entityId = entityId;
     }
 
+    /**
+     * Get the agent's name from the AuditRecord
+     * @return the agent's name
+     */
     public String getAgentName() {
         return agentName;
     }
 
+    /**
+     * Set the agent's name
+     * @param agentName the name to set
+     */
     public void setAgentName(String agentName) {
         this.agentName = agentName;
     }
 
+    /**
+     * Get the Action of this AuditRecord e.g. "Create Entity"
+     * @return the action
+     */
     public String getAction() {
         return action;
     }
 
+    /**
+     * Set the Action of the AuditRecord
+     * @param action the action to set
+     */
     public void setAction(String action) {
         this.action = action;
     }
 
+    /**
+     * Get the timestamp from the AuditRecord
+     * @return the timestamp
+     */
     public String getTimestamp() {
         return timestamp;
     }
 
+    /**
+     * Set the timespatmp of the AuditRecord
+     * @param timestamp the timestamp to set
+     */
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }

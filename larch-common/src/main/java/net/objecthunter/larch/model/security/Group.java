@@ -21,10 +21,18 @@ package net.objecthunter.larch.model.security;
 public class Group {
     private String name;
 
+    /**
+     * Get the group's name
+     * @return th grou's name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Set the group's name
+     * @param name the name to set
+     */
     public void setName(String name) {
         this.name = name;
     }
