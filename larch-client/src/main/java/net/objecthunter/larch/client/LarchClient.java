@@ -19,15 +19,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.model.Entity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.fluent.Executor;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
+import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.message.BasicHttpEntityEnclosingRequest;
+import org.apache.http.protocol.HttpRequestExecutor;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Client implementation for the Larch server
@@ -44,6 +50,23 @@ public class LarchClient {
     private Executor executor = Executor.newInstance()
             .auth(localhost, "admin", "admin")
             .authPreemptive(localhost);
+
+    /**
+     * Fetch the actual binary content from the repository
+     * @param entityId the Id of the entity
+     * @param binaryName the name of the binary to fetch
+     * @return an InputStream containing the binary's data
+     * @throws IOException
+     */
+    public InputStream retrieveBinaryContent(String entityId, String binaryName) throws  IOException {
+        final HttpResponse resp = this.execute(Request.Get(larchUri + "/entity/" + entityId + "/binary/" + binaryName))
+                .returnResponse();
+        if (resp.getStatusLine().getStatusCode() != 200) {
+            log.error("Unable to fetch binary data\n{}",EntityUtils.toString(resp.getEntity()));
+            throw new IOException("Unable to fetch binary data " + binaryName  + " from entity " + entityId);
+        }
+        return resp.getEntity().getContent();
+    }
 
     /**
      * Update an {@link net.objecthunter.larch.model.Entity} in the larch repository
