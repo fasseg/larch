@@ -276,6 +276,7 @@ public class DefaultEntityService implements EntityService {
             }
             e.getVersionPaths().put(e.getVersion(), oldVersionPath);
             e.setVersion(e.getVersion() + 1);
+            e.setUtcLastModified(now);
             this.indexService.update(e);
         }
         if (autoExport) {

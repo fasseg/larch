@@ -45,8 +45,8 @@
             <p class="property">Last modified</p>
             <p class="value" th:text="${md.value.utcLastModified}"></p>
             <p class="property">Content</p>
-            <a th:href="@{'/metadata/'} + ${md.key} + '/validate'" th:text="'Validate'"></a>
-            <a th:href="@{'/metadata/'} + ${md.key} + '/content'" th:text="'Download'"></a>
+            <a th:href="${binary.name} + '/metadata/' + ${md.key} + '/validate'" th:text="'Validate'"></a>
+            <a th:href="${binary.name} + '/metadata/' + ${md.key} + '/content'" th:text="'Download'"></a>
         </div>
         <div class="right">
             <div class="panel">
@@ -57,7 +57,7 @@
                 </script>
                 <p class="panel_title">Create new metadata</p>
                 <form enctype="multipart/form-data" method="post"
-                      th:action="@{'~/metadata'} + '?_csrf=' + ${_csrf.token}">
+                      th:action="${binary.name} + '/metadata?_csrf=' + ${_csrf.token}">
                     <input id="mdName" type="text" name="name" title="Set the name of the metadata"/>
                     <input id="mdFile" type="file" name="metadata" title="Select a metadata file for upload"/>
                     <select id="mdType" name="type" title="Select a valid metadata type">

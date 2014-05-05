@@ -147,6 +147,51 @@ public class MetadataController extends AbstractLarchController {
     }
 
     /**
+     * Controller method for adding {@link net.objecthunter.larch.model.Metadata} with a given name to an {@link net
+     * .objecthunter.larch.model.Binary} using a HTTP POST with multipart/form-data
+     *
+     * @param entityId   The is of the Entity to which the Metadata should be added
+     * @param binaryName the name of the binary
+     * @param mdName     the meta data set's name
+     * @param type       the meta data set's type
+     * @param file       the http multipart file containing the actual bytes
+     * @throws IOException
+     */
+    @RequestMapping(value = "/entity/{id}/binary/{binary-name}/metadata", method = RequestMethod.POST,
+            consumes = "multipart/form-data")
+    @ResponseStatus(HttpStatus.CREATED)
+    public String addBinaryMetadataHtml(@PathVariable("id") final String entityId,
+                                  @PathVariable("binary-name") final String binaryName,
+                                  @RequestParam("name") final String mdName,
+                                  @RequestParam("type") final String type,
+                                  @RequestParam("metadata") final MultipartFile file) throws IOException {
+
+        final Entity e = this.entityService.retrieve(entityId);
+        final Metadata md = new Metadata();
+        md.setName(mdName);
+        md.setType(type);
+        md.setData(IOUtils.toString(file.getInputStream()));
+        md.setOriginalFilename(file.getOriginalFilename());
+        md.setUtcCreated(file.getContentType());
+
+        if (e.getBinaries() == null || !e.getBinaries().containsKey(binaryName)) {
+            throw new FileNotFoundException("The binary " + binaryName + " does not exist on the entity " + entityId);
+        }
+        final Binary bin = e.getBinaries().get(binaryName);
+        if (bin.getMetadata() == null) {
+            bin.setMetadata(new HashMap<>());
+        }
+        if (bin.getMetadata().containsKey(md.getName())) {
+            throw new IOException("The meta data " + md.getName() + " already exists on the binary " + binaryName + "" +
+                    " of the entity " + entityId);
+        }
+        bin.getMetadata().put(md.getName(), md);
+        this.entityService.update(e);
+        this.auditService.create(AuditRecords.createMetadataRecord(entityId));
+        return "redirect:/entity/" + entityId + "/binary/" + binaryName;
+    }
+
+    /**
      * Controller method to retrieve the XML data of a {@link net.objecthunter.larch.model.Metadata} object of an
      * {@link net.objecthunter.larch.model.Entity} using a HTTP GET
      *
