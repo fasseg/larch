@@ -31,12 +31,13 @@ import org.junit.rules.TemporaryFolder;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.net.URI;
 
 import static org.junit.Assert.*;
 
 public class LarchClientIT extends AbstractLarchIT {
 
-    private LarchClient client = new LarchClient();
+    private LarchClient client = new LarchClient(URI.create("http://localhost:8080"),"admin","admin");
 
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();

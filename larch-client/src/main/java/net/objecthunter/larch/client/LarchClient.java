@@ -33,22 +33,27 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 
 /**
  * Client implementation for the Larch server
  */
 public class LarchClient {
-    private static final Logger log = LoggerFactory.getLogger(LarchClient.class);
 
+    private static final Logger log = LoggerFactory.getLogger(LarchClient.class);
+    private final URI larchUri;
     private ObjectMapper mapper = new ObjectMapper();
 
-    private String larchUri = "http://localhost:8080";
+    private Executor executor;
 
-    private HttpHost localhost = new HttpHost("localhost", 8080, "http");
-
-    private Executor executor = Executor.newInstance()
-            .auth(localhost, "admin", "admin")
-            .authPreemptive(localhost);
+    public LarchClient(URI larchUri, String username, String password) {
+        this.larchUri = larchUri;
+        final HttpHost larchHost = new HttpHost(larchUri.getHost(), larchUri.getPort(),
+                larchUri.getAuthority());
+        this.executor = Executor.newInstance()
+                .auth(larchHost, username, password)
+                .authPreemptive(larchHost);
+    }
 
     /**
      * Retrieve a {@link net.objecthunter.larch.model.state.LarchState} response from the repository containing detailed state information
@@ -111,7 +116,7 @@ public class LarchClient {
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
             log.error("Unable to fetch meta data\n{}", EntityUtils.toString(resp.getEntity()));
-            throw new IOException("Unable to fetch meta data " + metadataName + " from binary " + binaryName  +
+            throw new IOException("Unable to fetch meta data " + metadataName + " from binary " + binaryName +
                     " of entity " + entityId);
         }
         return mapper.readValue(resp.getEntity().getContent(), Metadata.class);
@@ -216,7 +221,7 @@ public class LarchClient {
                 .bodyString(mapper.writeValueAsString(bin), ContentType.APPLICATION_JSON))
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 201) {
-            log.error("Unable to add binary. Server says:\n",EntityUtils.toString(resp.getEntity()));
+            log.error("Unable to add binary. Server says:\n", EntityUtils.toString(resp.getEntity()));
             throw new IOException("Unable to add binary " + bin.getName() + " to entity " + entityId);
         }
     }
@@ -232,7 +237,7 @@ public class LarchClient {
         final HttpResponse resp = this.execute(Request.Delete(larchUri + "/entity/" + entityId + "/binary/" + binaryName))
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
-            log.error("Unable to delete binary. Server says:\n",EntityUtils.toString(resp.getEntity()));
+            log.error("Unable to delete binary. Server says:\n", EntityUtils.toString(resp.getEntity()));
             throw new IOException("Unable to delete binary " + binaryName + " of entity " + entityId);
         }
     }
