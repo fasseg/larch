@@ -161,10 +161,10 @@ public class MetadataController extends AbstractLarchController {
             consumes = "multipart/form-data")
     @ResponseStatus(HttpStatus.CREATED)
     public String addBinaryMetadataHtml(@PathVariable("id") final String entityId,
-                                  @PathVariable("binary-name") final String binaryName,
-                                  @RequestParam("name") final String mdName,
-                                  @RequestParam("type") final String type,
-                                  @RequestParam("metadata") final MultipartFile file) throws IOException {
+                                        @PathVariable("binary-name") final String binaryName,
+                                        @RequestParam("name") final String mdName,
+                                        @RequestParam("type") final String type,
+                                        @RequestParam("metadata") final MultipartFile file) throws IOException {
 
         final Entity e = this.entityService.retrieve(entityId);
         final Metadata md = new Metadata();
@@ -204,10 +204,48 @@ public class MetadataController extends AbstractLarchController {
      */
     @RequestMapping(method = RequestMethod.GET, value = "/entity/{id}/metadata/{metadata-name}/content", produces = {"application/xml", "text/xml"})
     @ResponseStatus(HttpStatus.OK)
-    public void retrieveXml(@PathVariable("id") final String id, @PathVariable("metadata-name") final String metadataName, @RequestHeader("Accept") final String accept, final HttpServletResponse resp) throws IOException {
+    public void retrieveMetadataXml(@PathVariable("id") final String id, @PathVariable("metadata-name") final String
+            metadataName, @RequestHeader("Accept") final String accept, final HttpServletResponse resp) throws IOException {
         resp.setContentType("text/xml");
         resp.setHeader("Content-Disposition", "inline");
         final String data = indexService.retrieve(id).getMetadata().get(metadataName).getData();
+        IOUtils.write(data, resp.getOutputStream());
+        resp.flushBuffer();
+    }
+
+    /**
+     * Controller method to retrieve the XML data of a {@link net.objecthunter.larch.model.Metadata} object of an
+     * {@link net.objecthunter.larch.model.Entity} using a HTTP GET
+     *
+     * @param id           The id of the Entity
+     * @param binaryName   the name the name of the binary
+     * @param metadataName The name of the Metadata to retrieve
+     * @param accept       the Spring MVC injected accept header of the HTTP GET request
+     * @param resp         the Spting MVC injected {@link javax.servlet.http.HttpServletResponse} to which the XML gets
+     *                     directly written
+     * @throws IOException
+     */
+    @RequestMapping(method = RequestMethod.GET,
+            value = "/entity/{id}/binary/{binary-name}/metadata/{metadata-name}/content",
+            produces = {"application/xml", "text/xml"})
+    @ResponseStatus(HttpStatus.OK)
+    public void retrieveBinaryMetadataXml(@PathVariable("id") final String id,
+                                          @PathVariable("binary-name") final String binaryName,
+                                          @PathVariable("metadata-name") final String metadataName,
+                                          @RequestHeader("Accept") final String accept,
+                                          final HttpServletResponse resp) throws IOException {
+        resp.setContentType("text/xml");
+        resp.setHeader("Content-Disposition", "inline");
+        final Entity e = this.indexService.retrieve(id);
+        if (e.getBinaries() == null || !e.getBinaries().containsKey(binaryName)) {
+            throw new FileNotFoundException("The binary " + binaryName + " does not exist on entity " + id);
+        }
+        final Binary bin = e.getBinaries().get(binaryName);
+        if (bin.getMetadata() == null || !bin.getMetadata().containsKey(metadataName)) {
+            throw new FileNotFoundException("The metadata " + metadataName + " does not exist on the binary " +
+                    binaryName + " of the entity " + id);
+        }
+        final String data = bin.getMetadata().get(metadataName).getData();
         IOUtils.write(data, resp.getOutputStream());
         resp.flushBuffer();
     }
@@ -228,6 +266,27 @@ public class MetadataController extends AbstractLarchController {
     public MetadataValidationResult validate(@PathVariable("id") final String id,
                                              @PathVariable("metadata-name") final String metadataName) throws IOException {
         return this.schemaService.validate(id, metadataName);
+    }
+
+    /**
+     * Controller method to request the validation result for a {@link net.objecthunter.larch.model.Metadata} object
+     * of a given {@link net.objecthunter.larch.model.Binary}
+     *
+     * @param id           the is of the Entity
+     * @param binaryName   the name of the binary
+     * @param metadataName the name of the Metadata
+     * @return A JSON representation of a {@link net.objecthunter.larch.model.MetadataValidationResult}
+     * @throws IOException
+     */
+    @RequestMapping(method = RequestMethod.GET,
+            value = "/entity/{id}/binary/{binary-name}/metadata/{metadata-name}/validate",
+            produces = {"application/json"})
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public MetadataValidationResult validate(@PathVariable("id") final String id,
+                                             @PathVariable("binary-name") final String binaryName,
+                                             @PathVariable("metadata-name") final String metadataName) throws IOException {
+        return this.schemaService.validate(id, binaryName, metadataName);
     }
 
     /**

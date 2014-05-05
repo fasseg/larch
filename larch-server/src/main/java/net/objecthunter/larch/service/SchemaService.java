@@ -15,7 +15,9 @@
 */
 package net.objecthunter.larch.service;
 
+import net.objecthunter.larch.model.Metadata;
 import net.objecthunter.larch.model.MetadataType;
+import net.objecthunter.larch.model.MetadataValidationResult;
 
 import java.io.IOException;
 import java.util.List;
@@ -69,4 +71,7 @@ public interface SchemaService {
      * @throws IOException
      */
     net.objecthunter.larch.model.MetadataValidationResult validate(String id, String metadataName) throws IOException;
+
+    MetadataValidationResult validate(String id, String binaryName, String metadataName) throws IOException;
+
 }

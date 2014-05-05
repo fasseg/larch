@@ -17,10 +17,7 @@ package net.objecthunter.larch.service.elasticsearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.helpers.MetadataTypes;
-import net.objecthunter.larch.model.Entity;
-import net.objecthunter.larch.model.Metadata;
-import net.objecthunter.larch.model.MetadataType;
-import net.objecthunter.larch.model.MetadataValidationResult;
+import net.objecthunter.larch.model.*;
 import net.objecthunter.larch.service.SchemaService;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
@@ -47,6 +44,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.time.ZoneOffset;
@@ -184,8 +182,38 @@ public class ElasticSearchSchemaService implements SchemaService {
             throw new IOException("The entity '" + id + "' has no meta data record named '" + metadataName);
         }
         final Metadata md = e.getMetadata().get(metadataName);
-        final String schemaUrl = this.getSchemUrlForType(md.getType());
 
+        return this.validate(md);
+    }
+
+    @Override
+    public MetadataValidationResult validate(String id, String binaryName, String metadataName) throws IOException {
+        /* fetch the entity first */
+        final GetResponse resp = this.client.prepareGet(ElasticSearchIndexService
+                        .INDEX_ENTITIES,
+                ElasticSearchIndexService.INDEX_ENTITY_TYPE, id
+        )
+                .execute()
+                .actionGet();
+        if (!resp.isExists()) {
+            throw new IOException("The entity '" + id + "' does not exist");
+        }
+        /* fetch the named metadata which will be validated */
+        final Entity e = mapper.readValue(resp.getSourceAsBytes(), Entity.class);
+        if (e.getBinaries() == null || !e.getBinaries().containsKey(binaryName)) {
+            throw new FileNotFoundException("The binary " + binaryName + " does not exist on the entity " + id);
+        }
+        final Binary bin = e.getBinaries().get(binaryName);
+        if (bin.getMetadata() == null || !bin.getMetadata().containsKey(metadataName)) {
+            throw new IOException("The binary " + binaryName + " of the entity '" + id + "' has no meta data record " +
+                    "named '" + metadataName);
+        }
+        final Metadata md = bin.getMetadata().get(metadataName);
+        return this.validate(md);
+    }
+
+    public MetadataValidationResult validate(Metadata md) throws IOException {
+        final String schemaUrl = this.getSchemUrlForType(md.getType());
         /* validate the schema against the given URL */
         final MetadataValidationResult result = new MetadataValidationResult();
         try {
