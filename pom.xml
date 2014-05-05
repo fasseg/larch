@@ -84,6 +84,16 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>net.objecthunter.larch</groupId>
+                <artifactId>larch-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.objecthunter.larch</groupId>
+                <artifactId>larch-client</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>1.1.2</version>

@@ -45,7 +45,7 @@ public class EntityControllerIT extends AbstractLarchIT {
         HttpResponse resp = this.execute(Request.Post("http://localhost:8080/entity")
                 .bodyString(mapper.writeValueAsString(createFixtureEntity()), ContentType.APPLICATION_JSON))
                 .returnResponse();
-        assertEquals(200, resp.getStatusLine().getStatusCode());
+        assertEquals(201, resp.getStatusLine().getStatusCode());
         final String id = EntityUtils.toString(resp.getEntity());
 
         Entity update = createFixtureEntity();
@@ -86,7 +86,7 @@ public class EntityControllerIT extends AbstractLarchIT {
         HttpResponse resp = this.execute(Request.Post("http://localhost:8080/entity")
                 .bodyString(mapper.writeValueAsString(createSimpleFixtureEntity()), ContentType.APPLICATION_JSON))
                 .returnResponse();
-        assertEquals(200, resp.getStatusLine().getStatusCode());
+        assertEquals(201, resp.getStatusLine().getStatusCode());
         final String id = EntityUtils.toString(resp.getEntity());
 
         for (int i = 0 ;i<2;i++) {
@@ -95,7 +95,7 @@ public class EntityControllerIT extends AbstractLarchIT {
             resp = this.execute(Request.Post("http://localhost:8080/entity")
                     .bodyString(mapper.writeValueAsString(child), ContentType.APPLICATION_JSON))
                     .returnResponse();
-            assertEquals(200, resp.getStatusLine().getStatusCode());
+            assertEquals(201, resp.getStatusLine().getStatusCode());
         }
 
         resp = this.execute(Request.Get("http://localhost:8080/entity/" + id))
@@ -118,10 +118,10 @@ public class EntityControllerIT extends AbstractLarchIT {
             resp = this.execute(Request.Post("http://localhost:8080/entity")
                     .bodyString(mapper.writeValueAsString(child), ContentType.APPLICATION_JSON))
                     .returnResponse();
-            assertEquals(200, resp.getStatusLine().getStatusCode());
+            assertEquals(201, resp.getStatusLine().getStatusCode());
         }
         log.debug("creating an entity with 100 children took {} ms", System.currentTimeMillis() - time);
-        assertEquals(200, resp.getStatusLine().getStatusCode());
+        assertEquals(201, resp.getStatusLine().getStatusCode());
 
         time = System.currentTimeMillis();
         resp = this.execute(Request.Get("http://localhost:8080/entity/" + id))
