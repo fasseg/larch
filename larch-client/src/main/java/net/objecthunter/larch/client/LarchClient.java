@@ -53,8 +53,9 @@ public class LarchClient {
             .auth(localhost, "admin", "admin")
             .authPreemptive(localhost);
 
+
     /**
-     * Retrieve a {@link net.objecthunter.larch.model.Metadata} from the repository
+     * Retrieve a {@link net.objecthunter.larch.model.Metadata} of an Entity from the repository
      * @param entityId the entity's id
      * @param metadataName the meta data set's name
      * @return the Metadata as a POJO
@@ -62,6 +63,23 @@ public class LarchClient {
      */
     public Metadata retrieveMetadata(String entityId, String metadataName) throws IOException  {
         final HttpResponse resp = this.execute(Request.Get(larchUri + "/entity/" + entityId + "/metadata/" + metadataName))
+                .returnResponse();
+        if (resp.getStatusLine().getStatusCode() != 200) {
+            log.error("Unable to fetch meta data\n{}",EntityUtils.toString(resp.getEntity()));
+            throw new IOException("Unable to fetch meta data " + metadataName  + " from entity " + entityId);
+        }
+        return mapper.readValue(resp.getEntity().getContent(), Metadata.class);
+    }
+
+    /**
+     * Retrieve a {@link net.objecthunter.larch.model.Metadata} of a Binary from the repository
+     * @param entityId the entity's id
+     * @param metadataName the meta data set's name
+     * @return the Metadata as a POJO
+     * @throws IOException if an error occurred while fetching the meta data
+     */
+    public Metadata retrieveBinaryMetadata(String entityId, String binaryName, String metadataName) throws IOException  {
+        final HttpResponse resp = this.execute(Request.Get(larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/metadata/" + metadataName))
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
             log.error("Unable to fetch meta data\n{}",EntityUtils.toString(resp.getEntity()));
