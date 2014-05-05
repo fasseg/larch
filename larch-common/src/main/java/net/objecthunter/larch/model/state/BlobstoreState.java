@@ -15,9 +15,17 @@
 */
 package net.objecthunter.larch.model.state;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
  * A DTO for wrapping the state of a Blobstore implementation
  */
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = FilesystemBlobstoreState.class, name = "native"),
+        @JsonSubTypes.Type(value = WeedFsBlobstoreState.class, name = "weedfs")
+})
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 public abstract class BlobstoreState {
     private final String name;
 

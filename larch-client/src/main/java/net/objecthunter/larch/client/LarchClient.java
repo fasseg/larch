@@ -111,7 +111,8 @@ public class LarchClient {
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
             log.error("Unable to fetch meta data\n{}", EntityUtils.toString(resp.getEntity()));
-            throw new IOException("Unable to fetch meta data " + metadataName + " from entity " + entityId);
+            throw new IOException("Unable to fetch meta data " + metadataName + " from binary " + binaryName  +
+                    " of entity " + entityId);
         }
         return mapper.readValue(resp.getEntity().getContent(), Metadata.class);
     }

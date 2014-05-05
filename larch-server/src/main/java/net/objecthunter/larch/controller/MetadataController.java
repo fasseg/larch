@@ -76,7 +76,7 @@ public class MetadataController extends AbstractLarchController {
         if (e.getMetadata() == null) {
             e.setMetadata(new HashMap<>());
         } else if( e.getMetadata().get(mdName) != null) {
-            throw new IOException("Metdata " + mdName + " already exists on Entity " + entityId);
+            throw new IOException("Meta data " + mdName + " already exists on Entity " + entityId);
         }
         final Metadata md = new Metadata();
         md.setName(mdName);
