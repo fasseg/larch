@@ -15,7 +15,6 @@
 */
 package net.objecthunter.larch.client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.model.Binary;
 import net.objecthunter.larch.model.Describe;
@@ -24,15 +23,10 @@ import net.objecthunter.larch.model.Metadata;
 import net.objecthunter.larch.model.state.LarchState;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.fluent.Executor;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
-import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.message.BasicHttpEntityEnclosingRequest;
-import org.apache.http.protocol.HttpRequestExecutor;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

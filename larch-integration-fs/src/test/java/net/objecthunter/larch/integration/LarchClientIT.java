@@ -22,6 +22,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class LarchClientIT extends AbstractLarchIT {
     private LarchClient client = new LarchClient();
@@ -42,5 +43,75 @@ public class LarchClientIT extends AbstractLarchIT {
         assertEquals(e.getId(), fetched.getId());
         assertEquals(e.getLabel(), fetched.getLabel());
         assertEquals(e.getBinaries().size(), fetched.getBinaries().size());
+    }
+
+    @Test
+    public void testRetrieveState() throws Exception {
+        fail("Not yet done!");
+    }
+
+    @Test
+    public void testRetrieveDescribe() throws Exception {
+        fail("Not yet done!");
+    }
+
+    @Test
+    public void testRetrieveMetadata() throws Exception {
+        fail("Not yet done!");
+    }
+
+    @Test
+    public void testRetrieveBinaryMetadata() throws Exception {
+        fail("Not yet done!");
+    }
+
+    @Test
+    public void testPostMetadata() throws Exception {
+        fail("Not yet done!");
+    }
+
+    @Test
+    public void testPostBinaryMetadata() throws Exception {
+        fail("Not yet done!");
+    }
+
+    @Test
+    public void testDeleteMetadata() throws Exception {
+        fail("Not yet done!");
+    }
+
+    @Test
+    public void testDeleteBinaryMetadata() throws Exception {
+        fail("Not yet done!");
+    }
+
+    @Test
+    public void testRetrieveBinary() throws Exception {
+        fail("Not yet done!");
+    }
+
+    @Test
+    public void testPostBinary() throws Exception {
+        fail("Not yet done!");
+    }
+
+    @Test
+    public void testDeleteBinary() throws Exception {
+        fail("Not yet done!");
+    }
+
+    @Test
+    public void testRetrieveBinaryContent() throws Exception {
+        fail("Not yet done!");
+    }
+
+    @Test
+    public void testUpdateEntity() throws Exception {
+        fail("Not yet done!");
+    }
+
+    @Test
+    public void testDeleteEntity() throws Exception {
+        fail("Not yet done!");
     }
 }
