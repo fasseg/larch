@@ -137,6 +137,12 @@ public class DefaultEntityService implements EntityService {
             final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
             b.setUtcCreated(now);
             b.setUtcLastModified(now);
+            if (b.getMetadata() != null) {
+                for (final Metadata md : b.getMetadata().values()) {
+                    md.setUtcCreated(now);
+                    md.setUtcLastModified(now);
+                }
+            }
         }
     }
 
