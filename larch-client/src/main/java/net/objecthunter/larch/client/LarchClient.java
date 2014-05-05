@@ -15,6 +15,7 @@
 */
 package net.objecthunter.larch.client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.model.Binary;
 import net.objecthunter.larch.model.Entity;
@@ -56,41 +57,76 @@ public class LarchClient {
 
     /**
      * Retrieve a {@link net.objecthunter.larch.model.Metadata} of an Entity from the repository
-     * @param entityId the entity's id
+     *
+     * @param entityId     the entity's id
      * @param metadataName the meta data set's name
      * @return the Metadata as a POJO
      * @throws IOException if an error occurred while fetching the meta data
      */
-    public Metadata retrieveMetadata(String entityId, String metadataName) throws IOException  {
+    public Metadata retrieveMetadata(String entityId, String metadataName) throws IOException {
         final HttpResponse resp = this.execute(Request.Get(larchUri + "/entity/" + entityId + "/metadata/" + metadataName))
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
-            log.error("Unable to fetch meta data\n{}",EntityUtils.toString(resp.getEntity()));
-            throw new IOException("Unable to fetch meta data " + metadataName  + " from entity " + entityId);
+            log.error("Unable to fetch meta data\n{}", EntityUtils.toString(resp.getEntity()));
+            throw new IOException("Unable to fetch meta data " + metadataName + " from entity " + entityId);
         }
         return mapper.readValue(resp.getEntity().getContent(), Metadata.class);
     }
 
     /**
      * Retrieve a {@link net.objecthunter.larch.model.Metadata} of a Binary from the repository
-     * @param entityId the entity's id
+     *
+     * @param entityId     the entity's id
      * @param metadataName the meta data set's name
      * @return the Metadata as a POJO
      * @throws IOException if an error occurred while fetching the meta data
      */
-    public Metadata retrieveBinaryMetadata(String entityId, String binaryName, String metadataName) throws IOException  {
+    public Metadata retrieveBinaryMetadata(String entityId, String binaryName, String metadataName) throws IOException {
         final HttpResponse resp = this.execute(Request.Get(larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/metadata/" + metadataName))
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
-            log.error("Unable to fetch meta data\n{}",EntityUtils.toString(resp.getEntity()));
-            throw new IOException("Unable to fetch meta data " + metadataName  + " from entity " + entityId);
+            log.error("Unable to fetch meta data\n{}", EntityUtils.toString(resp.getEntity()));
+            throw new IOException("Unable to fetch meta data " + metadataName + " from entity " + entityId);
         }
         return mapper.readValue(resp.getEntity().getContent(), Metadata.class);
     }
 
     /**
-     * Retrieve {@link net.objecthunter.larch.model.Binary} from the repository
+     * Add {@link net.objecthunter.larch.model.Metadata} to an existing entity
      * @param entityId the entity's id
+     * @param md the Metadata object
+     * @throws IOException
+     */
+    public void postMetadata(String entityId, Metadata md) throws IOException{
+        final HttpResponse resp = this.execute(Request.Post(larchUri + "/entity/" + entityId + "/metadata")
+                .bodyString(mapper.writeValueAsString(md), ContentType.APPLICATION_JSON))
+                .returnResponse();
+        if (resp.getStatusLine().getStatusCode() != 201) {
+            log.error("Unable to add meta data\n{}", EntityUtils.toString(resp.getEntity()));
+            throw new IOException("Unable to add meta data " + md.getName() + " from entity " + entityId);
+        }
+    }
+
+    /**
+     * Add {@link net.objecthunter.larch.model.Metadata} to an existing binary
+     * @param entityId the entity's id
+     * @param md the Metadata object
+     * @throws IOException
+     */
+    public void postBinaryMetadata(String entityId, String binaryName,  Metadata md) throws IOException{
+        final HttpResponse resp = this.execute(Request.Post(larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/metadata")
+                .bodyString(mapper.writeValueAsString(md), ContentType.APPLICATION_JSON))
+                .returnResponse();
+        if (resp.getStatusLine().getStatusCode() != 201) {
+            log.error("Unable to add meta data to binary\n{}", EntityUtils.toString(resp.getEntity()));
+            throw new IOException("Unable to add meta data " + md.getName() + " to binary " + binaryName + " of entity " + entityId);
+        }
+    }
+
+    /**
+     * Retrieve {@link net.objecthunter.larch.model.Binary} from the repository
+     *
+     * @param entityId   the entity's id
      * @param binaryName the binary's name
      * @return the Binary as a POJO
      * @throws IOException if an error occurred while fetching from the repository
@@ -99,24 +135,42 @@ public class LarchClient {
         final HttpResponse resp = this.execute(Request.Get(larchUri + "/entity/" + entityId + "/binary/" + binaryName))
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
-            log.error("Unable to fetch binary\n{}",EntityUtils.toString(resp.getEntity()));
-            throw new IOException("Unable to fetch binary" + binaryName  + " from entity " + entityId);
+            log.error("Unable to fetch binary\n{}", EntityUtils.toString(resp.getEntity()));
+            throw new IOException("Unable to fetch binary" + binaryName + " from entity " + entityId);
         }
         return mapper.readValue(resp.getEntity().getContent(), Binary.class);
     }
+
+    /**
+     * Add a {@link net.objecthunter.larch.model.Binary} to an existing entity
+     *
+     * @param entityId the entity's id
+     * @param bin      the binary object to add
+     * @throws IOException
+     */
+    public void postBinary(String entityId, Binary bin) throws IOException {
+        final HttpResponse resp = this.execute(Request.Post(larchUri + "/entity/" + entityId + "/binary")
+                .bodyString(mapper.writeValueAsString(bin), ContentType.APPLICATION_JSON))
+                .returnResponse();
+        if (resp.getStatusLine().getStatusCode() != 201) {
+            throw new IOException("Unable to add binary " + bin.getName() + " to entity " + entityId);
+        }
+    }
+
     /**
      * Fetch the actual binary content from the repository
-     * @param entityId the Id of the entity
+     *
+     * @param entityId   the Id of the entity
      * @param binaryName the name of the binary to fetch
      * @return an InputStream containing the binary's data
      * @throws IOException
      */
-    public InputStream retrieveBinaryContent(String entityId, String binaryName) throws  IOException {
+    public InputStream retrieveBinaryContent(String entityId, String binaryName) throws IOException {
         final HttpResponse resp = this.execute(Request.Get(larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/content"))
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
-            log.error("Unable to fetch binary data\n{}",EntityUtils.toString(resp.getEntity()));
-            throw new IOException("Unable to fetch binary data " + binaryName  + " from entity " + entityId);
+            log.error("Unable to fetch binary data\n{}", EntityUtils.toString(resp.getEntity()));
+            throw new IOException("Unable to fetch binary data " + binaryName + " from entity " + entityId);
         }
         return resp.getEntity().getContent();
     }
