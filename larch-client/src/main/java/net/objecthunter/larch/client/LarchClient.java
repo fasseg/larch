@@ -124,6 +124,39 @@ public class LarchClient {
     }
 
     /**
+     * Delete the {@link net.objecthunter.larch.model.Metadata} of a {@link net.objecthunter.larch.model.Entity}
+     * @param entityId the entity's id
+     * @param metadataName the meta data set's name
+     * @throws IOException
+     */
+    public void deleteMetadata(String entityId, String metadataName) throws IOException {
+        final HttpResponse resp = this.execute(Request.Delete(larchUri + "/entity/" + entityId + "/metadata/" + metadataName))
+                .returnResponse();
+        if (resp.getStatusLine().getStatusCode() != 200) {
+            log.error("Unable to remove meta data from entity\n{}", EntityUtils.toString(resp.getEntity()));
+            throw new IOException("Unable to remove meta data " + metadataName + "  of entity " + entityId);
+        }
+
+    }
+
+    /**
+     * Delete the {@link net.objecthunter.larch.model.Metadata} of a {@link net.objecthunter.larch.model.Binary}
+     * @param entityId the entity's id
+     * @param binaryName the binary's name
+     * @param metadataName the meta data set's name
+     * @throws IOException
+     */
+    public void deleteBinaryMetadata(String entityId, String binaryName, String metadataName) throws IOException {
+        final HttpResponse resp = this.execute(Request.Delete(larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/metadata/" + metadataName))
+                .returnResponse();
+        if (resp.getStatusLine().getStatusCode() != 200) {
+            log.error("Unable to remove meta data from binary\n{}", EntityUtils.toString(resp.getEntity()));
+            throw new IOException("Unable to remove meta data " + metadataName + " from binary " + binaryName + " of entity " + entityId);
+        }
+
+    }
+
+    /**
      * Retrieve {@link net.objecthunter.larch.model.Binary} from the repository
      *
      * @param entityId   the entity's id
@@ -154,6 +187,20 @@ public class LarchClient {
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 201) {
             throw new IOException("Unable to add binary " + bin.getName() + " to entity " + entityId);
+        }
+    }
+
+    /**
+     * Delete a {@link net.objecthunter.larch.model.Binary} in the repository
+     * @param entityId the entity's id
+     * @param binaryName the binary's name
+     * @throws IOException
+     */
+    public void deleteBinary(String entityId, String binaryName) throws IOException {
+        final HttpResponse resp = this.execute(Request.Delete(larchUri + "/entity/" + entityId + "/binary/" + binaryName))
+                .returnResponse();
+        if (resp.getStatusLine().getStatusCode() != 200) {
+            throw new IOException("Unable to delete binary " + binaryName + " of entity " + entityId);
         }
     }
 
