@@ -24,8 +24,17 @@ public class MetadataType {
 
     private String schemaUrl;
 
+    public MetadataType(String name, String schemaUrl) {
+        this.name = name;
+        this.schemaUrl = schemaUrl;
+    }
+
+    public MetadataType() {
+    }
+
     /**
      * Get the name of the metadata type
+     *
      * @return the name
      */
     public String getName() {
@@ -34,6 +43,7 @@ public class MetadataType {
 
     /**
      * Set the name of the metadata type
+     *
      * @param name the name to set
      */
     public void setName(String name) {
@@ -42,6 +52,7 @@ public class MetadataType {
 
     /**
      * Get the schema URL from the meta data type
+     *
      * @return the schema url
      */
     public String getSchemaUrl() {
@@ -50,6 +61,7 @@ public class MetadataType {
 
     /**
      * Set the schema URL for the meta data type
+     *
      * @param schemaUrl the url to set
      */
     public void setSchemaUrl(String schemaUrl) {

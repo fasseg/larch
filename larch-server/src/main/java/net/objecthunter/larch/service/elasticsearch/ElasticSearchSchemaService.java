@@ -16,6 +16,7 @@
 package net.objecthunter.larch.service.elasticsearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.objecthunter.larch.helpers.MetadataTypes;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.Metadata;
 import net.objecthunter.larch.model.MetadataType;
@@ -25,7 +26,6 @@ import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.count.CountResponse;
-import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
@@ -67,7 +67,7 @@ public class ElasticSearchSchemaService implements SchemaService {
     private ObjectMapper mapper;
 
     @PostConstruct
-    public void init() {
+    public void init() throws IOException {
         /* check if the metadata type index exists */
         log.debug("initialising ElasticSearchSchemaService");
         boolean indexExists = client.admin()
@@ -81,6 +81,14 @@ public class ElasticSearchSchemaService implements SchemaService {
                     .indices()
                     .create(new CreateIndexRequest(INDEX_MD_SCHEMATA))
                     .actionGet();
+            /* create the default metadata types */
+            for (MetadataType type : MetadataTypes.getDefaultMetadataTypes()) {
+                final IndexResponse resp = this.client.prepareIndex(INDEX_MD_SCHEMATA, INDEX_MD_SCHEMATA_TYPE,
+                        type.getName())
+                        .setSource(mapper.writeValueAsBytes(type))
+                        .execute()
+                        .actionGet();
+            }
         }
         this.client.admin().cluster()
                 .prepareHealth(INDEX_MD_SCHEMATA)
@@ -153,7 +161,7 @@ public class ElasticSearchSchemaService implements SchemaService {
         /* the metadata type is safe to delete, since it's no longer used */
         log.debug("deleting meta data type {} ", name);
         final DeleteResponse delete = this.client.prepareDelete(ElasticSearchSchemaService.INDEX_MD_SCHEMATA,
-                INDEX_MD_SCHEMATA_TYPE,name)
+                INDEX_MD_SCHEMATA_TYPE, name)
                 .execute()
                 .actionGet();
     }
