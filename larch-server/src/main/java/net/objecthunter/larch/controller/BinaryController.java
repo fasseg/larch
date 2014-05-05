@@ -15,6 +15,7 @@
 */
 package net.objecthunter.larch.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.helpers.AuditRecords;
 import net.objecthunter.larch.model.Binary;
 import net.objecthunter.larch.model.Entity;
@@ -30,6 +31,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Web controller class responsible for larch {@link net.objecthunter.larch.model.Binary} objects
@@ -51,6 +53,9 @@ public class BinaryController extends AbstractLarchController {
     @Autowired
     private BlobstoreService blobstoreService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     /**
      * Controller method for adding a {@link net.objecthunter.larch.model.Binary} to an existing {@link net
      * .objecthunter.larch.model.Entity} using a multipart/form-data encoded HTTP POST
@@ -67,6 +72,22 @@ public class BinaryController extends AbstractLarchController {
         entityService.createBinary(entityId, name, file.getContentType(), file.getInputStream());
         this.auditService.create(AuditRecords.createBinaryRecord(entityId));
         return "redirect:/entity/" + entityId;
+    }
+
+    /**
+     * Controller method for adding a {@link net.objecthunter.larch.model.Binary} to an existing {@link net
+     * .objecthunter.larch.model.Entity} using a application/json POST
+     *
+     * @param entityId The {@link net.objecthunter.larch.model.Entity}'s to which the created Binary should get added.
+     * @param src      An Inputstream holding the request body's content
+     * @throws IOException
+     */
+    @RequestMapping(value = "/entity/{id}/binary", method = RequestMethod.POST, consumes = "application/json")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void create(@PathVariable("id") final String entityId, final InputStream src) throws IOException {
+        final Binary b = this.mapper.readValue(src, Binary.class);
+        this.entityService.createBinary(entityId, b.getName(), b.getMimetype(), b.getSource().getInputStream());
+        this.auditService.create(AuditRecords.createBinaryRecord(entityId));
     }
 
     /**

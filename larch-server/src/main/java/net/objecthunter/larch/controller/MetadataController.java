@@ -91,6 +91,30 @@ public class MetadataController extends AbstractLarchController {
     }
 
     /**
+     * Controller method for adding {@link net.objecthunter.larch.model.Metadata} with a given name to an {@link net
+     * .objecthunter.larch.model.Entity} using a HTTP POST with multipart/form-data
+     *
+     * @param entityId The is of the Entity to which the Metadata should be added
+     * @param src the request body as an InputStream
+     * @return a redirection to the Entity to which the Metadata was added
+     * @throws IOException
+     */
+    @RequestMapping(value = "/entity/{id}/metadata", method = RequestMethod.POST, consumes = "application/json")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addMetadata(@PathVariable("id") final String entityId, final InputStream src) throws IOException {
+        final Entity e = entityService.retrieve(entityId);
+        final Metadata md = this.mapper.readValue(src, Metadata.class);
+        if (e.getMetadata() == null) {
+            e.setMetadata(new HashMap<>());
+        } else if (e.getMetadata().get(md.getName()) != null) {
+            throw new IOException("Meta data " + md.getName() + " already exists on Entity " + entityId);
+        }
+        e.getMetadata().put(md.getName(), md);
+        entityService.update(e);
+        this.auditService.create(AuditRecords.createMetadataRecord(entityId));
+    }
+
+    /**
      * Controller method to retrieve the XML data of a {@link net.objecthunter.larch.model.Metadata} object of an
      * {@link net.objecthunter.larch.model.Entity} using a HTTP GET
      *
