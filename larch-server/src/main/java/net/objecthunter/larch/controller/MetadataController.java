@@ -92,10 +92,10 @@ public class MetadataController extends AbstractLarchController {
 
     /**
      * Controller method for adding {@link net.objecthunter.larch.model.Metadata} with a given name to an {@link net
-     * .objecthunter.larch.model.Entity} using a HTTP POST with multipart/form-data
+     * .objecthunter.larch.model.Entity} using a HTTP POST with application/json
      *
      * @param entityId The is of the Entity to which the Metadata should be added
-     * @param src the request body as an InputStream
+     * @param src      the request body as an InputStream
      * @return a redirection to the Entity to which the Metadata was added
      * @throws IOException
      */
@@ -111,6 +111,39 @@ public class MetadataController extends AbstractLarchController {
         }
         e.getMetadata().put(md.getName(), md);
         entityService.update(e);
+        this.auditService.create(AuditRecords.createMetadataRecord(entityId));
+    }
+
+    /**
+     * Controller method for adding {@link net.objecthunter.larch.model.Metadata} with a given name to an {@link net
+     * .objecthunter.larch.model.Binary} using a HTTP POST with application/json
+     *
+     * @param entityId The is of the Entity to which the Metadata should be added
+     * @param src      the request body as an InputStream
+     * @return a redirection to the Entity to which the Metadata was added
+     * @throws IOException
+     */
+    @RequestMapping(value = "/entity/{id}/binary/{binary-name}/metadata", method = RequestMethod.POST,
+            consumes = "application/json")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addBinaryMetadata(@PathVariable("id") final String entityId, @PathVariable("binary-name") final String
+            binaryName, final InputStream src) throws IOException {
+
+        final Entity e = this.entityService.retrieve(entityId);
+        final Metadata md = this.mapper.readValue(src, Metadata.class);
+        if (e.getBinaries() == null || !e.getBinaries().containsKey(binaryName)) {
+            throw new FileNotFoundException("The binary " + binaryName + " does not exist ");
+        }
+        final Binary bin = e.getBinaries().get(binaryName);
+        if (bin.getMetadata() == null) {
+            bin.setMetadata(new HashMap<>());
+        }
+        if (bin.getMetadata().containsKey(md.getName())) {
+            throw new IOException("The meta data " + md.getName() + " already exists on the binary " + binaryName + "" +
+                    " of the entity " + entityId);
+        }
+        bin.getMetadata().put(md.getName(), md);
+        this.entityService.update(e);
         this.auditService.create(AuditRecords.createMetadataRecord(entityId));
     }
 
@@ -291,7 +324,7 @@ public class MetadataController extends AbstractLarchController {
     @RequestMapping(method = RequestMethod.DELETE, value = "/entity/{id}/metadata/{metadata-name}")
     @ResponseStatus(HttpStatus.OK)
     public void deleteMetadata(@PathVariable("id") final String entityId,
-                                     @PathVariable("metadata-name") final String mdName) throws IOException {
+                               @PathVariable("metadata-name") final String mdName) throws IOException {
         this.entityService.deleteMetadata(entityId, mdName);
     }
 }
