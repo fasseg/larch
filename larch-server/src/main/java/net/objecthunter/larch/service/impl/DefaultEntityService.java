@@ -355,4 +355,14 @@ public class DefaultEntityService implements EntityService {
         this.update(e);
     }
 
+    @Override
+    public void deleteMetadata(String entityId, String mdName) throws IOException {
+        final Entity e = this.indexService.retrieve(entityId);
+        if (e.getMetadata().get(mdName) == null) {
+            throw new FileNotFoundException("Meta data " + mdName + " does not exist on entity " + entityId);
+        }
+        e.getMetadata().remove(mdName);
+        this.update(e);
+    }
+
 }

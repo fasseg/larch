@@ -287,4 +287,11 @@ public class MetadataController extends AbstractLarchController {
         model.addAttribute("metadata", md);
         return new ModelAndView("metadata", model);
     }
+
+    @RequestMapping(method = RequestMethod.DELETE, value = "/entity/{id}/metadata/{metadata-name}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteMetadata(@PathVariable("id") final String entityId,
+                                     @PathVariable("metadata-name") final String mdName) throws IOException {
+        this.entityService.deleteMetadata(entityId, mdName);
+    }
 }

@@ -44,4 +44,6 @@ public interface EntityService {
     void createRelation(String id, String predicate, String object) throws IOException;
 
     void deleteBinary(String entityId, String name) throws IOException;
+
+    void deleteMetadata(String entityId, String mdName) throws IOException;
 }
