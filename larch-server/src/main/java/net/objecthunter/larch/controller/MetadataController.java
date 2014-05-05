@@ -120,7 +120,6 @@ public class MetadataController extends AbstractLarchController {
      *
      * @param entityId The is of the Entity to which the Metadata should be added
      * @param src      the request body as an InputStream
-     * @return a redirection to the Entity to which the Metadata was added
      * @throws IOException
      */
     @RequestMapping(value = "/entity/{id}/binary/{binary-name}/metadata", method = RequestMethod.POST,
@@ -326,5 +325,13 @@ public class MetadataController extends AbstractLarchController {
     public void deleteMetadata(@PathVariable("id") final String entityId,
                                @PathVariable("metadata-name") final String mdName) throws IOException {
         this.entityService.deleteMetadata(entityId, mdName);
+    }
+
+    @RequestMapping(method = RequestMethod.DELETE, value = "/entity/{id}/binary/{binary-name}/metadata/{metadata-name}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteBinaryMetadata(@PathVariable("id") final String entityId,
+                                     @PathVariable("binary-name") final String binaryName,
+                                     @PathVariable("metadata-name") final String mdName) throws IOException {
+        this.entityService.deleteBinaryMetadata(entityId, binaryName, mdName);
     }
 }

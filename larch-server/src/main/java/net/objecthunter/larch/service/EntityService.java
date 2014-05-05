@@ -46,4 +46,6 @@ public interface EntityService {
     void deleteBinary(String entityId, String name) throws IOException;
 
     void deleteMetadata(String entityId, String mdName) throws IOException;
+
+    void deleteBinaryMetadata(String entityId, String binaryName, String mdName) throws IOException;
 }

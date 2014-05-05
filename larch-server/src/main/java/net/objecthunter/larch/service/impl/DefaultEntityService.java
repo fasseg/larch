@@ -19,10 +19,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import net.objecthunter.larch.helpers.SizeCalculatingDigestInputStream;
-import net.objecthunter.larch.model.*;
-import net.objecthunter.larch.service.*;
-import net.objecthunter.larch.service.elasticsearch.ElasticSearchIndexService;
+import net.objecthunter.larch.model.Binary;
+import net.objecthunter.larch.model.Entity;
+import net.objecthunter.larch.model.LarchConstants;
+import net.objecthunter.larch.model.Metadata;
 import net.objecthunter.larch.model.source.UrlSource;
+import net.objecthunter.larch.service.BlobstoreService;
+import net.objecthunter.larch.service.EntityService;
+import net.objecthunter.larch.service.ExportService;
+import net.objecthunter.larch.service.IndexService;
+import net.objecthunter.larch.service.elasticsearch.ElasticSearchIndexService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +41,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.URI;
-import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.ZoneOffset;
@@ -247,7 +252,7 @@ public class DefaultEntityService implements EntityService {
         } catch (NoSuchAlgorithmException e1) {
             throw new IOException(e1);
         }
-        try (final SizeCalculatingDigestInputStream src =new SizeCalculatingDigestInputStream(inputStream, digest)) {
+        try (final SizeCalculatingDigestInputStream src = new SizeCalculatingDigestInputStream(inputStream, digest)) {
             final String path = blobstoreService.create(src);
             final Binary b = new Binary();
             final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
@@ -346,7 +351,7 @@ public class DefaultEntityService implements EntityService {
     }
 
     @Override
-    public void deleteBinary(String entityId, String name) throws IOException{
+    public void deleteBinary(String entityId, String name) throws IOException {
         final Entity e = this.indexService.retrieve(entityId);
         if (e.getBinaries().get(name) == null) {
             throw new FileNotFoundException("Binary " + name + " does not exist on entity " + entityId);
@@ -362,6 +367,20 @@ public class DefaultEntityService implements EntityService {
             throw new FileNotFoundException("Meta data " + mdName + " does not exist on entity " + entityId);
         }
         e.getMetadata().remove(mdName);
+        this.update(e);
+    }
+
+    @Override
+    public void deleteBinaryMetadata(String entityId, String binaryName, String mdName) throws IOException {
+        final Entity e = this.indexService.retrieve(entityId);
+        if (e.getBinaries() == null || !e.getBinaries().containsKey(binaryName)) {
+            throw new FileNotFoundException("The binary " + binaryName + " does not exist in the entity " + entityId);
+        }
+        final Binary bin = e.getBinaries().get(binaryName);
+        if (bin.getMetadata() == null || !bin.getMetadata().containsKey(mdName)) {
+            throw new FileNotFoundException("Meta data " + mdName + " does not exist on binary " + binaryName + " of entity " + entityId);
+        }
+        bin.getMetadata().remove(mdName);
         this.update(e);
     }
 
