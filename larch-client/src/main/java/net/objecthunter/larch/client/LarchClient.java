@@ -18,8 +18,10 @@ package net.objecthunter.larch.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.model.Binary;
+import net.objecthunter.larch.model.Describe;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.Metadata;
+import net.objecthunter.larch.model.state.LarchState;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -54,6 +56,35 @@ public class LarchClient {
             .auth(localhost, "admin", "admin")
             .authPreemptive(localhost);
 
+    /**
+     * Retrieve a {@link net.objecthunter.larch.model.state.LarchState} response from the repository containing detailed state information
+     *
+     * @return a LarchState POJO
+     * @throws IOException
+     */
+    public LarchState retrieveState() throws IOException {
+        final HttpResponse resp = this.execute(Request.Get(larchUri + "/state"))
+                .returnResponse();
+        if (resp.getStatusLine().getStatusCode() != 200) {
+            throw new IOException("Unable to retrieve LarchState response from the repository");
+        }
+        return mapper.readValue(resp.getEntity().getContent(), LarchState.class);
+    }
+
+    /**
+     * Retrieve a {@link net.objecthunter.larch.model.Describe} response from the repository containing general state information
+     *
+     * @return a Describe POJO
+     * @throws IOException
+     */
+    public Describe retrieveDescribe() throws IOException {
+        final HttpResponse resp = this.execute(Request.Get(larchUri))
+                .returnResponse();
+        if (resp.getStatusLine().getStatusCode() != 200) {
+            throw new IOException("Unable to retrieve Describe response from the repository");
+        }
+        return mapper.readValue(resp.getEntity().getContent(), Describe.class);
+    }
 
     /**
      * Retrieve a {@link net.objecthunter.larch.model.Metadata} of an Entity from the repository
@@ -93,11 +124,12 @@ public class LarchClient {
 
     /**
      * Add {@link net.objecthunter.larch.model.Metadata} to an existing entity
+     *
      * @param entityId the entity's id
-     * @param md the Metadata object
+     * @param md       the Metadata object
      * @throws IOException
      */
-    public void postMetadata(String entityId, Metadata md) throws IOException{
+    public void postMetadata(String entityId, Metadata md) throws IOException {
         final HttpResponse resp = this.execute(Request.Post(larchUri + "/entity/" + entityId + "/metadata")
                 .bodyString(mapper.writeValueAsString(md), ContentType.APPLICATION_JSON))
                 .returnResponse();
@@ -109,11 +141,12 @@ public class LarchClient {
 
     /**
      * Add {@link net.objecthunter.larch.model.Metadata} to an existing binary
+     *
      * @param entityId the entity's id
-     * @param md the Metadata object
+     * @param md       the Metadata object
      * @throws IOException
      */
-    public void postBinaryMetadata(String entityId, String binaryName,  Metadata md) throws IOException{
+    public void postBinaryMetadata(String entityId, String binaryName, Metadata md) throws IOException {
         final HttpResponse resp = this.execute(Request.Post(larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/metadata")
                 .bodyString(mapper.writeValueAsString(md), ContentType.APPLICATION_JSON))
                 .returnResponse();
@@ -125,7 +158,8 @@ public class LarchClient {
 
     /**
      * Delete the {@link net.objecthunter.larch.model.Metadata} of a {@link net.objecthunter.larch.model.Entity}
-     * @param entityId the entity's id
+     *
+     * @param entityId     the entity's id
      * @param metadataName the meta data set's name
      * @throws IOException
      */
@@ -141,8 +175,9 @@ public class LarchClient {
 
     /**
      * Delete the {@link net.objecthunter.larch.model.Metadata} of a {@link net.objecthunter.larch.model.Binary}
-     * @param entityId the entity's id
-     * @param binaryName the binary's name
+     *
+     * @param entityId     the entity's id
+     * @param binaryName   the binary's name
      * @param metadataName the meta data set's name
      * @throws IOException
      */
@@ -192,7 +227,8 @@ public class LarchClient {
 
     /**
      * Delete a {@link net.objecthunter.larch.model.Binary} in the repository
-     * @param entityId the entity's id
+     *
+     * @param entityId   the entity's id
      * @param binaryName the binary's name
      * @throws IOException
      */
