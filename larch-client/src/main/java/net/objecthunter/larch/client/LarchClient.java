@@ -72,7 +72,7 @@ public class LarchClient {
      * @throws IOException
      */
     public Describe retrieveDescribe() throws IOException {
-        final HttpResponse resp = this.execute(Request.Get(larchUri))
+        final HttpResponse resp = this.execute(Request.Get(larchUri + "/describe"))
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
             throw new IOException("Unable to retrieve Describe response from the repository");
