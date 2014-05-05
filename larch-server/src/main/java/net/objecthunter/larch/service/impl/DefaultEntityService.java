@@ -50,6 +50,7 @@ import java.util.Map;
  * operations of {@link net.objecthunter.larch.model.Entity} objects
  */
 public class DefaultEntityService implements EntityService {
+
     private static final Logger log = LoggerFactory.getLogger(DefaultEntityService.class);
 
     @Autowired
@@ -342,6 +343,16 @@ public class DefaultEntityService implements EntityService {
         }
         newVersion.getRelations().get(predicate).add(object);
         this.indexService.update(newVersion);
+    }
+
+    @Override
+    public void deleteBinary(String entityId, String name) throws IOException{
+        final Entity e = this.indexService.retrieve(entityId);
+        if (e.getBinaries().get(name) == null) {
+            throw new FileNotFoundException("Binary " + name + " does not exist on entity " + entityId);
+        }
+        e.getBinaries().remove(name);
+        this.update(e);
     }
 
 }

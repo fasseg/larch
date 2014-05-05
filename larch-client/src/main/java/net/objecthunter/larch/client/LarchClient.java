@@ -216,6 +216,7 @@ public class LarchClient {
                 .bodyString(mapper.writeValueAsString(bin), ContentType.APPLICATION_JSON))
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 201) {
+            log.error("Unable to add binary. Server says:\n",EntityUtils.toString(resp.getEntity()));
             throw new IOException("Unable to add binary " + bin.getName() + " to entity " + entityId);
         }
     }
@@ -231,6 +232,7 @@ public class LarchClient {
         final HttpResponse resp = this.execute(Request.Delete(larchUri + "/entity/" + entityId + "/binary/" + binaryName))
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
+            log.error("Unable to delete binary. Server says:\n",EntityUtils.toString(resp.getEntity()));
             throw new IOException("Unable to delete binary " + binaryName + " of entity " + entityId);
         }
     }

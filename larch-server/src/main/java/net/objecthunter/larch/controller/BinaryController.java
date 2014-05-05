@@ -133,4 +133,19 @@ public class BinaryController extends AbstractLarchController {
         response.flushBuffer();
     }
 
+    /**
+     * Controller method to delete a binary
+     *
+     * @param entityId the entity's id
+     * @param name     the name of the binary to delete
+     * @throws IOException
+     */
+    @RequestMapping(value = "/entity/{id}/binary/{name}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public void delete(@PathVariable("id") final String entityId, @PathVariable("name") final String name) throws
+            IOException {
+        this.entityService.deleteBinary(entityId, name);
+        this.auditService.create(AuditRecords.deleteEntityRecord(entityId));
+    }
 }
