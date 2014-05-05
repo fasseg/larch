@@ -23,6 +23,7 @@ import org.apache.http.client.fluent.Executor;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.apache.http.entity.ContentType;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +46,40 @@ public class LarchClient {
             .authPreemptive(localhost);
 
     /**
+     * Update an {@link net.objecthunter.larch.model.Entity} in the larch repository
+     *
+     * @param e the updated entity object to be written to the repository
+     * @throws IOException if an error occurred during update
+     */
+    public void updateEntity(Entity e) throws IOException {
+        if (e.getId() == null || e.getId().isEmpty()) {
+            throw new IOException("ID of the entity can not be empty when updating");
+        }
+        final HttpResponse resp = this.execute(Request.Put(larchUri + "/entity/" + e.getId())
+                .bodyString(mapper.writeValueAsString(e), ContentType.APPLICATION_JSON))
+                .returnResponse();
+        if (resp.getStatusLine().getStatusCode() != 200) {
+            log.error("Unable to update entity\n{}", EntityUtils.toString(resp.getEntity()));
+            throw new IOException("Unable to update entity " + e.getId());
+        }
+    }
+
+    /**
+     * Delete an entity in the larch repository
+     *
+     * @param id the id of the entity to delete
+     * @throws IOException
+     */
+    public void deleteEntity(String id) throws IOException {
+        final HttpResponse resp = this.execute(Request.Delete(larchUri + "/entity/" + id))
+                .returnResponse();
+        if (resp.getStatusLine().getStatusCode() != 200) {
+            log.error("Unable to delete Entity\n{}", EntityUtils.toString(resp.getEntity()));
+            throw new IOException("Unable to delete entity " + id);
+        }
+    }
+
+    /**
      * Post an {@link net.objecthunter.larch.model.Entity} to the Larch server
      *
      * @param e The entity to ingest
@@ -56,7 +91,7 @@ public class LarchClient {
                 .bodyString(mapper.writeValueAsString(e), ContentType.APPLICATION_JSON))
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 201) {
-            log.error("Unable to post entity to Larch: ", e);
+            log.error("Unable to post entity to Larch\n{}", EntityUtils.toString(resp.getEntity()));
             throw new IOException("Unable to create Entity " + e.getId());
         }
     }
@@ -76,6 +111,7 @@ public class LarchClient {
 
     /**
      * Execute a HTTP request
+     *
      * @param req the Request object to use for the execution
      * @return The HttpResponse containing the requested information
      * @throws IOException
