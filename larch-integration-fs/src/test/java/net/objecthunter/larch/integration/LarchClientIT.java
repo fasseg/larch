@@ -24,7 +24,9 @@ import net.objecthunter.larch.model.Metadata;
 import net.objecthunter.larch.model.state.LarchState;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -33,7 +35,11 @@ import java.io.InputStream;
 import static org.junit.Assert.*;
 
 public class LarchClientIT extends AbstractLarchIT {
+
     private LarchClient client = new LarchClient();
+
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
 
     @Test
     public void testPostEntity() throws Exception {
@@ -160,7 +166,7 @@ public class LarchClientIT extends AbstractLarchIT {
         this.client.postEntity(e);
         Binary bin = e.getBinaries().entrySet().iterator().next().getValue();
         InputStream src = this.client.retrieveBinaryContent(e.getId(), bin.getName());
-        File target = new File("target/" + RandomStringUtils.randomAlphabetic(16));
+        File target = new File(tempFolder.getRoot(), RandomStringUtils.randomAlphabetic(16));
         try (FileOutputStream sink = new FileOutputStream(target)) {
             IOUtils.copy(src, sink);
         }
