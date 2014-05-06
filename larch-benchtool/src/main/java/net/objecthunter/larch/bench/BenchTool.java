@@ -17,13 +17,28 @@ package net.objecthunter.larch.bench;/*
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.uncommons.maths.random.XORShiftRNG;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class BenchTool {
 
     private static final Logger log = LoggerFactory.getLogger(BenchTool.class);
+
+    public static final XORShiftRNG RNG = new XORShiftRNG();
+
+    public static final int[] SLICE = new int[1024];
+
+    static {
+        for (int i = 0; i< SLICE.length;i++) {
+            SLICE[i] = RNG.nextInt();
+        }
+    }
+
 
     public static void main(String[] args) {
         final Options ops = createOptions();
@@ -49,13 +64,13 @@ public class BenchTool {
                 larchUri = cli.getOptionValue('l');
             }
             if (cli.hasOption('a')) {
-                action = Action.valueOf(cli.getOptionValue('a'));
+                action = Action.valueOf(cli.getOptionValue('a').toUpperCase());
             }
             if (cli.hasOption('n')) {
                 numActions = Integer.parseInt(cli.getOptionValue('n'));
             }
             if (cli.hasOption('s')) {
-                size = Long.parseLong(cli.getOptionValue('s'));
+                size = getSizeFromArgument(cli.getOptionValue('s'));
             }
             if (cli.hasOption('t')) {
                 numThreads = Integer.parseInt(cli.getOptionValue('t'));
@@ -72,9 +87,11 @@ public class BenchTool {
 
         log.info("Running {} {} actions with size {} against {} using {} threads", new Object[]{numActions, action,
                 size, larchUri, numThreads});
-        final BenchToolRunner runner = new BenchToolRunner(action, larchUri, numActions, numThreads, size, user, password);
+        final BenchToolRunner runner = new BenchToolRunner(action, URI.create(larchUri), user, password, numActions, numThreads, size);
         try {
+            long time = System.currentTimeMillis();
             final List<BenchToolResult> results = runner.run();
+            ResultFormatter.printResults(results, numActions, size, System.currentTimeMillis() - time, System.out);
         } catch (IOException e) {
             log.error("Error while running bench\n", e);
         }
@@ -123,6 +140,34 @@ public class BenchTool {
                 .hasArg()
                 .create('p'));
         return ops;
+    }
+
+    private static long getSizeFromArgument(final String optionValue) {
+        final Matcher m = Pattern.compile("^(\\d*)([kKmMgGtT]{0,1})$").matcher(optionValue);
+        if (!m.find()) {
+            throw new IllegalArgumentException("Size " + optionValue + " could not be parsed");
+        }
+        final long size = Long.parseLong(m.group(1));
+        if (m.groupCount() == 1) {
+            return size;
+        }
+        final char postfix = m.group(2).charAt(0);
+        switch (postfix) {
+            case 'k':
+            case 'K':
+                return size * 1024l;
+            case 'm':
+            case 'M':
+                return size * 1024l * 1024l;
+            case 'g':
+            case 'G':
+                return size * 1024l * 1024l * 1024l;
+            case 't':
+            case 'T':
+                return size * 1024l * 1024l * 1024l * 1024l;
+            default:
+                return size;
+        }
     }
 
     public static void printUsage(final Options ops) {

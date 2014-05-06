@@ -22,8 +22,8 @@ import org.apache.commons.lang3.RandomStringUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Entities {
-    public static Entity createRandomEmptyEntity(long binarySize) {
+public abstract class BenchToolEntities {
+    public static Entity createRandomEmptyEntity() {
         final Entity e = new Entity();
         e.setLabel("benchtool-" + RandomStringUtils.randomAlphabetic(16));
         e.setType("book");

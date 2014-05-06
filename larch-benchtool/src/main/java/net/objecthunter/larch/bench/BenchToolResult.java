@@ -17,9 +17,18 @@ package net.objecthunter.larch.bench;
 
 public class BenchToolResult {
     private final long duration;
+    private final long size;
 
-    public BenchToolResult(long duration) {
+    public BenchToolResult(long size, long duration) {
         this.duration = duration;
+        this.size = size;
+    }
+
+    public long getSize() {
+        return size;
+    }
+    public float getThroughput() {
+        return (float) size / (float) duration * 1000f / (1024f*1024f);
     }
 
     public long getDuration() {

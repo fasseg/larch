@@ -17,68 +17,55 @@ package net.objecthunter.larch.bench;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.uncommons.maths.random.XORShiftRNG;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 public class RandomInputStream extends InputStream {
 
-    private static final byte[] RANDOM_SLICE = new byte[65535];
-    private static final XORShiftRNG RNG = new XORShiftRNG();
     private static final Logger log = LoggerFactory.getLogger(RandomInputStream.class);
-
-    static {
-        RNG.nextBytes(RANDOM_SLICE);
-    }
 
     private final long size;
     private long bytesRead;
-    private final int sliceLen;
     private int slicePos;
 
     public RandomInputStream(long size) {
         super();
         this.size = size;
-        this.sliceLen = RANDOM_SLICE.length;
     }
 
     @Override
     public int read() throws IOException {
-        if (bytesRead >= size) {
-            log.debug("returning -1 after {} bytes", bytesRead);
+        if (bytesRead == size) {
+            log.info("random stream stopping after " + bytesRead + " bytes");
             return -1;
         }
-        if (slicePos == 0 || slicePos == sliceLen - 1) {
-            slicePos = RNG.nextInt((int) Math.floor(sliceLen / 2f));
+        if (slicePos >= BenchTool.SLICE.length) {
+            slicePos = BenchTool.RNG.nextInt(BenchTool.SLICE.length / 2);
         }
         bytesRead++;
-        return RANDOM_SLICE[slicePos++];
+        return (int) BenchTool.SLICE[slicePos++];
     }
 
     @Override
     public int read(byte[] b) throws IOException {
-        int i = 0;
-        int data = 0;
-        for (; i < b.length; ++i) {
-            if ((data = read()) == -1) {
-                return i == 0 ? -1 : i;
-            }
-            b[i] = (byte) data;
-        }
-        return i;
+        return read(b, 0, b.length);
     }
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        int i = 0;
-        int data = 0;
-        for (; i < len; ++i) {
-            if ((data = read()) == -1) {
-                return i == 0 ? -1 : i;
-            }
-            b[i] = (byte) data;
+        if (len == 0) {
+            return 0;
         }
-        return i;
+        int i;
+        for (i = off; i - off < len; i++) {
+            int data = read();
+            if (data == -1) {
+                return i - off - 1;
+            }else {
+                b[i - off] = (byte) data;
+            }
+        }
+        return i - off;
     }
 }

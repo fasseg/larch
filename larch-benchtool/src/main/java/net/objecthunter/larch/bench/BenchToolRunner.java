@@ -15,10 +15,17 @@
 */
 package net.objecthunter.larch.bench;
 
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -33,29 +40,31 @@ public class BenchToolRunner {
     private final long size;
     private final int numActions;
     private final BenchTool.Action action;
-    private final String larchUri;
-    private final int numThreads;
-    private final String username;
-    private final String password;
     private final ExecutorService executor;
+    private final CloseableHttpClient httpClient;
+    private final URI larchUri;
 
-    public BenchToolRunner(BenchTool.Action action, String larchUri, int numActions, int numThreads, long size,
-                           String username, String password) {
+    public BenchToolRunner(BenchTool.Action action, URI larchUri,String user, String password, int numActions,
+                           int numThreads, long size) {
         this.size = size;
         this.numActions = numActions;
         this.action = action;
         this.larchUri = larchUri;
-        this.numThreads = numThreads;
-        this.username = username;
-        this.password = password;
+        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(
+                new AuthScope(larchUri.getHost(), larchUri.getPort()),
+                new UsernamePasswordCredentials(user, password)
+        );
+        this.httpClient = HttpClients.custom()
+                .setDefaultCredentialsProvider(credentialsProvider)
+                .build();
         this.executor = Executors.newFixedThreadPool(numThreads);
     }
 
     public List<BenchToolResult> run() throws IOException {
         final List<Future<BenchToolResult>> futures = new ArrayList<>();
         for (int i = 0; i < numActions; i++) {
-            futures.add(executor.submit(new ActionWorker(this.action, larchUri, this.size, this.username,
-                    this.password)));
+            futures.add(executor.submit(new ActionWorker(this.action, this.size, this.httpClient, this.larchUri.toASCIIString())));
         }
 
         try {
@@ -63,12 +72,12 @@ public class BenchToolRunner {
             int count = 0;
             for (Future<BenchToolResult> f : futures) {
                 results.add(f.get());
-                log.info("Finished {} of {} {} actions", new Object[] {++count, numActions, action.name()});
+                log.info("Finished {} of {} {} actions", new Object[]{++count, numActions, action.name()});
             }
             return results;
-        }catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             throw new IOException(e);
-        }finally {
+        } finally {
             this.executor.shutdown();
         }
     }
