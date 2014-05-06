@@ -25,9 +25,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.File;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.easymock.EasyMock.*;
 
 public class DefaultExportServiceTest {
     private DefaultExportService exportService;

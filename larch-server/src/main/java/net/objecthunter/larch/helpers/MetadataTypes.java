@@ -17,7 +17,6 @@ package net.objecthunter.larch.helpers;
 
 import net.objecthunter.larch.model.MetadataType;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

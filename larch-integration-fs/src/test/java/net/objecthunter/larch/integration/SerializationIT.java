@@ -18,8 +18,8 @@ package net.objecthunter.larch.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.integration.helpers.Fixtures;
 import net.objecthunter.larch.model.Entity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;

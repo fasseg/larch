@@ -15,18 +15,14 @@
 */
 package net.objecthunter.larch.integration;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.LarchServerConfiguration;
 import net.objecthunter.larch.model.state.WeedFsBlobstoreState;
 import net.objecthunter.larch.weedfs.WeedFSBlobstoreService;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.fluent.Request;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;

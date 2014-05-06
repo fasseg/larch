@@ -15,12 +15,8 @@
 */
 package net.objecthunter.larch.bench;
 
-import net.objecthunter.larch.model.Binary;
 import net.objecthunter.larch.model.Entity;
 import org.apache.commons.lang3.RandomStringUtils;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public abstract class BenchToolEntities {
     public static Entity createRandomEmptyEntity() {

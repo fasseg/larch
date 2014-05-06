@@ -18,7 +18,6 @@ package net.objecthunter.larch.service.elasticsearch;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.helpers.AuditRecords;
 import net.objecthunter.larch.model.AuditRecord;
-import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.security.User;
 import org.easymock.EasyMock;
 import org.elasticsearch.action.ListenableActionFuture;

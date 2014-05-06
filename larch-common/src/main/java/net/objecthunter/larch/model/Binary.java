@@ -16,7 +16,6 @@
 package net.objecthunter.larch.model;
 
 import net.objecthunter.larch.model.source.Source;
-import net.objecthunter.larch.model.source.UrlSource;
 
 import java.util.Map;
 

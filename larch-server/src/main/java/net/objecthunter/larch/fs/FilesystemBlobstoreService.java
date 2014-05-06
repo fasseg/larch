@@ -29,7 +29,7 @@ import org.springframework.core.env.Environment;
 import javax.annotation.PostConstruct;
 import java.io.*;
 
-import static net.objecthunter.larch.util.FileSystemUtil.*;
+import static net.objecthunter.larch.util.FileSystemUtil.checkAndCreate;
 
 /**
  * Implementation of a {@link net.objecthunter.larch.service.BlobstoreService} on a Posix file system.

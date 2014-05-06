@@ -21,7 +21,9 @@ import net.objecthunter.larch.model.Metadata;
 import net.objecthunter.larch.model.source.UrlSource;
 import org.apache.commons.lang3.RandomStringUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class Fixtures {
     public static Entity createFixtureEntityWithRandomId() throws Exception {

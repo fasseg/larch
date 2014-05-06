@@ -17,8 +17,6 @@ package net.objecthunter.larch.service.elasticsearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.model.AuditRecord;
-import net.objecthunter.larch.model.Entity;
-import net.objecthunter.larch.model.SearchResult;
 import net.objecthunter.larch.service.AuditService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.log4j.Logger;

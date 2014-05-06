@@ -15,7 +15,6 @@
 */
 package net.objecthunter.larch.service.elasticsearch;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.model.security.Group;
 import net.objecthunter.larch.model.security.User;

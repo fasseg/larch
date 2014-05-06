@@ -17,8 +17,6 @@ package net.objecthunter.larch.model.source;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import net.objecthunter.larch.model.state.FilesystemBlobstoreState;
-import net.objecthunter.larch.model.state.WeedFsBlobstoreState;
 
 import java.io.IOException;
 import java.io.InputStream;

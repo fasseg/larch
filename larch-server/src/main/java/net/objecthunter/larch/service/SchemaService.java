@@ -15,7 +15,6 @@
 */
 package net.objecthunter.larch.service;
 
-import net.objecthunter.larch.model.Metadata;
 import net.objecthunter.larch.model.MetadataType;
 import net.objecthunter.larch.model.MetadataValidationResult;
 
