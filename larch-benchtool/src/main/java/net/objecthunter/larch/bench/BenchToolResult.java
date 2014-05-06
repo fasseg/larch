@@ -27,8 +27,9 @@ public class BenchToolResult {
     public long getSize() {
         return size;
     }
+
     public float getThroughput() {
-        return (float) size / (float) duration * 1000f / (1024f*1024f);
+        return ((float) size * 1000f) / ((float) duration * 1024f * 1024f);
     }
 
     public long getDuration() {

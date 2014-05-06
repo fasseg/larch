@@ -32,7 +32,7 @@ public class ResultFormatter {
         float throughput = 0f;
         for (BenchToolResult result : results) {
             duration += result.getDuration();
-            throughput = result.getThroughput();
+            throughput += result.getThroughput();
         }
         throughput /= (float) results.size();
         float overallTroughput = ((float) num * (float) size * 1000f / ((float) overallDuration * 1024f *1024f));
