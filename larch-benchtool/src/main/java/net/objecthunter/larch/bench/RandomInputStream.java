@@ -22,21 +22,17 @@ import java.io.InputStream;
 
 public class RandomInputStream extends InputStream {
 
-    private final long size;
-
-    private long bytesRead;
-
-    private final int sliceLen;
-
-    private int slicePos;
-
-    public static final byte[] RANDOM_SLICE = new byte[65535];
-
-    public static final XORShiftRNG RNG = new XORShiftRNG();
+    private static final byte[] RANDOM_SLICE = new byte[65535];
+    private static final XORShiftRNG RNG = new XORShiftRNG();
 
     static {
         RNG.nextBytes(RANDOM_SLICE);
     }
+
+    private final long size;
+    private long bytesRead;
+    private final int sliceLen;
+    private int slicePos;
 
     public RandomInputStream(long size) {
         super();
@@ -46,17 +42,25 @@ public class RandomInputStream extends InputStream {
 
     @Override
     public int read() throws IOException {
+        if (bytesRead >= size) {
+            return -1;
+        }
         if (slicePos == 0 || slicePos == sliceLen - 1) {
             slicePos = RNG.nextInt((int) Math.floor(sliceLen / 2f));
         }
+        bytesRead++;
         return RANDOM_SLICE[slicePos++];
     }
 
     @Override
     public int read(byte[] b) throws IOException {
         int i = 0;
+        int data = 0;
         for (; i < b.length; ++i) {
-            b[i] = (byte) read();
+            if ((data = read()) == -1) {
+                return i == 0 ? -1 : i;
+            }
+            b[i] = (byte) data;
         }
         return i;
     }
@@ -64,8 +68,12 @@ public class RandomInputStream extends InputStream {
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         int i = 0;
+        int data = 0;
         for (; i < len; ++i) {
-            b[i] = (byte) read();
+            if ((data = read()) == -1) {
+                return i == 0 ? -1 : i;
+            }
+            b[i] = (byte) data;
         }
         return i;
     }

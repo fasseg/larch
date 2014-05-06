@@ -16,12 +16,15 @@
 package net.objecthunter.larch;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.web.multipart.support.MultipartFilter;
+import org.springframework.security.web.util.matcher.RegexRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.regex.Pattern;
 
 /**
  * Spring-security JavaConfig class defining the security context of the larch repository
@@ -32,16 +35,24 @@ public class LarchServerSecurityConfiguration extends WebSecurityConfigurerAdapt
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-            .authorizeRequests()
-            .requestMatchers(new AntPathRequestMatcher("/", "GET")).hasAnyRole("USER", "ADMIN")
-            .requestMatchers(new AntPathRequestMatcher("/entity", "POST")).hasAnyRole("USER", "ADMIN")
-            .and()
-            // TODO: enable CSRF again
-            .csrf().disable()
-            .httpBasic();
+        http.authorizeRequests()
+                .requestMatchers(new AntPathRequestMatcher("/", "GET")).hasAnyRole("USER", "ADMIN")
+                .requestMatchers(new AntPathRequestMatcher("/entity", "POST")).hasAnyRole("USER", "ADMIN")
+                //TODO: add missing matchers for other endpoints
+                .and()
+                .httpBasic();
+        http.csrf().requireCsrfProtectionMatcher(new LarchCsrfRequestMatcher());
         if (!Boolean.valueOf(env.getProperty("larch.security.csrf.enabled", "true"))) {
             http.csrf().disable();
+        }
+    }
+
+    private static class LarchCsrfRequestMatcher implements RequestMatcher {
+        private Pattern allowedMethods = Pattern.compile("^(GET|HEAD|TRACE|OPTIONS)$");
+
+        @Override
+        public boolean matches(HttpServletRequest request) {
+            return false;
         }
     }
 }

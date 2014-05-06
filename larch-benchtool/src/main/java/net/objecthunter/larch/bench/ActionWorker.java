@@ -16,6 +16,7 @@
 package net.objecthunter.larch.bench;
 
 import net.objecthunter.larch.client.LarchClient;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +51,9 @@ public class ActionWorker implements Callable<BenchToolResult> {
 
     private BenchToolResult doIngest() throws IOException {
         long time = System.currentTimeMillis();
-        client.postEntity(Entities.createRandomEmptyEntity(size));
+        String id = client.postEntity(Entities.createRandomEmptyEntity(size));
+        client.postBinary(id, RandomStringUtils.randomAlphabetic(16), "application/octet-stream",
+                new RandomInputStream(size));
         long duration = System.currentTimeMillis() - time;
         return new BenchToolResult(duration);
     }

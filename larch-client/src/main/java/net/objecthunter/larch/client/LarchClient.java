@@ -48,7 +48,7 @@ public class LarchClient {
 
     public LarchClient(URI larchUri, String username, String password) {
         this.larchUri = larchUri;
-        final HttpHost larch =new HttpHost(larchUri.getHost(), larchUri.getPort());
+        final HttpHost larch = new HttpHost(larchUri.getHost(), larchUri.getPort());
         this.executor = Executor.newInstance()
                 .auth(larch, username, password)
                 .authPreemptive(larch);
@@ -235,6 +235,18 @@ public class LarchClient {
         }
     }
 
+    public void postBinary(String entityId, String name, String mimeType, InputStream src) throws IOException {
+        final HttpResponse resp = this.execute(Request.Post(larchUri + "/entity/" + entityId + "/binary?name" + name
+                + "&mimeType=" + mimeType)
+                .useExpectContinue()
+                .bodyStream(src))
+                .returnResponse();
+        if (resp.getStatusLine().getStatusCode() != 201) {
+            log.error("Unable to add binary. Server says:\n", EntityUtils.toString(resp.getEntity()));
+            throw new IOException("Unable to add binary " + name + " to entity " + entityId);
+        }
+    }
+
     /**
      * Delete a {@link net.objecthunter.larch.model.Binary} in the repository
      *
@@ -311,9 +323,10 @@ public class LarchClient {
      * Post an {@link net.objecthunter.larch.model.Entity} to the Larch server
      *
      * @param e The entity to ingest
+     * @return the entity's id
      * @throws IOException if an error occurred while ingesting
      */
-    public void postEntity(Entity e) throws IOException {
+    public String postEntity(Entity e) throws IOException {
         final HttpResponse resp = this.execute(Request.Post(larchUri + "/entity")
                 .useExpectContinue()
                 .bodyString(mapper.writeValueAsString(e), ContentType.APPLICATION_JSON))
@@ -322,6 +335,7 @@ public class LarchClient {
             log.error("Unable to post entity to Larch at {}\n{}", larchUri, EntityUtils.toString(resp.getEntity()));
             throw new IOException("Unable to create Entity " + e.getId());
         }
+        return EntityUtils.toString(resp.getEntity());
     }
 
     /**

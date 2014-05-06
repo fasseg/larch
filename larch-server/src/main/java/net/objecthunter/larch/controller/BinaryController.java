@@ -76,6 +76,27 @@ public class BinaryController extends AbstractLarchController {
 
     /**
      * Controller method for adding a {@link net.objecthunter.larch.model.Binary} to an existing {@link net
+     * .objecthunter.larch.model.Entity} using a multipart/form-data encoded HTTP POST
+     *
+     * @param entityId The {@link net.objecthunter.larch.model.Entity}'s to which the created Binary should get added.
+     * @param name     The name of the Binary
+     * @param src     The request body containing the actual data
+     * @return The redirect address to view the updated Entity
+     * @throws IOException
+     */
+    @RequestMapping(value = "/entity/{id}/binary", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public String create(@PathVariable("id") final String entityId,
+                         @RequestParam("name") final String name,
+                         @RequestParam("mimetype") final String mimeType,
+                         final InputStream src) throws IOException {
+        entityService.createBinary(entityId, name, mimeType, src);
+        this.auditService.create(AuditRecords.createBinaryRecord(entityId));
+        return "redirect:/entity/" + entityId;
+    }
+
+    /**
+     * Controller method for adding a {@link net.objecthunter.larch.model.Binary} to an existing {@link net
      * .objecthunter.larch.model.Entity} using a application/json POST
      *
      * @param entityId The {@link net.objecthunter.larch.model.Entity}'s to which the created Binary should get added.
