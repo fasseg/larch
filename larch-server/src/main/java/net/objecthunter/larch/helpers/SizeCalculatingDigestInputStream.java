@@ -15,54 +15,70 @@
 */
 package net.objecthunter.larch.helpers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.DigestInputStream;
 import java.security.MessageDigest;
 
 /**
  * An {@link java.io.InputStream} implementaion which keeps track of the number of bytes read from it and is able to
  * calculate a Checksum while streaming
  */
-public class SizeCalculatingDigestInputStream extends DigestInputStream {
-    private long bytesRead = 0;
+public class SizeCalculatingDigestInputStream extends FilterInputStream {
+    private static final Logger log = LoggerFactory.getLogger(SizeCalculatingDigestInputStream.class);
+    protected MessageDigest digest;
+    private boolean on = true;
 
-    /**
-     * Create a SizeCalculatingDigestInputStream instance
-     *
-     * @param stream the Stream to wrap this SizeCalculatingDigestInputStream around
-     * @param digest the {@link java.security.MessageDigest} to use for the checksum calculation
-     */
+    private long calculatedSize = 0;
+
     public SizeCalculatingDigestInputStream(InputStream stream, MessageDigest digest) {
-        super(stream, digest);
+        super(stream);
+        setMessageDigest(digest);
     }
 
-    @Override
+    public MessageDigest getMessageDigest() {
+        return digest;
+    }
+
+    public void setMessageDigest(MessageDigest digest) {
+        this.digest = digest;
+    }
+
+
     public int read() throws IOException {
-        bytesRead++;
-        return super.read();
+        int ch = in.read();
+        if (ch > 0) {
+            calculatedSize++;
+            if (on) {
+                digest.update((byte) ch);
+            }
+        }
+        return ch;
     }
 
-    @Override
-    public int read(byte[] b) throws IOException {
-        int read = super.read(b);
-        bytesRead += read;
-        return read;
-    }
-
-    @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        int read = super.read(b, off, len);
-        bytesRead += read;
-        return read;
+        int result = in.read(b, off, len);
+        if (result != -1) {
+            calculatedSize += result;
+            if (on) {
+                digest.update(b, off, result);
+            }
+        }
+        return result;
     }
 
-    /**
-     * returns the number of bytes produced by this {@link java.io.InputStream}
-     *
-     * @return
-     */
-    public long getBytesRead() {
-        return bytesRead;
+    public long getCalculatedSize() {
+        return calculatedSize;
+    }
+
+    public void on(boolean on) {
+        this.on = on;
+    }
+
+    public String toString() {
+        return "[Digest Input Stream] " + digest.toString();
     }
 }

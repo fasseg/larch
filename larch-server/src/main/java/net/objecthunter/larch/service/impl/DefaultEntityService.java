@@ -136,7 +136,7 @@ public class DefaultEntityService implements EntityService {
             final String path = this.blobstoreService.create(src);
             final String checksum = new BigInteger(1, digest.digest()).toString(16);
             b.setChecksum(checksum);
-            b.setSize(src.getBytesRead());
+            b.setSize(src.getCalculatedSize());
             b.setChecksumType(digest.getAlgorithm());
             b.setPath(path);
             b.setSource(new UrlSource(URI.create("http://localhost:8080/entity/" + entityId + "/binary/" + b.getName() + "/content"), true));
@@ -262,7 +262,7 @@ public class DefaultEntityService implements EntityService {
             b.setMimetype(contentType);
             b.setChecksum(new BigInteger(1, digest.digest()).toString(16));
             b.setChecksumType("MD5");
-            b.setSize(src.getBytesRead());
+            b.setSize(src.getCalculatedSize());
             b.setSource(new UrlSource(URI.create("http://localhost:8080/entity/" + entityId + "/binary/" + name + "/content"), true));
             b.setPath(path);
             b.setUtcCreated(now);

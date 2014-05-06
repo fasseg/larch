@@ -236,13 +236,13 @@ public class LarchClient {
     }
 
     public void postBinary(String entityId, String name, String mimeType, InputStream src) throws IOException {
-        final HttpResponse resp = this.execute(Request.Post(larchUri + "/entity/" + entityId + "/binary?name" + name
-                + "&mimeType=" + mimeType)
+        final HttpResponse resp = this.execute(Request.Post(larchUri + "/entity/" + entityId + "/binary?name=" + name
+                + "&mimetype=" + mimeType)
                 .useExpectContinue()
                 .bodyStream(src))
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 201) {
-            log.error("Unable to add binary. Server says:\n", EntityUtils.toString(resp.getEntity()));
+            log.error("Unable to add binary. Server says:\n{}", EntityUtils.toString(resp.getEntity()));
             throw new IOException("Unable to add binary " + name + " to entity " + entityId);
         }
     }

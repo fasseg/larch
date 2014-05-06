@@ -63,11 +63,13 @@ public class BenchToolRunner {
             int count = 0;
             for (Future<BenchToolResult> f : futures) {
                 results.add(f.get());
-                log.info("Finished {} of {} {} actions", new Object[] {count, numActions, action.name()});
+                log.info("Finished {} of {} {} actions", new Object[] {++count, numActions, action.name()});
             }
             return results;
         }catch (InterruptedException | ExecutionException e) {
             throw new IOException(e);
+        }finally {
+            this.executor.shutdown();
         }
     }
 }

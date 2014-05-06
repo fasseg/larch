@@ -15,6 +15,8 @@
 */
 package net.objecthunter.larch.bench;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.uncommons.maths.random.XORShiftRNG;
 
 import java.io.IOException;
@@ -24,6 +26,7 @@ public class RandomInputStream extends InputStream {
 
     private static final byte[] RANDOM_SLICE = new byte[65535];
     private static final XORShiftRNG RNG = new XORShiftRNG();
+    private static final Logger log = LoggerFactory.getLogger(RandomInputStream.class);
 
     static {
         RNG.nextBytes(RANDOM_SLICE);
@@ -43,6 +46,7 @@ public class RandomInputStream extends InputStream {
     @Override
     public int read() throws IOException {
         if (bytesRead >= size) {
+            log.debug("returning -1 after {} bytes", bytesRead);
             return -1;
         }
         if (slicePos == 0 || slicePos == sliceLen - 1) {
