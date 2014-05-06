@@ -66,6 +66,7 @@ public class ElasticSearchSchemaServiceTest {
         ReflectionTestUtils.setField(schemaService, "client", mockClient);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testGetSchemUrlForType() throws Exception {
         MetadataType type = Fixtures.createMetadataType();
@@ -87,6 +88,7 @@ public class ElasticSearchSchemaServiceTest {
         assertEquals(type.getSchemaUrl(), url);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testGetSchemaTypes() throws Exception {
         MetadataType type = Fixtures.createMetadataType();
@@ -114,6 +116,7 @@ public class ElasticSearchSchemaServiceTest {
         verify(mockClient, mockFuture, mockSearchRequestBuilder, mockSearchResponse, mockHits, mockHit);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testCreateSchemaType() throws Exception {
         MetadataType type = Fixtures.createMetadataType();
@@ -152,6 +155,7 @@ public class ElasticSearchSchemaServiceTest {
                 mockGetResponse, mockIndexRequestBuilder, mockIndexResponse);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testDeleteMetadataType() throws Exception {
         MetadataType type = Fixtures.createMetadataType();

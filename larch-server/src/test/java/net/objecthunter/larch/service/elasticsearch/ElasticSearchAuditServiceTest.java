@@ -65,6 +65,7 @@ public class ElasticSearchAuditServiceTest {
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testRetrieve() throws Exception {
         SearchRequestBuilder mockSearchRequestBuilder = createMock(SearchRequestBuilder.class);
@@ -101,6 +102,7 @@ public class ElasticSearchAuditServiceTest {
         assertNotNull(records.get(0).getTimestamp());
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testCreate() throws Exception {
         GetRequestBuilder mockGetRequestBuilder = createMock(GetRequestBuilder.class);

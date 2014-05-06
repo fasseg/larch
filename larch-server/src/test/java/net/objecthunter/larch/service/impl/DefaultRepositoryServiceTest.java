@@ -76,6 +76,7 @@ public class DefaultRepositoryServiceTest {
         verify(mockClient, mockIndexService, mockBlobstoreService);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testDescribe() throws Exception {
         ClusterStateRequestBuilder mockClusterStateRequest = createMock(ClusterStateRequestBuilder.class);

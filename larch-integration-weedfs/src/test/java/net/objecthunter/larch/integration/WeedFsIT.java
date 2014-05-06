@@ -35,17 +35,13 @@ public class WeedFsIT extends AbstractWeedFsLarchIT {
     @Autowired
     private LarchServerConfiguration config;
 
-    private WeedFsMaster master;
-
-    private WeedFsVolume volume;
-
     @Autowired
     private Environment env;
 
     @PostConstruct
     public void setup() {
-        master = config.weedFsMaster();
-        volume = config.weedfsVolume();
+        final WeedFsMaster master = config.weedFsMaster();
+        final WeedFsVolume volume = config.weedfsVolume();
     }
 
     @Test

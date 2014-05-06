@@ -55,6 +55,7 @@ public class ElasticSearchCredentialsServiceTest {
         ReflectionTestUtils.setField(credentialsService, "client", mockClient);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testAuthenticate() throws Exception {
         User u = Fixtures.createUser();
@@ -79,6 +80,7 @@ public class ElasticSearchCredentialsServiceTest {
         assertEquals("test", ((User) auth.getPrincipal()).getName());
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testCreateUser() throws Exception {
         User u = Fixtures.createUser();
@@ -108,6 +110,7 @@ public class ElasticSearchCredentialsServiceTest {
         verify(mockClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testCreateGroup() throws Exception {
         Group g = Fixtures.createGroup();
@@ -137,6 +140,7 @@ public class ElasticSearchCredentialsServiceTest {
         verify(mockClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testUpdateUser() throws Exception {
         User u = Fixtures.createUser();
@@ -167,6 +171,7 @@ public class ElasticSearchCredentialsServiceTest {
         verify(mockClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testUpdateGroup() throws Exception {
         Group g = Fixtures.createGroup();
@@ -196,6 +201,7 @@ public class ElasticSearchCredentialsServiceTest {
         verify(mockClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testAddUserToGroup() throws Exception {
         User u = Fixtures.createUser();
@@ -243,6 +249,7 @@ public class ElasticSearchCredentialsServiceTest {
         verify(mockClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testDeleteUser() throws Exception {
         User u = Fixtures.createUser();
@@ -270,6 +277,7 @@ public class ElasticSearchCredentialsServiceTest {
 
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testDeleteGroup() throws Exception {
         Group g = Fixtures.createGroup();
@@ -296,6 +304,7 @@ public class ElasticSearchCredentialsServiceTest {
         verify(mockClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockDeleteRequestBuilder);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testRemoveUserFromGroup() throws Exception {
         User u = Fixtures.createUser();
@@ -343,6 +352,7 @@ public class ElasticSearchCredentialsServiceTest {
         verify(mockClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testRetrieveUser() throws Exception {
         User u = Fixtures.createUser();
@@ -363,6 +373,7 @@ public class ElasticSearchCredentialsServiceTest {
         verify(mockClient, mockGetRequestBuilder, mockGetResponse, mockFuture);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testRetrieveGroup() throws Exception {
         Group g = Fixtures.createGroup();
@@ -384,6 +395,7 @@ public class ElasticSearchCredentialsServiceTest {
 
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testRetrieveUsers() throws Exception {
         User u = Fixtures.createUser();
@@ -413,6 +425,7 @@ public class ElasticSearchCredentialsServiceTest {
         assertEquals(u.getGroups().get(0).getName(),users.get(0).getGroups().get(0).getName());
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testRetrieveGroups() throws Exception {
         Group g = Fixtures.createGroup();

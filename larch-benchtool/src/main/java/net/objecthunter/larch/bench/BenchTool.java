@@ -85,8 +85,8 @@ public class BenchTool {
             log.error("Unable to parse commandline.\n", e);
         }
 
-        log.info("Running {} {} actions with size {} against {} using {} threads", new Object[]{numActions, action,
-                size, larchUri, numThreads});
+        log.info("Running {} {} actions with size {} against {} using {} threads", numActions, action,
+                size, larchUri, numThreads);
         final BenchToolRunner runner = new BenchToolRunner(action, URI.create(larchUri), user, password, numActions, numThreads, size);
         try {
             long time = System.currentTimeMillis();

@@ -66,6 +66,7 @@ public class ElasticSearchIndexServiceTest {
         ReflectionTestUtils.setField(indexService, "client", mockClient);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testCreate() throws Exception {
         Entity e = Fixtures.createEntity();
@@ -102,6 +103,7 @@ public class ElasticSearchIndexServiceTest {
                 mockIndexRequestBuilder);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testUpdate() throws Exception {
         Entity e = Fixtures.createEntity();
@@ -132,6 +134,7 @@ public class ElasticSearchIndexServiceTest {
 
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testRetrieve() throws Exception {
         Entity e = Fixtures.createEntity();
@@ -170,6 +173,7 @@ public class ElasticSearchIndexServiceTest {
                 mockGetResponse, mockFuture);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testDelete() throws Exception {
         Entity e = Fixtures.createEntity();
@@ -193,6 +197,7 @@ public class ElasticSearchIndexServiceTest {
         verify(mockClient, mockAdminClient, mockIndicesAdminClient, mockDeleteRequest, mockDeleteResponse, mockFuture);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testStatus() throws Exception {
         IndicesStatsResponse mockStats = createMock(IndicesStatsResponse.class);
@@ -241,6 +246,7 @@ public class ElasticSearchIndexServiceTest {
                 mockStatusResponse, mockByteSize, mockDocStatus, mockFlushStats, mockMergeStats, mockRefreshStats);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testExists() throws Exception {
         Entity e = Fixtures.createEntity();

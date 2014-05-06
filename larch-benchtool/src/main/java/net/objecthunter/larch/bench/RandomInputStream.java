@@ -44,7 +44,7 @@ public class RandomInputStream extends InputStream {
             slicePos = BenchTool.RNG.nextInt(BenchTool.SLICE.length / 2);
         }
         bytesRead++;
-        return (int) BenchTool.SLICE[slicePos++];
+        return BenchTool.SLICE[slicePos++];
     }
 
     @Override

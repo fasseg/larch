@@ -170,8 +170,7 @@ public class LarchServerConfiguration {
     @Bean
     @Primary
     public ObjectMapper objectMapper() {
-        final ObjectMapper mapper = new ObjectMapper();
-        return mapper;
+        return new ObjectMapper();
     }
 
     /**

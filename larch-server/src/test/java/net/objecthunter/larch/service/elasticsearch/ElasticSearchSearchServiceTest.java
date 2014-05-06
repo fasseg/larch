@@ -52,6 +52,7 @@ public class ElasticSearchSearchServiceTest {
         ReflectionTestUtils.setField(searchService, "client", mockClient);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testScanIndexWithNumRecords() throws Exception {
         SearchResponse mockSearchResponse = createMock(SearchResponse.class);
@@ -90,6 +91,7 @@ public class ElasticSearchSearchServiceTest {
 
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testSearchEntities() throws Exception {
         SearchResponse mockSearchResponse = createMock(SearchResponse.class);
@@ -133,6 +135,7 @@ public class ElasticSearchSearchServiceTest {
                 mockSearchResponse, mockHits, mockHit, mockField);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testScanIndexDefaultNumRecords() throws Exception {
         SearchResponse mockSearchResponse = createMock(SearchResponse.class);
