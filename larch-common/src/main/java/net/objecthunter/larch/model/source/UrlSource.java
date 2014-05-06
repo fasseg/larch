@@ -26,7 +26,7 @@ import java.net.URI;
  * actual data. If for example a {@link net.objecthunter.larch.model.Binary} is ingested a UrlSource object is used
  * to reference the actual content on disk using a {@code file://}
  */
-public class UrlSource {
+public class UrlSource implements Source{
     private final URI uri;
     private final boolean internal;
 
@@ -94,7 +94,8 @@ public class UrlSource {
      * @throws IOException
      */
     @JsonIgnore
-    public InputStream getInputStream() throws IOException {
+    @Override
+    public InputStream getInputStream()  throws IOException {
         return uri.toURL().openStream();
     }
 }

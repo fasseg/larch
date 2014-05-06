@@ -15,6 +15,7 @@
 */
 package net.objecthunter.larch.model;
 
+import net.objecthunter.larch.model.source.Source;
 import net.objecthunter.larch.model.source.UrlSource;
 
 import java.util.Map;
@@ -33,7 +34,7 @@ public class Binary {
     private String checksum;
     private String checksumType;
     private String path;
-    private UrlSource source;
+    private Source source;
     private String utcCreated;
     private String utcLastModified;
 
@@ -53,11 +54,11 @@ public class Binary {
         this.utcCreated = utcCreated;
     }
 
-    public UrlSource getSource() {
+    public Source getSource() {
         return source;
     }
 
-    public void setSource(UrlSource source) {
+    public void setSource(Source source) {
         this.source = source;
     }
 
