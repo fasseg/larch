@@ -48,11 +48,10 @@ public class LarchClient {
 
     public LarchClient(URI larchUri, String username, String password) {
         this.larchUri = larchUri;
-        final HttpHost larchHost = new HttpHost(larchUri.getHost(), larchUri.getPort(),
-                larchUri.getAuthority());
+        final HttpHost larch =new HttpHost(larchUri.getHost(), larchUri.getPort());
         this.executor = Executor.newInstance()
-                .auth(larchHost, username, password)
-                .authPreemptive(larchHost);
+                .auth(larch, username, password)
+                .authPreemptive(larch);
     }
 
     /**
@@ -62,7 +61,8 @@ public class LarchClient {
      * @throws IOException
      */
     public LarchState retrieveState() throws IOException {
-        final HttpResponse resp = this.execute(Request.Get(larchUri + "/state"))
+        final HttpResponse resp = this.execute(Request.Get(larchUri + "/state")
+                .useExpectContinue())
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
             throw new IOException("Unable to retrieve LarchState response from the repository");
@@ -77,7 +77,8 @@ public class LarchClient {
      * @throws IOException
      */
     public Describe retrieveDescribe() throws IOException {
-        final HttpResponse resp = this.execute(Request.Get(larchUri + "/describe"))
+        final HttpResponse resp = this.execute(Request.Get(larchUri + "/describe")
+                .useExpectContinue())
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
             throw new IOException("Unable to retrieve Describe response from the repository");
@@ -94,7 +95,8 @@ public class LarchClient {
      * @throws IOException if an error occurred while fetching the meta data
      */
     public Metadata retrieveMetadata(String entityId, String metadataName) throws IOException {
-        final HttpResponse resp = this.execute(Request.Get(larchUri + "/entity/" + entityId + "/metadata/" + metadataName))
+        final HttpResponse resp = this.execute(Request.Get(larchUri + "/entity/" + entityId + "/metadata/" + metadataName)
+                .useExpectContinue())
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
             log.error("Unable to fetch meta data\n{}", EntityUtils.toString(resp.getEntity()));
@@ -112,7 +114,8 @@ public class LarchClient {
      * @throws IOException if an error occurred while fetching the meta data
      */
     public Metadata retrieveBinaryMetadata(String entityId, String binaryName, String metadataName) throws IOException {
-        final HttpResponse resp = this.execute(Request.Get(larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/metadata/" + metadataName))
+        final HttpResponse resp = this.execute(Request.Get(larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/metadata/" + metadataName)
+                .useExpectContinue())
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
             log.error("Unable to fetch meta data\n{}", EntityUtils.toString(resp.getEntity()));
@@ -131,6 +134,7 @@ public class LarchClient {
      */
     public void postMetadata(String entityId, Metadata md) throws IOException {
         final HttpResponse resp = this.execute(Request.Post(larchUri + "/entity/" + entityId + "/metadata")
+                .useExpectContinue()
                 .bodyString(mapper.writeValueAsString(md), ContentType.APPLICATION_JSON))
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 201) {
@@ -148,6 +152,7 @@ public class LarchClient {
      */
     public void postBinaryMetadata(String entityId, String binaryName, Metadata md) throws IOException {
         final HttpResponse resp = this.execute(Request.Post(larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/metadata")
+                .useExpectContinue()
                 .bodyString(mapper.writeValueAsString(md), ContentType.APPLICATION_JSON))
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 201) {
@@ -164,7 +169,8 @@ public class LarchClient {
      * @throws IOException
      */
     public void deleteMetadata(String entityId, String metadataName) throws IOException {
-        final HttpResponse resp = this.execute(Request.Delete(larchUri + "/entity/" + entityId + "/metadata/" + metadataName))
+        final HttpResponse resp = this.execute(Request.Delete(larchUri + "/entity/" + entityId + "/metadata/" + metadataName)
+                .useExpectContinue())
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
             log.error("Unable to remove meta data from entity\n{}", EntityUtils.toString(resp.getEntity()));
@@ -182,7 +188,8 @@ public class LarchClient {
      * @throws IOException
      */
     public void deleteBinaryMetadata(String entityId, String binaryName, String metadataName) throws IOException {
-        final HttpResponse resp = this.execute(Request.Delete(larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/metadata/" + metadataName))
+        final HttpResponse resp = this.execute(Request.Delete(larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/metadata/" + metadataName)
+                .useExpectContinue())
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
             log.error("Unable to remove meta data from binary\n{}", EntityUtils.toString(resp.getEntity()));
@@ -200,7 +207,8 @@ public class LarchClient {
      * @throws IOException if an error occurred while fetching from the repository
      */
     public Binary retrieveBinary(String entityId, String binaryName) throws IOException {
-        final HttpResponse resp = this.execute(Request.Get(larchUri + "/entity/" + entityId + "/binary/" + binaryName))
+        final HttpResponse resp = this.execute(Request.Get(larchUri + "/entity/" + entityId + "/binary/" + binaryName)
+                .useExpectContinue())
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
             log.error("Unable to fetch binary\n{}", EntityUtils.toString(resp.getEntity()));
@@ -218,6 +226,7 @@ public class LarchClient {
      */
     public void postBinary(String entityId, Binary bin) throws IOException {
         final HttpResponse resp = this.execute(Request.Post(larchUri + "/entity/" + entityId + "/binary")
+                .useExpectContinue()
                 .bodyString(mapper.writeValueAsString(bin), ContentType.APPLICATION_JSON))
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 201) {
@@ -234,7 +243,8 @@ public class LarchClient {
      * @throws IOException
      */
     public void deleteBinary(String entityId, String binaryName) throws IOException {
-        final HttpResponse resp = this.execute(Request.Delete(larchUri + "/entity/" + entityId + "/binary/" + binaryName))
+        final HttpResponse resp = this.execute(Request.Delete(larchUri + "/entity/" + entityId + "/binary/" + binaryName)
+                .useExpectContinue())
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
             log.error("Unable to delete binary. Server says:\n", EntityUtils.toString(resp.getEntity()));
@@ -251,7 +261,8 @@ public class LarchClient {
      * @throws IOException
      */
     public InputStream retrieveBinaryContent(String entityId, String binaryName) throws IOException {
-        final HttpResponse resp = this.execute(Request.Get(larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/content"))
+        final HttpResponse resp = this.execute(Request.Get(larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/content")
+                .useExpectContinue())
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
             log.error("Unable to fetch binary data\n{}", EntityUtils.toString(resp.getEntity()));
@@ -271,6 +282,7 @@ public class LarchClient {
             throw new IOException("ID of the entity can not be empty when updating");
         }
         final HttpResponse resp = this.execute(Request.Put(larchUri + "/entity/" + e.getId())
+                .useExpectContinue()
                 .bodyString(mapper.writeValueAsString(e), ContentType.APPLICATION_JSON))
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
@@ -286,7 +298,8 @@ public class LarchClient {
      * @throws IOException
      */
     public void deleteEntity(String id) throws IOException {
-        final HttpResponse resp = this.execute(Request.Delete(larchUri + "/entity/" + id))
+        final HttpResponse resp = this.execute(Request.Delete(larchUri + "/entity/" + id)
+                .useExpectContinue())
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
             log.error("Unable to delete Entity\n{}", EntityUtils.toString(resp.getEntity()));
@@ -298,15 +311,15 @@ public class LarchClient {
      * Post an {@link net.objecthunter.larch.model.Entity} to the Larch server
      *
      * @param e The entity to ingest
-     * @return The identifier of the created entity
      * @throws IOException if an error occurred while ingesting
      */
     public void postEntity(Entity e) throws IOException {
         final HttpResponse resp = this.execute(Request.Post(larchUri + "/entity")
+                .useExpectContinue()
                 .bodyString(mapper.writeValueAsString(e), ContentType.APPLICATION_JSON))
                 .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 201) {
-            log.error("Unable to post entity to Larch\n{}", EntityUtils.toString(resp.getEntity()));
+            log.error("Unable to post entity to Larch at {}\n{}", larchUri, EntityUtils.toString(resp.getEntity()));
             throw new IOException("Unable to create Entity " + e.getId());
         }
     }
@@ -319,6 +332,7 @@ public class LarchClient {
      */
     public Entity retrieveEntity(String id) throws IOException {
         final HttpResponse resp = this.execute(Request.Get(larchUri + "/entity/" + id)
+                .useExpectContinue()
                 .addHeader("Accept", "application/json"))
                 .returnResponse();
         return mapper.readValue(resp.getEntity().getContent(), Entity.class);

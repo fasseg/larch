@@ -17,30 +17,17 @@ package net.objecthunter.larch.bench;
 
 import net.objecthunter.larch.model.Binary;
 import net.objecthunter.larch.model.Entity;
-import net.objecthunter.larch.model.source.StreamSource;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Entities {
-    public static Entity createRandomEntityWithBinary(long binarySize) {
+    public static Entity createRandomEmptyEntity(long binarySize) {
         final Entity e = new Entity();
         e.setLabel("benchtool-" + RandomStringUtils.randomAlphabetic(16));
         e.setType("book");
-        final Binary bin = createRandomBinary(binarySize);
-        final Map<String, Binary> binaries = new HashMap<>();
-        binaries.put(bin.getName(), bin);
-        e.setBinaries(binaries);
         return e;
     }
 
-    private static Binary createRandomBinary(long binarySize) {
-        final Binary bin = new Binary();
-        bin.setName(RandomStringUtils.randomAlphabetic(16));
-        bin.setSource(new StreamSource(new RandomInputStream(binarySize)));
-        bin.setMimetype("application/json");
-        bin.setSize(binarySize);
-        return bin;
-    }
 }

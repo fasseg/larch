@@ -50,7 +50,7 @@ public class ActionWorker implements Callable<BenchToolResult> {
 
     private BenchToolResult doIngest() throws IOException {
         long time = System.currentTimeMillis();
-        client.postEntity(Entities.createRandomEntityWithBinary(size));
+        client.postEntity(Entities.createRandomEmptyEntity(size));
         long duration = System.currentTimeMillis() - time;
         return new BenchToolResult(duration);
     }

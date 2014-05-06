@@ -37,6 +37,8 @@ public class LarchServerSecurityConfiguration extends WebSecurityConfigurerAdapt
             .requestMatchers(new AntPathRequestMatcher("/", "GET")).hasAnyRole("USER", "ADMIN")
             .requestMatchers(new AntPathRequestMatcher("/entity", "POST")).hasAnyRole("USER", "ADMIN")
             .and()
+            // TODO: enable CSRF again
+            .csrf().disable()
             .httpBasic();
         if (!Boolean.valueOf(env.getProperty("larch.security.csrf.enabled", "true"))) {
             http.csrf().disable();

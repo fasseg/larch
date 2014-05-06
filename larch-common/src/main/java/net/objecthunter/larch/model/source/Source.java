@@ -25,7 +25,6 @@ import java.io.InputStream;
 
 @JsonSubTypes({
         @JsonSubTypes.Type(value = UrlSource.class, name = "url-source"),
-        @JsonSubTypes.Type(value = StreamSource.class, name = "stream-source")
 })
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 public interface Source {

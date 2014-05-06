@@ -25,10 +25,6 @@ public class BenchTool {
 
     private static final Logger log = LoggerFactory.getLogger(BenchTool.class);
 
-    public static enum Action {
-        INGEST
-    }
-
     public static void main(String[] args) {
         final Options ops = createOptions();
         final CommandLineParser cliParser = new BasicParser();
@@ -43,7 +39,7 @@ public class BenchTool {
         String password = "admin";
 
         /* parse the user supplied args */
-        try{
+        try {
             final CommandLine cli = cliParser.parse(ops, args);
             if (cli.hasOption('h')) {
                 printUsage(ops);
@@ -70,17 +66,17 @@ public class BenchTool {
             if (cli.hasOption('p')) {
                 password = cli.getOptionValue('p');
             }
-        }  catch (ParseException e) {
-            log.error("Unable to parse commandline.\n",e);
+        } catch (ParseException e) {
+            log.error("Unable to parse commandline.\n", e);
         }
 
-        log.info("Running {} {} actions with size {} against {} using {} threads", new Object[] {numActions, action,
+        log.info("Running {} {} actions with size {} against {} using {} threads", new Object[]{numActions, action,
                 size, larchUri, numThreads});
-        final BenchToolRunner runner = new BenchToolRunner(action,larchUri,numActions,numThreads,size,user,password);
+        final BenchToolRunner runner = new BenchToolRunner(action, larchUri, numActions, numThreads, size, user, password);
         try {
             final List<BenchToolResult> results = runner.run();
         } catch (IOException e) {
-            log.error("Error while running bench\n",e);
+            log.error("Error while running bench\n", e);
         }
     }
 
@@ -137,5 +133,9 @@ public class BenchTool {
         System.out.println("   java -jar larch-benchtool.jar -l http://localhost:8080 -n 1 -a ingest -s 100m\n");
         System.out.println(" * Ingest 20 files of 1gb using 5 threads\n   --------------------------------------");
         System.out.println("   java -jar larch-benchtool.jar -l http://localhost:8080 -n 20 -a ingest -s 1g -t 5\n");
+    }
+
+    public static enum Action {
+        INGEST
     }
 }
