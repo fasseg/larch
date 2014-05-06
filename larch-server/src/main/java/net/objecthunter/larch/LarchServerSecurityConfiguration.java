@@ -52,6 +52,12 @@ public class LarchServerSecurityConfiguration extends WebSecurityConfigurerAdapt
 
         @Override
         public boolean matches(HttpServletRequest request) {
+            // protect HTML forms from Cross Site forgeries using Sessions
+            if (request.getContentType().equalsIgnoreCase("multipart/form-data") || request.getContentType()
+                    .equalsIgnoreCase("application/x-www-form-urlencoded")) {
+                return true;
+            }
+            // everything else must authenticate and does not need a CSRF protection
             return false;
         }
     }
