@@ -43,7 +43,11 @@ public class WeedFsMaster{
     private InputStreamLoggerTask loggerTask;
 
     @PostConstruct
-    public void runMaster() {
+    public void init() {
+        if (env.getProperty("weedfs.master.enabled") != null && !Boolean.parseBoolean(env.getProperty("weedfs.master.enabled"))) {
+            // no weedfs master node is needed
+            return;
+        }
         /* check if the master dir exists and create if neccessary */
         final File dir = new File(env.getProperty("weedfs.master.dir"));
         if (!dir.exists()) {
