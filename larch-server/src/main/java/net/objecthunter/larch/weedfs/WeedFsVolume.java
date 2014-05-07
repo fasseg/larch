@@ -60,8 +60,8 @@ public class WeedFsVolume {
             String[] args = new String[]{
                     env.getProperty("weedfs.binary"),
                     "volume",
-                    "-ip=localhost",
-                    "-publicUrl=localhost:8081",
+                    "-ip=" + env.getProperty("weedfs.volume.public"),
+                    "-publicUrl=" + env.getProperty("weedfs.volume.public") + ":" + env.getProperty("weedfs.volume.port"),
                     "-dir=" + env.getProperty("weedfs.volume.dir"),
                     "-mserver=" + env.getProperty("weedfs.master.host") + ":" + env.getProperty("weedfs.master.port"),
                     "-port=" + env.getProperty("weedfs.volume.port")

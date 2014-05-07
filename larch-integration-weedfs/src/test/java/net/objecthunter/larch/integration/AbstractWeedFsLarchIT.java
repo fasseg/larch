@@ -24,8 +24,10 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -39,6 +41,10 @@ import javax.annotation.PostConstruct;
 @ActiveProfiles("weedfs")
 public abstract class AbstractWeedFsLarchIT {
     private static final Logger log = LoggerFactory.getLogger(AbstractWeedFsLarchIT.class);
+
+    @Autowired
+    private Environment env;
+
     @PostConstruct
     public void waitForWeedFs() throws Exception {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
@@ -46,8 +52,9 @@ public abstract class AbstractWeedFsLarchIT {
         int count = 0;
         boolean weedfsReady = false;
         final ObjectMapper mapper = new ObjectMapper();
+        final String weedUri = "http://" + env.getProperty("weedfs.master.public") + ":" + env.getProperty("weedfs.master.port");
         do {
-            HttpResponse resp = Request.Get("http://localhost:9333/dir/status")
+            HttpResponse resp = Request.Get(weedUri + "/dir/status")
                     .execute()
                     .returnResponse();
             JsonNode node = mapper.readTree(resp.getEntity().getContent());

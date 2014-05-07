@@ -77,7 +77,8 @@ public class WeedFsMaster{
                     env.getProperty("weedfs.binary"),
                     "master",
                     "-mdir=" + env.getProperty("weedfs.master.dir"),
-                    "-port=" + env.getProperty("weedfs.master.port")
+                    "-port=" + env.getProperty("weedfs.master.port"),
+                    "-ip=" + env.getProperty("weedfs.master.public")
             );
             masterProcess = new ProcessBuilder(command)
                     .redirectErrorStream(true)
