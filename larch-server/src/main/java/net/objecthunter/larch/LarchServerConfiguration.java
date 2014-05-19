@@ -23,6 +23,7 @@ import net.objecthunter.larch.service.elasticsearch.*;
 import net.objecthunter.larch.service.impl.DefaultEntityService;
 import net.objecthunter.larch.service.impl.DefaultExportService;
 import net.objecthunter.larch.service.impl.DefaultRepositoryService;
+import net.objecthunter.larch.util.FileSystemUtil;
 import net.objecthunter.larch.weedfs.WeedFSBlobstoreService;
 import net.objecthunter.larch.weedfs.WeedFsMaster;
 import net.objecthunter.larch.weedfs.WeedFsVolume;
@@ -40,6 +41,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.jms.Queue;
+import java.io.File;
 
 /**
  * General JavaConfig class for the larch repository containing all the necessary beans for a larch
@@ -251,8 +253,11 @@ public class LarchServerConfiguration {
 
     @Bean
     public BrokerService brokerService() throws Exception{
+        final File dir = new File(env.getProperty("larch.messaging.path.data",System.getProperty("java.io.tmpdir") + "/larch-jms-data"));
+        FileSystemUtil.checkAndCreate(dir);
         final BrokerService broker = new BrokerService();
         broker.addConnector(brokerUri());
+        broker.getPersistenceAdapter().setDirectory(dir);
         broker.start();
         return broker;
     }
@@ -269,10 +274,6 @@ public class LarchServerConfiguration {
 
     @Bean
     public String brokerUri() {
-        String brokerUri = env.getProperty("larch.messaging.broker.uri");
-        if (brokerUri == null || brokerUri.isEmpty()) {
-            brokerUri = "vm://localhost";
-        }
-        return brokerUri;
+        return  env.getProperty("larch.messaging.broker.uri", "vm://localhost");
     }
 }
