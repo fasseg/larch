@@ -26,12 +26,20 @@ import net.objecthunter.larch.service.impl.DefaultRepositoryService;
 import net.objecthunter.larch.weedfs.WeedFSBlobstoreService;
 import net.objecthunter.larch.weedfs.WeedFsMaster;
 import net.objecthunter.larch.weedfs.WeedFsVolume;
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.broker.BrokerService;
+import org.apache.activemq.command.ActiveMQQueue;
 import org.elasticsearch.client.Client;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.*;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+
+import javax.jms.Queue;
 
 /**
  * General JavaConfig class for the larch repository containing all the necessary beans for a larch
@@ -41,6 +49,9 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 @ComponentScan(basePackages = "net.objecthunter.larch.controller")
 @Configuration
 public class LarchServerConfiguration {
+
+    @Autowired
+    public Environment env;
 
     /**
      * Get a {@link net.objecthunter.larch.service.AuditService} Spring bean
@@ -228,5 +239,40 @@ public class LarchServerConfiguration {
     @Order(Ordered.LOWEST_PRECEDENCE - 9)
     public ElasticSearchCredentialsService larchElasticSearchAuthenticationManager() {
         return new ElasticSearchCredentialsService();
+    }
+
+    @Bean
+    public JmsTemplate jmsTemplate() {
+        final JmsTemplate templ =new JmsTemplate(activeMQConnectionFactory());
+        templ.setReceiveTimeout(500);
+        templ.setDefaultDestination(jmsQueue());
+        return templ;
+    }
+
+    @Bean
+    public BrokerService brokerService() throws Exception{
+        final BrokerService broker = new BrokerService();
+        broker.addConnector(brokerUri());
+        broker.start();
+        return broker;
+    }
+
+    @Bean
+    public Queue jmsQueue() {
+        return new ActiveMQQueue("larch");
+    }
+
+    @Bean
+    public ActiveMQConnectionFactory activeMQConnectionFactory() {
+        return new ActiveMQConnectionFactory(brokerUri());
+    }
+
+    @Bean
+    public String brokerUri() {
+        String brokerUri = env.getProperty("larch.messaging.broker.uri");
+        if (brokerUri == null || brokerUri.isEmpty()) {
+            brokerUri = "vm://localhost";
+        }
+        return brokerUri;
     }
 }
