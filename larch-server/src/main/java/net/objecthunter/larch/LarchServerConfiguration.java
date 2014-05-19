@@ -22,6 +22,7 @@ import net.objecthunter.larch.service.*;
 import net.objecthunter.larch.service.elasticsearch.*;
 import net.objecthunter.larch.service.impl.DefaultEntityService;
 import net.objecthunter.larch.service.impl.DefaultExportService;
+import net.objecthunter.larch.service.impl.DefaultMessagingService;
 import net.objecthunter.larch.service.impl.DefaultRepositoryService;
 import net.objecthunter.larch.util.FileSystemUtil;
 import net.objecthunter.larch.weedfs.WeedFSBlobstoreService;
@@ -275,5 +276,10 @@ public class LarchServerConfiguration {
     @Bean
     public String brokerUri() {
         return  env.getProperty("larch.messaging.broker.uri", "vm://localhost");
+    }
+
+    @Bean
+    public MessagingService messagingService() {
+        return new DefaultMessagingService();
     }
 }

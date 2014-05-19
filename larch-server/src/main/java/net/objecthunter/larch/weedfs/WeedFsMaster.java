@@ -71,7 +71,6 @@ public class WeedFsMaster{
             throw new IllegalArgumentException("The weedfs binary at " + binary.getAbsolutePath() + " can not be executed");
         }
         try {
-            log.info("starting WeedFS master");
 
             final List<String> command = Arrays.asList(
                     env.getProperty("weedfs.binary"),
@@ -80,6 +79,7 @@ public class WeedFsMaster{
                     "-port=" + env.getProperty("weedfs.master.port"),
                     "-ip=" + env.getProperty("weedfs.master.public")
             );
+            log.info("Starting weedfs master with command '" + String.join(" ", command) + "'");
             masterProcess = new ProcessBuilder(command)
                     .redirectErrorStream(true)
                     .redirectInput(ProcessBuilder.Redirect.PIPE)

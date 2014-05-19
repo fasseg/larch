@@ -54,18 +54,17 @@ public class WeedFsVolume {
             throw new IllegalArgumentException("Unable to use volume directory. Please check the configuration");
         }
         try {
-            log.info("starting WeedFS volume");
-
             /* start weedfs volume server */
             String[] args = new String[]{
                     env.getProperty("weedfs.binary"),
                     "volume",
                     "-ip=" + env.getProperty("weedfs.volume.public"),
-                    "-publicUrl=" + env.getProperty("weedfs.volume.public") + ":" + env.getProperty("weedfs.volume.port"),
+                    "-publicIp=" + env.getProperty("weedfs.volume.public"),
                     "-dir=" + env.getProperty("weedfs.volume.dir"),
                     "-mserver=" + env.getProperty("weedfs.master.host") + ":" + env.getProperty("weedfs.master.port"),
                     "-port=" + env.getProperty("weedfs.volume.port")
             };
+            log.info("Starting weedfs volume with command '" + String.join(" ", args) + "'");
             volumeProcess = new ProcessBuilder(args)
                     .redirectErrorStream(true)
                     .redirectInput(ProcessBuilder.Redirect.PIPE)

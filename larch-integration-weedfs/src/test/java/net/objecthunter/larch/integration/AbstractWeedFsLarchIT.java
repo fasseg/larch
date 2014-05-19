@@ -53,6 +53,7 @@ public abstract class AbstractWeedFsLarchIT {
         boolean weedfsReady = false;
         final ObjectMapper mapper = new ObjectMapper();
         final String weedUri = "http://" + env.getProperty("weedfs.master.public") + ":" + env.getProperty("weedfs.master.port");
+        log.info("waiting for (datacenters != null) at " + weedUri + "/dir/status");
         do {
             HttpResponse resp = Request.Get(weedUri + "/dir/status")
                     .execute()
@@ -63,7 +64,7 @@ public abstract class AbstractWeedFsLarchIT {
             }else{
                 Thread.sleep(150);
             }
-        }while (!weedfsReady && count++ < 150);
+        }while (!weedfsReady && count++ < 500);
         if (!weedfsReady) {
             throw new Exception("WeedFS not ready after " + count * 150 + " ms");
         }
