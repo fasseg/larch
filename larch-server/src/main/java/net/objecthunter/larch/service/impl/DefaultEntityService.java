@@ -24,10 +24,7 @@ import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.LarchConstants;
 import net.objecthunter.larch.model.Metadata;
 import net.objecthunter.larch.model.source.UrlSource;
-import net.objecthunter.larch.service.BlobstoreService;
-import net.objecthunter.larch.service.EntityService;
-import net.objecthunter.larch.service.ExportService;
-import net.objecthunter.larch.service.IndexService;
+import net.objecthunter.larch.service.*;
 import net.objecthunter.larch.service.elasticsearch.ElasticSearchIndexService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
@@ -112,10 +109,12 @@ public class DefaultEntityService implements EntityService {
         final String id = this.indexService.create(e);
         log.debug("finished creating Entity {}", id);
 
+        // export the created entity
         if (autoExport) {
             exportService.export(e);
             log.debug("exported entity {} ", id);
         }
+
         return id;
     }
 

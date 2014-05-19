@@ -21,6 +21,7 @@ import net.objecthunter.larch.helpers.AuditRecords;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.service.AuditService;
 import net.objecthunter.larch.service.EntityService;
+import net.objecthunter.larch.service.MessagingService;
 import net.objecthunter.larch.service.SchemaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,6 +42,9 @@ public class EntityController extends AbstractLarchController {
 
     @Autowired
     private EntityService entityService;
+
+    @Autowired
+    private MessagingService messagingService;
 
     @Autowired
     private AuditService auditService;
@@ -65,6 +69,7 @@ public class EntityController extends AbstractLarchController {
         final JsonNode node = mapper.readTree(src);
         this.entityService.patch(id, node);
         this.auditService.create(AuditRecords.updateEntityRecord(id));
+        this.messagingService.publishUpdateEntity(id);
     }
 
     /**
@@ -126,6 +131,7 @@ public class EntityController extends AbstractLarchController {
     public String create(final InputStream src) throws IOException {
         final String id = this.entityService.create(mapper.readValue(src, Entity.class));
         this.auditService.create(AuditRecords.createEntityRecord(id));
+        this.messagingService.publishCreateEntity(id);
         return id;
     }
 
@@ -147,5 +153,6 @@ public class EntityController extends AbstractLarchController {
         }
         this.entityService.update(e);
         this.auditService.create(AuditRecords.updateEntityRecord(id));
+        this.messagingService.publishUpdateEntity(id);
     }
 }

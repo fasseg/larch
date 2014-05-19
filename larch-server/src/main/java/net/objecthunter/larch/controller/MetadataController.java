@@ -18,10 +18,7 @@ package net.objecthunter.larch.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.helpers.AuditRecords;
 import net.objecthunter.larch.model.*;
-import net.objecthunter.larch.service.AuditService;
-import net.objecthunter.larch.service.EntityService;
-import net.objecthunter.larch.service.IndexService;
-import net.objecthunter.larch.service.SchemaService;
+import net.objecthunter.larch.service.*;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -56,6 +53,9 @@ public class MetadataController extends AbstractLarchController {
     private AuditService auditService;
 
     @Autowired
+    private MessagingService messagingService;
+
+    @Autowired
     private ObjectMapper mapper;
 
     /**
@@ -87,6 +87,7 @@ public class MetadataController extends AbstractLarchController {
         e.getMetadata().put(mdName, md);
         entityService.update(e);
         this.auditService.create(AuditRecords.createMetadataRecord(entityId));
+        this.messagingService.publishCreateMetadata(entityId, mdName);
         return "redirect:/entity/" + entityId;
     }
 
@@ -112,6 +113,7 @@ public class MetadataController extends AbstractLarchController {
         e.getMetadata().put(md.getName(), md);
         entityService.update(e);
         this.auditService.create(AuditRecords.createMetadataRecord(entityId));
+        this.messagingService.publishCreateMetadata(entityId, md.getName());
     }
 
     /**
@@ -144,6 +146,7 @@ public class MetadataController extends AbstractLarchController {
         bin.getMetadata().put(md.getName(), md);
         this.entityService.update(e);
         this.auditService.create(AuditRecords.createMetadataRecord(entityId));
+        this.messagingService.publishCreateBinaryMetadata(entityId, binaryName, md.getName());
     }
 
     /**
@@ -188,6 +191,7 @@ public class MetadataController extends AbstractLarchController {
         bin.getMetadata().put(md.getName(), md);
         this.entityService.update(e);
         this.auditService.create(AuditRecords.createMetadataRecord(entityId));
+        this.messagingService.publishCreateBinaryMetadata(entityId, binaryName, mdName);
         return "redirect:/entity/" + entityId + "/binary/" + binaryName;
     }
 
@@ -429,6 +433,7 @@ public class MetadataController extends AbstractLarchController {
     public void deleteMetadata(@PathVariable("id") final String entityId,
                                @PathVariable("metadata-name") final String mdName) throws IOException {
         this.entityService.deleteMetadata(entityId, mdName);
+        this.messagingService.publishDeleteMetadata(entityId, mdName);
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/entity/{id}/binary/{binary-name}/metadata/{metadata-name}")
@@ -437,5 +442,6 @@ public class MetadataController extends AbstractLarchController {
                                      @PathVariable("binary-name") final String binaryName,
                                      @PathVariable("metadata-name") final String mdName) throws IOException {
         this.entityService.deleteBinaryMetadata(entityId, binaryName, mdName);
+        this.messagingService.publishDeleteBinaryMetadata(entityId, binaryName, mdName);
     }
 }

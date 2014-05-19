@@ -117,4 +117,29 @@ public class DefaultMessagingService implements MessagingService {
     public void publishDeleteBinaryMetadata(String entityId, String binaryName, String mdName) {
         this.publish("Deleted meta data " + mdName + " on binary " + binaryName + " of entity " + entityId);
     }
+
+    @Override
+    public void publishAddUser(String userName) {
+        this.publish("Added user " + userName);
+    }
+
+    @Override
+    public void publishDeleteUser(String userName) {
+        this.publish("Deleted user " + userName);
+    }
+
+    @Override
+    public void publishUpdateUser(String userName) {
+        this.publish("Update user " + userName);
+    }
+
+    @Override
+    public void publishCreateRelation(String subject, String predicate, String object) {
+        this.publish("Added relation " + subject + " " + predicate + " " + object);
+    }
+
+    @Override
+    public void publishDeleteRelation(String subject, String predicate, String object) {
+        this.publish("Deleted relation " + subject + " " + predicate + " " + object);
+    }
 }

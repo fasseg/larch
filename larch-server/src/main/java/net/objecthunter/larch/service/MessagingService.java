@@ -17,16 +17,36 @@ package net.objecthunter.larch.service;
 
 public interface MessagingService {
     public void publishCreateEntity(String entityId);
+
     public void publishUpdateEntity(String entityId);
+
     public void publishDeleteEntity(String entityId);
+
     public void publishCreateBinary(String entityId, String binaryName);
+
     public void publishUpdateBinary(String entityId, String binaryName);
+
     public void publishDeleteBinary(String entityId, String binaryName);
-    public void publishCreateMetadata(String entityId, String binaryName);
+
+    public void publishCreateMetadata(String entityId, String mdName);
+
     public void publishUpdateMetadata(String entityId, String mdName);
+
     public void publishDeleteMetadata(String entityId, String mdname);
+
     public void publishCreateBinaryMetadata(String entityId, String binaryName, String mdName);
+
     public void publishUpdateBinaryMetadata(String entityId, String binaryName, String mdName);
+
     public void publishDeleteBinaryMetadata(String entityId, String binaryName, String mdName);
 
+    public void publishAddUser(String userName);
+
+    public void publishDeleteUser(String userName);
+
+    public void publishUpdateUser(String userName);
+
+    public void publishCreateRelation(String subject, String predicate, String object);
+
+    public void publishDeleteRelation(String subject, String predicate, String object);
 }

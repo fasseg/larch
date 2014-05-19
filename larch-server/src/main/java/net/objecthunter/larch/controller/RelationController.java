@@ -18,6 +18,7 @@ package net.objecthunter.larch.controller;
 import net.objecthunter.larch.helpers.AuditRecords;
 import net.objecthunter.larch.service.AuditService;
 import net.objecthunter.larch.service.EntityService;
+import net.objecthunter.larch.service.MessagingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -36,6 +37,9 @@ public class RelationController extends AbstractLarchController {
     @Autowired
     private AuditService auditService;
 
+    @Autowired
+    private MessagingService messagingService;
+
     /**
      * Controller method for adding a new triple relating an {@link net.objecthunter.larch.model.Entity} via a
      * predicate to an object using a HTTP POST
@@ -47,8 +51,9 @@ public class RelationController extends AbstractLarchController {
     @RequestMapping(value = "/entity/{id}/relation", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public void create(@PathVariable("id") final String id, @RequestParam("predicate") final String predicate, @RequestParam("object") final String object) throws IOException {
-        entityService.createRelation(id, predicate, object);
+        this.entityService.createRelation(id, predicate, object);
         this.auditService.create(AuditRecords.createRelationRecord(id));
+        this.messagingService.publishCreateRelation(id, predicate, object);
     }
 
     /**
@@ -62,7 +67,8 @@ public class RelationController extends AbstractLarchController {
     @RequestMapping(value = "/entity/{id}/relation", method = RequestMethod.POST, produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
     public String createHtml(@PathVariable("id") final String id, @RequestParam("predicate") final String predicate, @RequestParam("object") final String object) throws IOException {
-        entityService.createRelation(id, predicate, object);
+        this.entityService.createRelation(id, predicate, object);
+        this.messagingService.publishCreateRelation(id, predicate, object);
         return "redirect:/entity/" + id;
     }
 }

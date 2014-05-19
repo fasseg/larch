@@ -54,6 +54,9 @@ public class BinaryController extends AbstractLarchController {
     private BlobstoreService blobstoreService;
 
     @Autowired
+    private MessagingService messagingService;
+
+    @Autowired
     private ObjectMapper mapper;
 
     /**
@@ -71,6 +74,7 @@ public class BinaryController extends AbstractLarchController {
     public String create(@PathVariable("id") final String entityId, @RequestParam("name") final String name, @RequestParam("binary") final MultipartFile file) throws IOException {
         entityService.createBinary(entityId, name, file.getContentType(), file.getInputStream());
         this.auditService.create(AuditRecords.createBinaryRecord(entityId));
+        this.messagingService.publishCreateBinary(entityId, name);
         return "redirect:/entity/" + entityId;
     }
 
@@ -91,6 +95,7 @@ public class BinaryController extends AbstractLarchController {
                          final InputStream src) throws IOException {
         entityService.createBinary(entityId, name, mimeType, src);
         this.auditService.create(AuditRecords.createBinaryRecord(entityId));
+        this.messagingService.publishCreateBinary(entityId, name);
     }
 
     /**
@@ -107,6 +112,7 @@ public class BinaryController extends AbstractLarchController {
         final Binary b = this.mapper.readValue(src, Binary.class);
         this.entityService.createBinary(entityId, b.getName(), b.getMimetype(), b.getSource().getInputStream());
         this.auditService.create(AuditRecords.createBinaryRecord(entityId));
+        this.messagingService.publishCreateBinary(entityId, b.getName());
     }
 
     /**
@@ -187,5 +193,6 @@ public class BinaryController extends AbstractLarchController {
             IOException {
         this.entityService.deleteBinary(entityId, name);
         this.auditService.create(AuditRecords.deleteEntityRecord(entityId));
+        this.messagingService.publishDeleteBinary(entityId, name);
     }
 }
