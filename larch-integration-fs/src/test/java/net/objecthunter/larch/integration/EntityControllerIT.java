@@ -16,7 +16,9 @@
 package net.objecthunter.larch.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.objecthunter.larch.integration.helpers.TestMessageListener;
 import net.objecthunter.larch.model.Entity;
+import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
@@ -26,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.jms.*;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 
@@ -128,6 +131,30 @@ public class EntityControllerIT extends AbstractLarchIT {
         Entity fetched = mapper.readValue(resp.getEntity().getContent(), Entity.class);
         assertEquals(100, fetched.getChildren().size());
         assertEquals("Collection", fetched.getType());
+    }
+
+    @Test
+    public void testCreateAndReceiveMessage() throws Exception {
+        String brokerUrl = "vm://localhost";
+        ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(brokerUrl);
+        Connection conn = connectionFactory.createConnection();
+        conn.start();
+        Session sess = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        Queue queue = sess.createQueue("larch");
+        TestMessageListener listener = new TestMessageListener();
+        MessageConsumer consumer = sess.createConsumer(queue);
+        consumer.setMessageListener(listener);
+
+        // create a new entity
+        HttpResponse resp = this.execute(Request.Post("http://localhost:8080/entity")
+                .bodyString(mapper.writeValueAsString(createSimpleFixtureEntity()), ContentType.APPLICATION_JSON))
+                .returnResponse();
+        assertEquals(201, resp.getStatusLine().getStatusCode());
+        assertTrue(listener.isMessageReceived());
+        Message msg = listener.getLastMessage();
+        assertNotNull(msg);
+        assertTrue(msg instanceof TextMessage);
+        assertTrue(((TextMessage) msg).getText().startsWith("Created entity"));
     }
 
 }
