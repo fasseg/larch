@@ -1,10 +1,14 @@
 package shell
 
+import net.objecthunter.larch.model.Describe
+import net.objecthunter.larch.model.state.LarchState
 import net.objecthunter.larch.service.RepositoryService
+import org.crsh.cli.Command
+import org.crsh.cli.Usage
 import org.crsh.command.InvocationContext
 import org.springframework.beans.factory.BeanFactory
 
-/* 
+/*
 * Copyright 2014 Frank Asseg
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,8 +23,12 @@ import org.springframework.beans.factory.BeanFactory
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-abstract class ServiceProvider {
-    public static Object getService(InvocationContext ctx, Class type) {
-        return ((BeanFactory) ctx.attributes["spring.beanfactory"]).getBean(type);
+
+class shutdown {
+
+    @Usage("Shutdown the repository")
+    @Command
+    def main(InvocationContext ctx) {
+        System.exit(0);
     }
 }

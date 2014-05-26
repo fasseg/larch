@@ -3,6 +3,7 @@ package shell
 import net.objecthunter.larch.model.Describe
 import net.objecthunter.larch.model.state.LarchState
 import net.objecthunter.larch.service.RepositoryService
+import net.objecthunter.larch.util.ServiceProvider
 import org.crsh.cli.Command
 import org.crsh.cli.Usage
 import org.crsh.command.InvocationContext
