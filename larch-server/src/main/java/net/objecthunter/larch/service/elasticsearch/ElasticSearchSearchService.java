@@ -72,6 +72,7 @@ public class ElasticSearchSearchService implements SearchService {
 
         final List<Entity> entites = new ArrayList<>(numRecords);
         for (final SearchHit hit : resp.getHits()) {
+            // TODO: check if JSON docuemnt is prefetched or laziliy initialised
             String label = hit.field("label") != null ? hit.field("label").getValue() : "";
             String type = hit.field("type") != null ? hit.field("type").getValue() : "";
             final Entity e = new Entity();
