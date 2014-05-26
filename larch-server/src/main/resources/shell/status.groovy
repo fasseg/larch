@@ -7,6 +7,9 @@ import net.objecthunter.larch.util.ServiceProvider
 import org.crsh.cli.Command
 import org.crsh.cli.Usage
 import org.crsh.command.InvocationContext
+import org.crsh.text.Color
+import org.crsh.text.Decoration
+import org.crsh.text.RenderPrintWriter
 
 /*
 * Copyright 2014 Frank Asseg
@@ -25,6 +28,7 @@ import org.crsh.command.InvocationContext
 */
 
 class status {
+    RenderPrintWriter sink;
 
     @Usage("Repository status information")
     @Command
@@ -34,66 +38,58 @@ class status {
         final Describe desc = repositoryService.describe();
         final LarchState state = repositoryService.status();
         final StringBuilder resp = new StringBuilder();
-        resp.append("\n:::: Module Larch ::::\n\n")
-                .append("Version\t\t\t\t")
-                .append(desc.larchVersion)
-                .append('\n')
-                .append("Cluster name\t\t\t")
-                .append(desc.larchClusterName)
-                .append('\n')
-                .append("Host name\t\t\t")
-                .append(desc.larchHost)
-                .append('\n\n')
-                .append(":::: Module ElasticSearch ::::\n\n")
-                .append("Version\t\t\t\t")
-                .append(desc.esVersion)
-                .append('\n')
-                .append("Master node name\t\t")
-                .append(desc.esMasterNodeName)
-                .append('\n')
-                .append("Master node address\t\t")
-                .append(desc.esMasterNodeAddress)
-                .append('\n')
-                .append("Node name\t\t\t")
-                .append(desc.esNodeName)
-                .append('\n')
-                .append("Number of nodes\t\t\t")
-                .append(desc.esNumDataNodes)
-                .append('\n')
-                .append("Number of indexed records\t")
-                .append(desc.esNumIndexedRecords)
-                .append('\n')
-                .append("Index name\t\t\t")
-                .append(state.indexState.name)
-                .append('\n')
-                .append("Number of docs\t\t\t")
-                .append(state.indexState.numDocs)
-                .append('\n')
-                .append("Max number of docs\t\t")
-                .append(state.indexState.maxDocs)
-                .append('\n')
-                .append("Number of docs to merge\t\t")
-                .append(state.indexState.numDocsToMerge)
-                .append('\n')
-                .append("Store size\t\t\t")
-                .append(state.indexState.storeSize)
-                .append('\n')
-                .append("Shards size\t\t\t")
-                .append(state.indexState.shardsSize)
-                .append('\n')
-                .append("Size to merge\t\t\t")
-                .append(state.indexState.sizeToMerge)
-                .append('\n')
-                .append("Total flush time\t\t")
-                .append(state.indexState.totalFlushTime)
-                .append('\n')
-                .append("Total refresh time\t\t")
-                .append(state.indexState.totalRefreshTime)
-                .append('\n\n')
-                .append(":::: Module Blobstore ::::\n\n")
-                .append("Name\t\t\t\t")
-                .append(state.blobstoreState.name)
-                .append('\n');
-        return resp.toString();
+        sink = ctx.getWriter();
+        printHeader("Module Larch");
+        printField("Version\t\t\t\t");
+        printValue(desc.larchVersion);
+        printField("Cluster name\t\t\t");
+        printValue(desc.larchClusterName);
+        printField("Host name\t\t\t");
+        printValue(desc.larchHost);
+        printHeader("Module ElasticSearch");
+        printField("Version\t\t\t\t");
+        printValue(desc.esVersion);
+        printField("Master node name\t\t");
+        printValue(desc.esMasterNodeName);
+        printField("Master node address\t\t");
+        printValue(desc.esMasterNodeAddress);
+        printField("Node name\t\t\t");
+        printValue(desc.esNodeName);
+        printField("Number of nodes\t\t\t");
+        printValue(String.valueOf(desc.esNumDataNodes));
+        printField("Number of indexed records\t");
+        printValue(String.valueOf(desc.esNumIndexedRecords));
+        printField("Index name\t\t\t");
+        printValue(state.indexState.name);
+        printField("Number of docs\t\t\t");
+        printValue(String.valueOf(state.indexState.numDocs));
+        printField("Max number of docs\t\t");
+        printValue(String.valueOf(state.indexState.maxDocs));
+        printField("Number of docs to merge\t\t");
+        printValue(String.valueOf(state.indexState.numDocsToMerge));
+        printField("Store size\t\t\t");
+        printValue(String.valueOf(state.indexState.storeSize));
+        printField("Shards size\t\t\t");
+        printValue(String.valueOf(state.indexState.shardsSize));
+        printField("Size to merge\t\t\t");
+        printValue(String.valueOf(state.indexState.sizeToMerge));
+        printField("Total flush time\t\t");
+        printValue(String.valueOf(state.indexState.totalFlushTime));
+        printField("Total refresh time\t\t");
+        printValue(String.valueOf(state.indexState.totalRefreshTime));
+        printHeader("Module Blobstore");
+        printField("Name\t\t\t\t");
+        printValue(state.blobstoreState.name);
+    }
+
+    def printHeader(String header) {
+        sink.print("\n");
+        sink.println(header, Decoration.bold, Color.green);
+    }
+    def printField(String field) {
+        sink.print(field)
+    }
+    def printValue(String value) {
+        sink.println(value, Color.yellow);
     }
 }
