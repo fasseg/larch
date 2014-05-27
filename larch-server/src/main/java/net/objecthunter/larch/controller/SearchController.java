@@ -87,7 +87,7 @@ public class SearchController extends AbstractLarchController {
      * Fill all Parameters that are search-fields into Map.
      * 
      * @param request HttpServletRequest
-     * @return Map<EntitiesSearchField, String> key: searchField, value: searchString
+     * @return Map<EntitiesSearchField, String[]> key: searchField, value: searchStrings (Words)
      */
     private Map<EntitiesSearchField, String[]> fillSearchFields(HttpServletRequest request) {
         Map<EntitiesSearchField, String[]> queryMap = new HashMap<EntitiesSearchField, String[]>();

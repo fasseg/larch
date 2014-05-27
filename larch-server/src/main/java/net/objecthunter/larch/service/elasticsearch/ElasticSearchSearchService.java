@@ -32,7 +32,6 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.slf4j.Logger;
@@ -163,6 +162,13 @@ public class ElasticSearchSearchService implements SearchService {
         return scanIndex(offset, maxRecords);
     }
 
+    /**
+     * Holds enabled search-fields in entities-index.
+     * Differentiate between name of GET/POST-Parameter and name of Search-Field in index.
+     * 
+     * @author mih
+     *
+     */
     public static enum EntitiesSearchField {
         ID("id", "id"), 
         LABEL("label", "label"), 
