@@ -52,4 +52,5 @@ public interface SearchService {
      * @return a list of {@link net.objecthunter.larch.model.Entity}s available in the repository
      */
     SearchResult scanIndex(int offset);
+
 }
