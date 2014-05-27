@@ -16,6 +16,8 @@
 package net.objecthunter.larch.service.elasticsearch;
 
 import net.objecthunter.larch.model.SearchResult;
+import net.objecthunter.larch.service.elasticsearch.ElasticSearchSearchService.EntitiesSearchField;
+
 import org.elasticsearch.action.ListenableActionFuture;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -32,6 +34,8 @@ import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.easymock.EasyMock.*;
 
@@ -130,7 +134,9 @@ public class ElasticSearchSearchServiceTest {
 
         replay(mockClient, mockAdminClient, mockIndicesAdminClient, mockSearchRequestBuilder, mockFuture,
                 mockSearchResponse, mockHits, mockHit, mockField);
-        SearchResult result = searchService.searchEntities("*");
+        Map<EntitiesSearchField, String[]> searchFields = new HashMap<EntitiesSearchField, String[]>();
+        searchFields.put(EntitiesSearchField.ALL, new String[]{"*"});
+        SearchResult result = searchService.searchEntities(searchFields);
         verify(mockClient, mockAdminClient, mockIndicesAdminClient, mockSearchRequestBuilder, mockFuture,
                 mockSearchResponse, mockHits, mockHit, mockField);
     }

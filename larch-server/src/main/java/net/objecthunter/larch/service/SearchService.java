@@ -15,7 +15,10 @@
 */
 package net.objecthunter.larch.service;
 
+import java.util.Map;
+
 import net.objecthunter.larch.model.SearchResult;
+import net.objecthunter.larch.service.elasticsearch.ElasticSearchSearchService.EntitiesSearchField;
 
 /**
  * Search service definition allowing for different searches in the repository
@@ -34,12 +37,12 @@ public interface SearchService {
     SearchResult scanIndex(int offset, int numRecords);
 
     /**
-     * Search {@link net.objecthunter.larch.model.Entity}s in the repository using a simple terms query
+     * Search {@link net.objecthunter.larch.model.Entity}s in the repository.
      *
-     * @param terms the terms query to use for the search
+     * @param searchFields Map with key: EntitiesSearchField and value searchStrings as array.
      * @return A {@link net.objecthunter.larch.model.SearchResult} containig the search hits
      */
-    SearchResult searchEntities(String terms);
+    SearchResult searchEntities(Map<EntitiesSearchField, String[]> searchFields);
 
     /**
      * Retrieve a {@link net.objecthunter.larch.model.SearchResult} containing all {@link net.objecthunter.larch.model
