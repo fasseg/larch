@@ -2,6 +2,6 @@ language: java
 jdk:
   - oraclejdk8
 before_install:
-    - wget http://dl.bintray.com/chrislusf/Weed-FS/weed_0.59_linux_amd64.tar.gz 
+    - wget http://dl.bintray.com/chrislusf/Weed-FS/weed_0.59_amd64.deb 
     - sudo dpkg -i weed_0.59_amd64.deb
 script: mvn verify
