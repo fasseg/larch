@@ -21,7 +21,15 @@
             });
             </script>
             <form method="post" th:action="'/search?_csrf=' + ${_csrf.token}" enctype="multipart/form-data">
-                <input type="text" id="searchMain" name="term"/>
+                <label for="searchMain">All Fields:</label><input type="text" id="searchMain" name="term"/>
+                <label for="id">ID:</label><input type="text" id="id" name="id"/>
+                <label for="label">Label:</label><input type="text" id="label" name="label"/>
+                <label for="type">Type:</label><input type="text" id="type" name="type"/>
+                <label for="parent">Parent:</label><input type="text" id="parent" name="parent"/>
+                <label for="tag">Tag:</label><input type="text" id="tag" name="tag"/>
+                <label for="state">State:</label><input type="text" id="state" name="state"/>
+                <label for="version">Version:</label><input type="text" id="version" name="version"/>
+                <input type="submit" value="Submit"/>
             </form>
         </div>
     </div>

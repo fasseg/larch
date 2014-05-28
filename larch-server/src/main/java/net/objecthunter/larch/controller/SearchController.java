@@ -15,14 +15,24 @@
 */
 package net.objecthunter.larch.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.servlet.http.HttpServletRequest;
+
 import net.objecthunter.larch.model.SearchResult;
 import net.objecthunter.larch.service.SearchService;
+import net.objecthunter.larch.service.elasticsearch.ElasticSearchSearchService.EntitiesSearchField;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -43,8 +53,8 @@ public class SearchController extends AbstractLarchController {
      * .model.Entity}s as s JSON representation
      */
     @RequestMapping(method = RequestMethod.POST, produces = {"application/json"})
-    public SearchResult searchMatchFields(@RequestParam("term") final String query) {
-        return searchService.searchEntities(query);
+    public SearchResult searchMatchFields(final HttpServletRequest request) {
+        return searchService.searchEntities(fillSearchFields(request));
     }
 
 
@@ -67,9 +77,42 @@ public class SearchController extends AbstractLarchController {
      * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} used to render the HTML view
      */
     @RequestMapping(method = RequestMethod.POST, produces = {"text/html"})
-    public ModelAndView searchMatchFieldsHtml(@RequestParam("term") final String query) {
+    public ModelAndView searchMatchFieldsHtml(final HttpServletRequest request) {
         final ModelMap model = new ModelMap();
-        model.addAttribute("result", searchMatchFields(query));
+        model.addAttribute("result", searchMatchFields(request));
         return new ModelAndView("searchresult", model);
+    }
+    
+    /**
+     * Fill all Parameters that are search-fields into Map.
+     * 
+     * @param request HttpServletRequest
+     * @return Map<EntitiesSearchField, String[]> key: searchField, value: searchStrings (Words)
+     */
+    private Map<EntitiesSearchField, String[]> fillSearchFields(HttpServletRequest request) {
+        Map<EntitiesSearchField, String[]> queryMap = new HashMap<EntitiesSearchField, String[]>();
+        Map<String, String[]> parameters = request.getParameterMap();
+        for (Entry<String, String[]> parameter : parameters.entrySet()) {
+            EntitiesSearchField entitiesSearchField = EntitiesSearchField.getWithRequestParameter(parameter.getKey());
+            if (entitiesSearchField != null) {
+                List<String> values = new ArrayList<String>();
+                if (parameter.getValue() != null && parameter.getValue().length > 0) {
+                    for (int i = 0; i <  parameter.getValue().length; i++) {
+                        if (StringUtils.isNotBlank(parameter.getValue()[i])) {
+                            String[] words = parameter.getValue()[i].split("\\s");
+                            for (int j = 0; j < words.length; j++) {
+                                if (StringUtils.isNotBlank(words[j])) {
+                                    values.add(words[j]);
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!values.isEmpty()) {
+                    queryMap.put(entitiesSearchField, values.toArray(new String[values.size()]));
+                }
+            }
+        }
+        return queryMap;
     }
 }
