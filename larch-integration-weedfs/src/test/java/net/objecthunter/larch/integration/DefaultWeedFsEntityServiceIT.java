@@ -86,9 +86,7 @@ public class DefaultWeedFsEntityServiceIT extends AbstractWeedFsLarchIT {
         //assertEquals(orig.getUtcLastModified(), fetched.getUtcLastModified());
         //assertEquals(orig.getUtcCreated(), fetched.getUtcCreated());
         assertEquals(1, orig.getVersion());
-        assertNull(orig.getVersionPaths());
         assertEquals(1, fetched.getVersion());
-        assertNull(fetched.getVersionPaths());
     }
 
 

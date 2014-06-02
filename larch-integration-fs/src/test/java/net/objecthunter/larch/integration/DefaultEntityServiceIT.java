@@ -92,8 +92,6 @@ public class DefaultEntityServiceIT extends AbstractLarchIT {
         Entity fetched = entityService.retrieve(e.getId(), 1);
         assertEquals(orig.getLabel(), fetched.getLabel());
         assertEquals(1, orig.getVersion());
-        assertNull(orig.getVersionPaths());
         assertEquals(1, fetched.getVersion());
-        assertNull(fetched.getVersionPaths());
     }
 }

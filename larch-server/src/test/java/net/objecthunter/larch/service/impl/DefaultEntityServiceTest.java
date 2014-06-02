@@ -21,6 +21,7 @@ import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.service.BlobstoreService;
 import net.objecthunter.larch.service.ExportService;
 import net.objecthunter.larch.service.IndexService;
+import net.objecthunter.larch.service.VersionService;
 import net.objecthunter.larch.test.util.Fixtures;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,6 +37,7 @@ public class DefaultEntityServiceTest {
     private IndexService mockIndexService;
     private BlobstoreService mockBlobstoreService;
     private ExportService mockExportService;
+    private VersionService mockVersionService;
 
     @Before
     public void setup() {
@@ -43,10 +45,12 @@ public class DefaultEntityServiceTest {
         mockIndexService = createMock(IndexService.class);
         mockBlobstoreService = createMock(BlobstoreService.class);
         mockExportService = createMock(ExportService.class);
+        mockVersionService = createMock(VersionService.class);
         ReflectionTestUtils.setField(entityService, "mapper", new ObjectMapper());
         ReflectionTestUtils.setField(entityService, "indexService", mockIndexService);
         ReflectionTestUtils.setField(entityService, "exportService", mockExportService);
         ReflectionTestUtils.setField(entityService, "blobstoreService", mockBlobstoreService);
+        ReflectionTestUtils.setField(entityService, "versionService", mockVersionService);
     }
 
     @Test
@@ -68,7 +72,6 @@ public class DefaultEntityServiceTest {
         mockIndexService.update(e);
         expectLastCall();
         expect(mockIndexService.retrieve(e.getId())).andReturn(e);
-        expect(mockBlobstoreService.createOldVersionBlob(e)).andReturn("oldversionpath");
 
         replay(mockIndexService, mockExportService, mockBlobstoreService);
         this.entityService.update(e);
@@ -131,7 +134,6 @@ public class DefaultEntityServiceTest {
         Binary b = Fixtures.createBinary();
         b.setName("BINARY_CREATE");
 
-        expect(mockBlobstoreService.createOldVersionBlob(e)).andReturn("oldpath");
         expect(mockIndexService.retrieve(e.getId())).andReturn(e);
         expect(mockBlobstoreService.create(anyObject(InputStream.class))).andReturn("/path/to/bin");
         mockIndexService.update(e);
@@ -148,7 +150,6 @@ public class DefaultEntityServiceTest {
         Entity e = Fixtures.createEntity();
 
         expect(mockIndexService.retrieve(e.getId())).andReturn(e).times(2);
-        expect(mockBlobstoreService.createOldVersionBlob(e)).andReturn("oldpath");
         mockIndexService.update(e);
         expectLastCall();
 
@@ -163,7 +164,6 @@ public class DefaultEntityServiceTest {
         Entity e = Fixtures.createEntity();
 
         expect(mockIndexService.retrieve(e.getId())).andReturn(e);
-        expect(mockBlobstoreService.createOldVersionBlob(e)).andReturn("oldpath");
         mockIndexService.update(e);
         expectLastCall();
 

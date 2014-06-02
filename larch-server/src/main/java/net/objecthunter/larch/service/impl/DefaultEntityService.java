@@ -59,6 +59,9 @@ public class DefaultEntityService implements EntityService {
     private BlobstoreService blobstoreService;
 
     @Autowired
+    private VersionService versionService;
+
+    @Autowired
     private IndexService indexService;
 
     @Autowired
@@ -163,14 +166,9 @@ public class DefaultEntityService implements EntityService {
     @Override
     public void update(Entity e) throws IOException {
         final Entity oldVersion = this.indexService.retrieve(e.getId());
-        final String oldVersionPath = this.blobstoreService.createOldVersionBlob(oldVersion);
+        this.versionService.addOldVersion(oldVersion);
         final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
         e.setVersion(oldVersion.getVersion() + 1);
-        if (oldVersion.getVersionPaths() == null) {
-            e.setVersionPaths(new HashMap<>());
-        } else {
-            e.setVersionPaths(oldVersion.getVersionPaths());
-        }
         if (e.getMetadata() != null) {
             for (final Metadata md : e.getMetadata().values()) {
                 if (md.getUtcCreated() == null) {
@@ -179,7 +177,6 @@ public class DefaultEntityService implements EntityService {
                 md.setUtcLastModified(now);
             }
         }
-        e.getVersionPaths().put(oldVersion.getVersion(), oldVersionPath);
         e.setUtcCreated(oldVersion.getUtcCreated());
         e.setUtcLastModified(now);
         if (e.getLabel() == null || e.getLabel().isEmpty()) {
@@ -235,16 +232,13 @@ public class DefaultEntityService implements EntityService {
         if (i == e.getVersion()) {
             return e; // the current version
         }
-        if (e.getVersionPaths() == null || !e.getVersionPaths().containsKey(i)) {
-            throw new IOException("Unknown version " + i + " for Entity " + id);
-        }
-        return mapper.readValue(this.blobstoreService.retrieveOldVersionBlob(e.getVersionPaths().get(i)), Entity.class);
+        return this.versionService.getOldVersion(id, i);
     }
 
     @Override
     public void createBinary(String entityId, String name, String contentType, InputStream inputStream) throws IOException {
         final Entity e = indexService.retrieve(entityId);
-        final String oldVersionPath = this.blobstoreService.createOldVersionBlob(e);
+        this.versionService.addOldVersion(e);
         final MessageDigest digest;
         try {
             digest = MessageDigest.getInstance("MD5");
@@ -270,10 +264,6 @@ public class DefaultEntityService implements EntityService {
                 e.setBinaries(new HashMap<>(1));
             }
             e.getBinaries().put(name, b);
-            if (e.getVersionPaths() == null) {
-                e.setVersionPaths(new HashMap<>());
-            }
-            e.getVersionPaths().put(e.getVersion(), oldVersionPath);
             e.setVersion(e.getVersion() + 1);
             e.setUtcLastModified(now);
             this.indexService.update(e);
@@ -331,14 +321,10 @@ public class DefaultEntityService implements EntityService {
             }
         }
         final Entity oldVersion = this.indexService.retrieve(id);
-        final String oldVersionPath = this.blobstoreService.createOldVersionBlob(oldVersion);
+        this.versionService.addOldVersion(oldVersion);
         final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
         final Entity newVersion = oldVersion;
         newVersion.setUtcLastModified(now);
-        if (newVersion.getVersionPaths() == null) {
-            newVersion.setVersionPaths(new HashMap<>(1));
-        }
-        newVersion.getVersionPaths().put(oldVersion.getVersion(), oldVersionPath);
         newVersion.setVersion(oldVersion.getVersion() + 1);
         if (newVersion.getRelations() == null) {
             newVersion.setRelations(new HashMap<>());
