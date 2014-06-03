@@ -17,7 +17,7 @@ package net.objecthunter.larch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationConfig;
-import net.objecthunter.larch.fs.FilesystemBlobstoreService;
+import net.objecthunter.larch.service.fs.FilesystemBlobstoreService;
 import net.objecthunter.larch.service.*;
 import net.objecthunter.larch.service.elasticsearch.*;
 import net.objecthunter.larch.service.impl.DefaultEntityService;
@@ -25,9 +25,9 @@ import net.objecthunter.larch.service.impl.DefaultExportService;
 import net.objecthunter.larch.service.impl.DefaultMessagingService;
 import net.objecthunter.larch.service.impl.DefaultRepositoryService;
 import net.objecthunter.larch.util.FileSystemUtil;
-import net.objecthunter.larch.weedfs.WeedFSBlobstoreService;
-import net.objecthunter.larch.weedfs.WeedFsMaster;
-import net.objecthunter.larch.weedfs.WeedFsVolume;
+import net.objecthunter.larch.service.weedfs.WeedFSBlobstoreService;
+import net.objecthunter.larch.service.weedfs.WeedFsMaster;
+import net.objecthunter.larch.service.weedfs.WeedFsVolume;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.command.ActiveMQQueue;
@@ -128,10 +128,10 @@ public class LarchServerConfiguration {
     }
 
     /**
-     * Get a {@link net.objecthunter.larch.fs.FilesystemBlobstoreService} implementation for usage as a {@link net
+     * Get a {@link net.objecthunter.larch.service.fs.FilesystemBlobstoreService} implementation for usage as a {@link net
      * .objecthunter.larch.service.BlobstoreService} in the repository
      *
-     * @return the {@link net.objecthunter.larch.fs.FilesystemBlobstoreService} implementation
+     * @return the {@link net.objecthunter.larch.service.fs.FilesystemBlobstoreService} implementation
      */
     @Bean
     @Profile("fs")
@@ -140,10 +140,10 @@ public class LarchServerConfiguration {
     }
 
     /**
-     * Get a {@link net.objecthunter.larch.weedfs.WeedFsMaster} object responsible for starting and stopping the Weed
+     * Get a {@link net.objecthunter.larch.service.weedfs.WeedFsMaster} object responsible for starting and stopping the Weed
      * FS master node
      *
-     * @return the {@link net.objecthunter.larch.weedfs.WeedFsMaster} object
+     * @return the {@link net.objecthunter.larch.service.weedfs.WeedFsMaster} object
      */
     @Bean
     @Profile("weedfs")
@@ -153,10 +153,10 @@ public class LarchServerConfiguration {
     }
 
     /**
-     * Get a {@link net.objecthunter.larch.weedfs.WeedFsVolume} object responsible for starting and stopping a Weed
+     * Get a {@link net.objecthunter.larch.service.weedfs.WeedFsVolume} object responsible for starting and stopping a Weed
      * FS volume node
      *
-     * @return the {@link net.objecthunter.larch.weedfs.WeedFsVolume} object
+     * @return the {@link net.objecthunter.larch.service.weedfs.WeedFsVolume} object
      */
     @Bean
     @Profile("weedfs")
@@ -166,10 +166,10 @@ public class LarchServerConfiguration {
     }
 
     /**
-     * Get a {@link net.objecthunter.larch.weedfs.WeedFSBlobstoreService} implementation as the {@link net
+     * Get a {@link net.objecthunter.larch.service.weedfs.WeedFSBlobstoreService} implementation as the {@link net
      * .objecthunter.larch.service.BlobstoreService} fro the repository
      *
-     * @return the {@link net.objecthunter.larch.weedfs.WeedFSBlobstoreService} object
+     * @return the {@link net.objecthunter.larch.service.weedfs.WeedFSBlobstoreService} object
      */
     @Bean
     @Profile("weedfs")

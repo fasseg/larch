@@ -15,7 +15,7 @@
 */
 package net.objecthunter.larch.integration;
 
-import net.objecthunter.larch.fs.FilesystemBlobstoreService;
+import net.objecthunter.larch.service.fs.FilesystemBlobstoreService;
 import net.objecthunter.larch.model.state.FilesystemBlobstoreState;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;

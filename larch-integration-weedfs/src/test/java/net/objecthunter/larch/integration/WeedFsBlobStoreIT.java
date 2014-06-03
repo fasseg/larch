@@ -18,7 +18,7 @@ package net.objecthunter.larch.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.LarchServerConfiguration;
 import net.objecthunter.larch.model.state.WeedFsBlobstoreState;
-import net.objecthunter.larch.weedfs.WeedFSBlobstoreService;
+import net.objecthunter.larch.service.weedfs.WeedFSBlobstoreService;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
