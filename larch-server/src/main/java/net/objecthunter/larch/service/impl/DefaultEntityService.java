@@ -70,6 +70,9 @@ public class DefaultEntityService implements EntityService {
     private ExportService exportService;
 
     @Autowired
+    private PublishService publishService;
+
+    @Autowired
     private Environment env;
 
     private boolean autoExport;
@@ -178,6 +181,10 @@ public class DefaultEntityService implements EntityService {
         }
         e.setUtcCreated(oldVersion.getUtcCreated());
         e.setUtcLastModified(now);
+        if (e.getState() != null && e.getState().equals(Entity.STATE_PUBLISHED)) {
+            /* reset published state so that the new version is not published by default */
+            e.setState(Entity.STATE_INGESTED);
+        }
         if (e.getLabel() == null || e.getLabel().isEmpty()) {
             e.setLabel("Unnamed entity");
         }
@@ -369,4 +376,14 @@ public class DefaultEntityService implements EntityService {
         this.update(e);
     }
 
+    @Override
+    public void publish(String id) throws IOException {
+        final Entity e = this.indexService.retrieve(id);
+        if (e.getState().equals(Entity.STATE_PUBLISHED)) {
+            throw new IOException("The entity with the id " + id +  " is already published");
+        }
+        e.setState(Entity.STATE_PUBLISHED);
+        this.indexService.update(e);
+        this.publishService.publish(e);
+    }
 }

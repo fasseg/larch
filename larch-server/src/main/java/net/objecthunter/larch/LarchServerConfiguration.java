@@ -17,17 +17,17 @@ package net.objecthunter.larch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationConfig;
-import net.objecthunter.larch.service.fs.FilesystemBlobstoreService;
 import net.objecthunter.larch.service.*;
 import net.objecthunter.larch.service.elasticsearch.*;
+import net.objecthunter.larch.service.fs.FilesystemBlobstoreService;
 import net.objecthunter.larch.service.impl.DefaultEntityService;
 import net.objecthunter.larch.service.impl.DefaultExportService;
 import net.objecthunter.larch.service.impl.DefaultMessagingService;
 import net.objecthunter.larch.service.impl.DefaultRepositoryService;
-import net.objecthunter.larch.util.FileSystemUtil;
 import net.objecthunter.larch.service.weedfs.WeedFSBlobstoreService;
 import net.objecthunter.larch.service.weedfs.WeedFsMaster;
 import net.objecthunter.larch.service.weedfs.WeedFsVolume;
+import net.objecthunter.larch.util.FileSystemUtil;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.command.ActiveMQQueue;
@@ -104,6 +104,16 @@ public class LarchServerConfiguration {
     @Bean
     public IndexService elasticSearchIndexService() {
         return new ElasticSearchIndexService();
+    }
+
+    /**
+     * Get a {@link net.objecthunter.larch.service.PublishService} implementation Spring bean
+     *
+     * @return a {@link net.objecthunter.larch.service.PublishService} implementation
+     */
+    @Bean
+    public PublishService publishService() {
+        return new ElasticSearchPublishService();
     }
 
     /**
@@ -232,6 +242,7 @@ public class LarchServerConfiguration {
 
     /**
      * Get a  {@link net.objecthunter.larch.service.VersionService} Spring bean
+     *
      * @return a VersionService implementation
      */
     @Bean

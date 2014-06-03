@@ -59,7 +59,8 @@ public class EntityController extends AbstractLarchController {
      * Controller method for patching an {@link net.objecthunter.larch.model.Entity} stored in the repository. The
      * patch method allows only a set of given fields to be updated and therefore allowing for more efficient
      * resource usage
-     * @param id The id of the {@link net.objecthunter.larch.model.Entity} to patch
+     *
+     * @param id  The id of the {@link net.objecthunter.larch.model.Entity} to patch
      * @param src The JSON representation of the subset of fields which should get updated on the Entity
      * @throws IOException
      */
@@ -76,7 +77,7 @@ public class EntityController extends AbstractLarchController {
      * Controller method for retrieval of a JSON representation of the current version of an {@link net.objecthunter
      * .larch.model.Entity}
      *
-     * @param id      the {@link net.objecthunter.larch.model.Entity}'s id
+     * @param id the {@link net.objecthunter.larch.model.Entity}'s id
      * @return An Entity object which gets transformed into a JSON response by Spring MVC
      * @throws IOException
      */
@@ -89,6 +90,7 @@ public class EntityController extends AbstractLarchController {
 
     /**
      * Controller method for retrieval of a HTML view of the current version of an {@link net.objecthunter.larch.model.Entity}
+     *
      * @param id The is of the {@link net.objecthunter.larch.model.Entity} to retrieve
      * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} for rendering the HTML view
      * @throws IOException
@@ -121,6 +123,7 @@ public class EntityController extends AbstractLarchController {
     /**
      * Controller method for creation of a new {@link net.objecthunter.larch.model.Entity} using a HTTP POST with the
      * JSON representation of the entity as the request body
+     *
      * @param src The Stream injected by Spring MVC containing the JSON representation of the Entity to create.
      * @return The id of the created entity.
      * @throws IOException
@@ -138,7 +141,8 @@ public class EntityController extends AbstractLarchController {
     /**
      * Controller method for updating an {@link net.objecthunter.larch.model.Entity} using a HTTP PUT with a JSON
      * entity representation as request body
-     * @param id The is of the Entity to update
+     *
+     * @param id  The is of the Entity to update
      * @param src The Stream injected by Spring MVC containing the JSON representation of the updated Entity
      * @throws IOException
      */
@@ -154,5 +158,20 @@ public class EntityController extends AbstractLarchController {
         this.entityService.update(e);
         this.auditService.create(AuditRecords.updateEntityRecord(id));
         this.messagingService.publishUpdateEntity(id);
+    }
+
+    @RequestMapping(value = "/{id}/publish", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void publish(@PathVariable("id") final String id) throws IOException {
+        this.entityService.publish(id);
+        this.auditService.create(AuditRecords.publishEntityRecord(id));
+        this.messagingService.publishPublishEntity(id);
+    }
+
+    @RequestMapping(value = "/{id}/publish", method = RequestMethod.POST, produces = "text/html")
+    @ResponseStatus(HttpStatus.OK)
+    public ModelAndView publishHtml(@PathVariable("id") final String id) throws IOException {
+        this.publish(id);
+        return this.retrieveHtml(id);
     }
 }

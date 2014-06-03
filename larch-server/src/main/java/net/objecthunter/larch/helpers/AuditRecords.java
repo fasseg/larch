@@ -189,4 +189,9 @@ public abstract class AuditRecords {
         return record;
     }
 
+    public static AuditRecord publishEntityRecord(String id) {
+        final AuditRecord rec = skeletonRecord(id);
+        rec.setAction(AuditRecord.EVENT_PUBLISH_ENTITY);
+        return rec;
+    }
 }
