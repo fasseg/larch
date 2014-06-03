@@ -41,14 +41,11 @@ import java.util.List;
 /**
  * Implementation of an {@link net.objecthunter.larch.service.AuditService} built on top of ElasticSearch
  */
-public class ElasticSearchAuditService implements AuditService {
+public class ElasticSearchAuditService extends AbstractElasticSearchService implements AuditService {
     public static final String INDEX_AUDIT = "audit";
     private static final Logger log = Logger.getLogger(ElasticSearchAuditService.class);
 
     private int maxRecords = 50;
-
-    @Autowired
-    private Client client;
 
     @Autowired
     private ObjectMapper mapper;
@@ -56,22 +53,8 @@ public class ElasticSearchAuditService implements AuditService {
     @PostConstruct
     public void init() {
         log.debug("initialising ElasticSearchIndexService");
-        boolean indexExists = client.admin()
-                .indices()
-                .exists(new IndicesExistsRequest(INDEX_AUDIT))
-                .actionGet()
-                .isExists();
-        if (!indexExists) {
-            client.admin()
-                    .indices()
-                    .create(new CreateIndexRequest(INDEX_AUDIT))
-                    .actionGet();
-        }
-        this.client.admin().cluster()
-                .prepareHealth(INDEX_AUDIT)
-                .setWaitForYellowStatus()
-                .execute()
-                .actionGet();
+        this.checkAndOrCreateIndex(INDEX_AUDIT);
+        this.waitForIndex(INDEX_AUDIT);
     }
 
     @Override
@@ -115,12 +98,4 @@ public class ElasticSearchAuditService implements AuditService {
                 .actionGet()
                 .isExists();
     }
-
-    private void refreshIndex(String... indices) {
-        this.client.admin()
-                .indices()
-                .refresh(new RefreshRequest(indices))
-                .actionGet();
-    }
-
 }

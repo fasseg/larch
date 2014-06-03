@@ -41,11 +41,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * An implementation of a {@link net.objecthunter.larch.service.SearchService} built on top of ElasticSearch
  */
-public class ElasticSearchSearchService implements SearchService {
+public class ElasticSearchSearchService extends AbstractElasticSearchService implements SearchService {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticSearchSearchService.class);
-
-    @Autowired
-    private Client client;
 
     private int maxRecords = 50;
 
