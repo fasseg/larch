@@ -46,7 +46,7 @@ import java.util.List;
 /**
  * An {@link net.objecthunter.larch.service.IndexService} implementation built on top of ElasticSearch.
  */
-public class ElasticSearchIndexService implements IndexService {
+public class ElasticSearchIndexService extends AbstractElasticSearchService implements IndexService {
     public static final String INDEX_ENTITIES = "entities";
     public static final String INDEX_ENTITY_TYPE = "entity";
     public static final String STATE_PUBLISHED = "published";
@@ -56,30 +56,13 @@ public class ElasticSearchIndexService implements IndexService {
     private static final Logger log = LoggerFactory.getLogger(ElasticSearchIndexService.class);
 
     @Autowired
-    private Client client;
-
-    @Autowired
     private ObjectMapper mapper;
 
     @PostConstruct
     public void init() {
         log.debug("initialising ElasticSearchIndexService");
-        boolean indexExists = client.admin()
-                .indices()
-                .exists(new IndicesExistsRequest(INDEX_ENTITIES))
-                .actionGet()
-                .isExists();
-        if (!indexExists) {
-            client.admin()
-                    .indices()
-                    .create(new CreateIndexRequest(INDEX_ENTITIES))
-                    .actionGet();
-        }
-        this.client.admin().cluster()
-                .prepareHealth(INDEX_ENTITIES)
-                .setWaitForYellowStatus()
-                .execute()
-                .actionGet();
+        this.checkAndOrCreateIndex(INDEX_ENTITIES);
+        this.waitForIndex(INDEX_ENTITIES);
     }
 
     @Override
@@ -100,13 +83,6 @@ public class ElasticSearchIndexService implements IndexService {
                 .actionGet();
         refreshIndex(INDEX_ENTITIES);
         return e.getId();
-    }
-
-    private void refreshIndex(String... indices) {
-        client.admin()
-                .indices()
-                .refresh(new RefreshRequest(indices))
-                .actionGet();
     }
 
     @Override

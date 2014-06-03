@@ -52,14 +52,10 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ElasticSearchSchemaService implements SchemaService {
+public class ElasticSearchSchemaService extends AbstractElasticSearchService implements SchemaService {
     public static final String INDEX_MD_SCHEMATA = "mdschema";
     public static final String INDEX_MD_SCHEMATA_TYPE = "mdschema-type";
     private static final Logger log = LoggerFactory.getLogger(ElasticSearchSchemaService.class);
-
-
-    @Autowired
-    private Client client;
 
     @Autowired
     private ObjectMapper mapper;
@@ -68,40 +64,20 @@ public class ElasticSearchSchemaService implements SchemaService {
     public void init() throws IOException {
         /* check if the metadata type index exists */
         log.debug("initialising ElasticSearchSchemaService");
-        boolean indexExists = client.admin()
-                .indices()
-                .exists(new IndicesExistsRequest(INDEX_MD_SCHEMATA))
-                .actionGet()
-                .isExists();
-        if (!indexExists) {
-            /* create the necessary index */
-            client.admin()
-                    .indices()
-                    .create(new CreateIndexRequest(INDEX_MD_SCHEMATA))
+        this.checkAndOrCreateIndex(INDEX_MD_SCHEMATA);
+        this.waitForIndex(INDEX_MD_SCHEMATA);
+        this.checkAndOrCreateDefaultMdTypes();
+    }
+
+    private void checkAndOrCreateDefaultMdTypes() throws IOException{
+        for (MetadataType type : MetadataTypes.getDefaultMetadataTypes()) {
+            final IndexResponse resp = this.client.prepareIndex(INDEX_MD_SCHEMATA, INDEX_MD_SCHEMATA_TYPE,
+                    type.getName())
+                    .setSource(mapper.writeValueAsBytes(type))
+                    .execute()
                     .actionGet();
-            /* create the default metadata types */
-            for (MetadataType type : MetadataTypes.getDefaultMetadataTypes()) {
-                final IndexResponse resp = this.client.prepareIndex(INDEX_MD_SCHEMATA, INDEX_MD_SCHEMATA_TYPE,
-                        type.getName())
-                        .setSource(mapper.writeValueAsBytes(type))
-                        .execute()
-                        .actionGet();
-            }
         }
-        this.client.admin().cluster()
-                .prepareHealth(INDEX_MD_SCHEMATA)
-                .setWaitForYellowStatus()
-                .execute()
-                .actionGet();
     }
-
-    private void refreshIndex(String... indices) {
-        client.admin()
-                .indices()
-                .refresh(new RefreshRequest(indices))
-                .actionGet();
-    }
-
     public String getSchemUrlForType(String type) throws IOException {
         final GetResponse get = this.client.prepareGet(INDEX_MD_SCHEMATA, INDEX_MD_SCHEMATA_TYPE, type)
                 .execute()

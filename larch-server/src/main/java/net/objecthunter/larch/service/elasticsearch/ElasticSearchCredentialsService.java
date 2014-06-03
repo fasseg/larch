@@ -46,22 +46,19 @@ import java.util.List;
  * Implementation of a spring-security {@link org.springframework.security.authentication.AuthenticationManager}
  * which uses ElasticSearch indices as a persistence layer
  */
-public class ElasticSearchCredentialsService implements AuthenticationManager, CredentialsService {
+public class ElasticSearchCredentialsService extends AbstractElasticSearchService implements AuthenticationManager, CredentialsService {
     public static final String INDEX_USERS = "users";
     public static final String INDEX_GROUPS = "groups";
     public static final String INDEX_USERS_TYPE = "user";
     public static final String INDEX_GROUPS_TYPE = "group";
 
     @Autowired
-    private Client client;
-
-    @Autowired
     private ObjectMapper mapper;
 
     @PostConstruct
     public void setup() throws IOException {
-        checkAndOrCreateIndex(INDEX_USERS);
-        checkAndOrCreateIndex(INDEX_GROUPS);
+        this.checkAndOrCreateIndex(INDEX_USERS);
+        this.checkAndOrCreateIndex(INDEX_GROUPS);
         checkAndOrCreateDefaultGroups();
         checkAndOrCreateDefaultUsers();
     }
@@ -110,19 +107,6 @@ public class ElasticSearchCredentialsService implements AuthenticationManager, C
                         .execute()
                         .actionGet();
             }
-        }
-    }
-
-    private void checkAndOrCreateIndex(String index) {
-        final IndicesExistsResponse exists = client.admin().indices()
-                .prepareExists(index)
-                .execute()
-                .actionGet();
-        if (!exists.isExists()) {
-            // create the group index
-            client.admin().indices().prepareCreate(index)
-                    .execute()
-                    .actionGet();
         }
     }
 
