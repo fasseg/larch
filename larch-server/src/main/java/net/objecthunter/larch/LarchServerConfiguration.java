@@ -168,6 +168,7 @@ public class LarchServerConfiguration {
     /**
      * Get a {@link net.objecthunter.larch.weedfs.WeedFSBlobstoreService} implementation as the {@link net
      * .objecthunter.larch.service.BlobstoreService} fro the repository
+     *
      * @return the {@link net.objecthunter.larch.weedfs.WeedFSBlobstoreService} object
      */
     @Bean
@@ -179,6 +180,7 @@ public class LarchServerConfiguration {
     /**
      * Get a Jackson {@link com.fasterxml.jackson.databind.ObjectMapper} Spring bean for JSON
      * serialization/deserialization
+     *
      * @return the {@link com.fasterxml.jackson.databind.ObjectMapper} implementation used by various services
      */
     @Bean
@@ -189,7 +191,8 @@ public class LarchServerConfiguration {
 
     /**
      * Get the {@link com.fasterxml.jackson.databind.SerializationConfig} Spring bean for the Jackson {@link com.fasterxml.jackson.databind.ObjectMapper}
-      * @return the {@link com.fasterxml.jackson.databind.SerializationConfig} that should be used by the Jackson mapper
+     *
+     * @return the {@link com.fasterxml.jackson.databind.SerializationConfig} that should be used by the Jackson mapper
      */
     @Bean
     public SerializationConfig serializationConfig() {
@@ -198,6 +201,7 @@ public class LarchServerConfiguration {
 
     /**
      * Get the {@link net.objecthunter.larch.service.ExportService} Spring bean
+     *
      * @return a {@link net.objecthunter.larch.service.ExportService} implementation to be used by the repository
      */
     @Bean
@@ -207,16 +211,18 @@ public class LarchServerConfiguration {
 
     /**
      * Get a {@link net.objecthunter.larch.service.SearchService} Spring bean
+     *
      * @return a {@link net.objecthunter.larch.service.SearchService} implementation
      */
     @Bean
-    public SearchService service() {
+    public SearchService searchService() {
         return new ElasticSearchSearchService();
     }
 
     /**
      * A commons-multipart {@link org.springframework.web.multipart.commons.CommonsMultipartResolver} for resolving
      * files in a HTTP multipart request
+     *
      * @return a {@link org.springframework.web.multipart.commons.CommonsMultipartResolver} object used by Spring MVC
      */
     @Bean
@@ -225,7 +231,17 @@ public class LarchServerConfiguration {
     }
 
     /**
+     * Get a  {@link net.objecthunter.larch.service.VersionService} Spring bean
+     * @return a VersionService implementation
+     */
+    @Bean
+    public VersionService versionService() {
+        return new ElasticSearchVersionService();
+    }
+
+    /**
      * The Spring-security JavaConfig class containing the relevan AuthZ/AuthN definitions
+     *
      * @return the {@link LarchServerSecurityConfiguration} used
      */
     @Bean
@@ -236,6 +252,7 @@ public class LarchServerConfiguration {
 
     /**
      * Get a {@link net.objecthunter.larch.service.CredentialsService} implementation for use by the repository
+     *
      * @return a {@link net.objecthunter.larch.service.CredentialsService} implementation
      */
     @Bean
@@ -246,15 +263,15 @@ public class LarchServerConfiguration {
 
     @Bean
     public JmsTemplate jmsTemplate() {
-        final JmsTemplate templ =new JmsTemplate(activeMQConnectionFactory());
+        final JmsTemplate templ = new JmsTemplate(activeMQConnectionFactory());
         templ.setReceiveTimeout(500);
         templ.setDefaultDestination(jmsQueue());
         return templ;
     }
 
     @Bean
-    public BrokerService brokerService() throws Exception{
-        final File dir = new File(env.getProperty("larch.messaging.path.data",System.getProperty("java.io.tmpdir") + "/larch-jms-data"));
+    public BrokerService brokerService() throws Exception {
+        final File dir = new File(env.getProperty("larch.messaging.path.data", System.getProperty("java.io.tmpdir") + "/larch-jms-data"));
         FileSystemUtil.checkAndCreate(dir);
         final BrokerService broker = new BrokerService();
         broker.addConnector(brokerUri());
@@ -275,7 +292,7 @@ public class LarchServerConfiguration {
 
     @Bean
     public String brokerUri() {
-        return  env.getProperty("larch.messaging.broker.uri", "vm://localhost");
+        return env.getProperty("larch.messaging.broker.uri", "vm://localhost");
     }
 
     @Bean

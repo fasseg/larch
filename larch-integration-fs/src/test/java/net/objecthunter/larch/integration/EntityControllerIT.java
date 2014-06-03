@@ -59,14 +59,11 @@ public class EntityControllerIT extends AbstractLarchIT {
         resp = this.execute(Request.Get("http://localhost:8080/entity/" + id))
                 .returnResponse();
         Entity fetched = mapper.readValue(resp.getEntity().getContent(), Entity.class);
-        assertNotNull(fetched.getVersionPaths());
-        assertEquals(1, fetched.getVersionPaths().size());
         assertEquals(2, fetched.getVersion());
 
         resp = this.execute(Request.Get("http://localhost:8080/entity/" + id + "/version/1"))
                 .returnResponse();
         Entity oldVersion = mapper.readValue(resp.getEntity().getContent(), Entity.class);
-        assertNull(oldVersion.getVersionPaths());
         assertEquals(1, oldVersion.getVersion());
         assertNotNull(oldVersion.getUtcCreated());
         assertNotNull(oldVersion.getUtcLastModified());

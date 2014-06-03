@@ -35,7 +35,6 @@ public class Entity {
     private List<String> children;
     private Map<String, Metadata> metadata;
     private Map<String, Binary> binaries;
-    private Map<Integer, String> versionPaths;
     private Map<String, List<String>> relations;
 
     /**
@@ -108,24 +107,6 @@ public class Entity {
      */
     public void setUtcCreated(String utcCreated) {
         this.utcCreated = utcCreated;
-    }
-
-    /**
-     * Get the versions paths of the entity
-     *
-     * @return the version paths of old version
-     */
-    public Map<Integer, String> getVersionPaths() {
-        return versionPaths;
-    }
-
-    /**
-     * Set the version paths of the entity
-     *
-     * @param versionPaths the version paths to set
-     */
-    public void setVersionPaths(Map<Integer, String> versionPaths) {
-        this.versionPaths = versionPaths;
     }
 
     /**
