@@ -83,10 +83,6 @@
             <p class="panel_title">Children</p>
             <p th:each="child: ${entity.children}" class="value"><a  th:href="@{'/entity/'} + ${child}" th:text="${child}"></a></p>
         </div>
-        <div th:if="${entity.versionPaths != null and not #lists.isEmpty(entity.versionPaths)}" class="panel">
-            <p class="panel_title">Old versions</p>
-            <p th:each="v: ${entity.versionPaths}" class="value"><a  th:href="@{'/entity/'} + ${entity.id} + '/version/' + ${v.key}" th:text="'Version ' + ${v.key}"></a></p>
-        </div>
         <div class="right">
             <div class="panel">
                 <script>
