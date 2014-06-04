@@ -142,4 +142,9 @@ public class DefaultMessagingService implements MessagingService {
     public void publishDeleteRelation(String subject, String predicate, String object) {
         this.publish("Deleted relation " + subject + " " + predicate + " " + object);
     }
+
+    @Override
+    public void publishPublishEntity(String id) {
+        this.publish("Published entity " + id);
+    }
 }
