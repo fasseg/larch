@@ -23,6 +23,11 @@ import java.util.Map;
  * creating an {@link Entity} and adding content/metadata to it.
  */
 public class Entity {
+
+    public static final String STATE_PUBLISHED = "published";
+    public static final String STATE_ARCHIVED = "archived";
+    public static final String STATE_INGESTED = "ingested";
+
     private int version;
     private String id;
     private String label;

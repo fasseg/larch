@@ -70,6 +70,7 @@ public class ElasticSearchVersionServiceTest {
         verify(mockIndexRequestBuilder, mockClient, mockAdminClient, mockIndicesAdminClient, mockBlobstoreService, mockFuture);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testGetOldVersion() throws Exception {
         SearchRequestBuilder mockSearchRequestBuilder = createMock(SearchRequestBuilder.class);

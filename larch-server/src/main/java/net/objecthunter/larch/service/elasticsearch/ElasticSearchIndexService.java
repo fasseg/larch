@@ -49,9 +49,6 @@ import java.util.List;
 public class ElasticSearchIndexService extends AbstractElasticSearchService implements IndexService {
     public static final String INDEX_ENTITIES = "entities";
     public static final String INDEX_ENTITY_TYPE = "entity";
-    public static final String STATE_PUBLISHED = "published";
-    public static final String STATE_ARCHIVED = "archived";
-    public static final String STATE_INGESTED = "ingested";
 
     private static final Logger log = LoggerFactory.getLogger(ElasticSearchIndexService.class);
 

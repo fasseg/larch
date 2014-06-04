@@ -25,7 +25,6 @@ import net.objecthunter.larch.model.LarchConstants;
 import net.objecthunter.larch.model.Metadata;
 import net.objecthunter.larch.model.source.UrlSource;
 import net.objecthunter.larch.service.*;
-import net.objecthunter.larch.service.elasticsearch.ElasticSearchIndexService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,7 +104,7 @@ public class DefaultEntityService implements EntityService {
                 createAndMutateBinary(e.getId(), b);
             }
         }
-        e.setState(ElasticSearchIndexService.STATE_INGESTED);
+        e.setState(Entity.STATE_INGESTED);
         e.setVersion(1);
         e.setUtcCreated(now);
         e.setUtcLastModified(now);
