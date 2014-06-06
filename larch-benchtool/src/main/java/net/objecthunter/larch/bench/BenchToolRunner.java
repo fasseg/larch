@@ -15,6 +15,7 @@
 */
 package net.objecthunter.larch.bench;
 
+import net.objecthunter.larch.client.LarchClient;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -41,30 +42,23 @@ public class BenchToolRunner {
     private final int numActions;
     private final BenchTool.Action action;
     private final ExecutorService executor;
-    private final CloseableHttpClient httpClient;
+    private final LarchClient larchClient;
     private final URI larchUri;
 
-    public BenchToolRunner(BenchTool.Action action, URI larchUri,String user, String password, int numActions,
+    public BenchToolRunner(BenchTool.Action action, URI larchUri, String user, String password, int numActions,
                            int numThreads, long size) {
         this.size = size;
         this.numActions = numActions;
         this.action = action;
         this.larchUri = larchUri;
-        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        credentialsProvider.setCredentials(
-                new AuthScope(larchUri.getHost(), larchUri.getPort()),
-                new UsernamePasswordCredentials(user, password)
-        );
-        this.httpClient = HttpClients.custom()
-                .setDefaultCredentialsProvider(credentialsProvider)
-                .build();
+        this.larchClient = new LarchClient(larchUri, user, password);
         this.executor = Executors.newFixedThreadPool(numThreads);
     }
 
     public List<BenchToolResult> run() throws IOException {
         final List<Future<BenchToolResult>> futures = new ArrayList<>();
         for (int i = 0; i < numActions; i++) {
-            futures.add(executor.submit(new ActionWorker(this.action, this.size, this.httpClient, this.larchUri.toASCIIString())));
+            futures.add(executor.submit(new ActionWorker(this.action, this.size, this.larchClient, this.larchUri.toASCIIString())));
         }
 
         try {
