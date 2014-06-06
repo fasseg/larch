@@ -178,9 +178,11 @@ public class BenchTool {
         System.out.println("   java -jar larch-benchtool.jar -l http://localhost:8080 -n 1 -a ingest -s 100m\n");
         System.out.println(" * Ingest 20 files of 1gb using 5 threads\n   --------------------------------------");
         System.out.println("   java -jar larch-benchtool.jar -l http://localhost:8080 -n 20 -a ingest -s 1g -t 5\n");
+        System.out.println(" * Retrieve 20 files of 1gb using 5 threads\n   --------------------------------------");
+        System.out.println("   java -jar larch-benchtool.jar -l http://localhost:8080 -n 20 -a retrieve -s 1g -t 5\n");
     }
 
     public static enum Action {
-        INGEST
+        INGEST, RETRIEVE;
     }
 }
