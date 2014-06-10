@@ -104,8 +104,15 @@ public class BenchTool {
                 .withLongOpt("larch-url")
                 .hasArg()
                 .create('l'));
+        final StringBuilder desc = new StringBuilder("The action to perform [");
+        for (Action a: Action.values()) {
+            desc.append(a)
+                    .append("|");
+        }
+        desc.delete(desc.length() - 1, desc.length());
+        desc.append("]");
         ops.addOption(OptionBuilder.withArgName("action")
-                .withDescription("The action to perform")
+                .withDescription(desc.toString())
                 .withLongOpt("action")
                 .hasArg()
                 .create('a'));
@@ -114,15 +121,8 @@ public class BenchTool {
                 .withLongOpt("num-actions")
                 .hasArg()
                 .create('n'));
-        final StringBuilder desc = new StringBuilder("The size of the individual binaries created [");
-        for (Action a: Action.values()) {
-            desc.append(a)
-                    .append("|");
-        }
-        desc.delete(desc.length() - 1, desc.length());
-        desc.append("]");
         ops.addOption(OptionBuilder.withArgName("size")
-                .withDescription(desc.toString())
+                .withDescription("The size of the individual binaries created")
                 .withLongOpt("size")
                 .hasArg()
                 .create('s'));
@@ -192,6 +192,6 @@ public class BenchTool {
     }
 
     public static enum Action {
-        INGEST, RETRIEVE, UPDATE, DELETE, ;
+        INGEST, RETRIEVE, UPDATE, DELETE;
     }
 }
