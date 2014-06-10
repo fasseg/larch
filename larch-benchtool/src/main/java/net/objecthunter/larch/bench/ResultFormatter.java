@@ -26,26 +26,21 @@ public class ResultFormatter {
     private static final Logger log = LoggerFactory.getLogger(ResultFormatter.class);
     private static final DecimalFormat format = new DecimalFormat("###.##");
 
-    public static void printResults(List<BenchToolResult> results, int num, long size, long overallDuration,
-                                    OutputStream sink) {
+    public static void printResults(List<BenchToolResult> results, int num, long size, OutputStream sink) {
         long duration = 0;
         float throughput = 0f;
         for (BenchToolResult result : results) {
             duration += result.getDuration();
             throughput += result.getThroughput();
         }
-        throughput /= (float) results.size();
-        float overallTroughput = ((float) num * (float) size * 1000f / ((float) overallDuration * 1024f *1024f));
         log.info("-----------------------------------------------------------------------");
         log.info("RESULTS");
         log.info("-----------------------------------------------------------------------");
         log.info("Number of results\t\t{}", results.size());
         log.info("Individual size\t\t{} mb", format.format((float) size / (1024f*1024f)));
         log.info("Overall Size\t\t{} mb", format.format((float) (size * num) / (1024f * 1024f)));
-        log.info("Duration of threads\t\t{} secs", format.format((float) duration / 1000f));
-        log.info("Overall duration\t\t{} secs", format.format((float) overallDuration / 100f));
+        log.info("Aggregate duration of threads\t\t{} secs", format.format((float) duration / 1000f));
         log.info("Avg. throughput per thread\t{} mb/sec", format.format(throughput));
-        log.info("Overall throughput:\t\t{} mb/sec", format.format(overallTroughput));
         log.info("-----------------------------------------------------------------------");
     }
 }

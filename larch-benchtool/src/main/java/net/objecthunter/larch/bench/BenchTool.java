@@ -89,9 +89,8 @@ public class BenchTool {
                 size, larchUri, numThreads);
         final BenchToolRunner runner = new BenchToolRunner(action, URI.create(larchUri), user, password, numActions, numThreads, size);
         try {
-            long time = System.currentTimeMillis();
             final List<BenchToolResult> results = runner.run();
-            ResultFormatter.printResults(results, numActions, size, System.currentTimeMillis() - time, System.out);
+            ResultFormatter.printResults(results, numActions, size, System.out);
         } catch (IOException e) {
             log.error("Error while running bench\n", e);
         }
@@ -115,8 +114,15 @@ public class BenchTool {
                 .withLongOpt("num-actions")
                 .hasArg()
                 .create('n'));
+        final StringBuilder desc = new StringBuilder("The size of the individual binaries created [");
+        for (Action a: Action.values()) {
+            desc.append(a)
+                    .append("|");
+        }
+        desc.delete(desc.length() - 1, desc.length());
+        desc.append("]");
         ops.addOption(OptionBuilder.withArgName("size")
-                .withDescription("The size of the individual binaries created")
+                .withDescription(desc.toString())
                 .withLongOpt("size")
                 .hasArg()
                 .create('s'));
@@ -151,6 +157,9 @@ public class BenchTool {
         if (m.groupCount() == 1) {
             return size;
         }
+        if (m.group(2).isEmpty()) {
+            return size;
+        }
         final char postfix = m.group(2).charAt(0);
         switch (postfix) {
             case 'k':
@@ -183,6 +192,6 @@ public class BenchTool {
     }
 
     public static enum Action {
-        INGEST, RETRIEVE;
+        INGEST, RETRIEVE, UPDATE, DELETE, ;
     }
 }
