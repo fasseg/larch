@@ -19,13 +19,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.client.LarchClient;
 import net.objecthunter.larch.model.Entity;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.InputStreamEntity;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,14 +49,72 @@ public class ActionWorker implements Callable<BenchToolResult> {
                 return doIngest();
             case RETRIEVE:
                 return doRetrieve();
+            case UPDATE:
+                return doUpdate();
+            case DELETE:
+                return doDelete();
             default:
                 throw new IllegalArgumentException("Unknown action '" + this.action + "'");
         }
     }
 
-    private BenchToolResult doRetrieve() {
+    private BenchToolResult doDelete() throws IOException {
+        /* create an entity */
+        final Entity e = BenchToolEntities.createRandomEmptyEntity();
+        final String entityId = this.larchClient.postEntity(e);
 
-        return null;
+        /* add a binary */
+        final String binaryName =RandomStringUtils.randomAlphabetic(16);
+        this.larchClient.postBinary(entityId,
+                binaryName,
+                "application/octet-stream",
+                new RandomInputStream(size));
+
+        /* measure the deletion duration */
+        long time = System.currentTimeMillis();
+        this.larchClient.deleteEntity(entityId);
+        return new BenchToolResult(size, System.currentTimeMillis() - time);
+    }
+
+    private BenchToolResult doUpdate() throws IOException {
+        /* create an entity */
+        final Entity e = BenchToolEntities.createRandomEmptyEntity();
+        final String entityId = this.larchClient.postEntity(e);
+
+        /* add a binary */
+        final String binaryName =RandomStringUtils.randomAlphabetic(16);
+        this.larchClient.postBinary(entityId,
+                binaryName,
+                "application/octet-stream",
+                new RandomInputStream(size));
+
+        /* measure the update duration */
+        e.setLabel("updated label");
+        e.setId(entityId);
+        long time = System.currentTimeMillis();
+        this.larchClient.postBinary(entityId,
+                binaryName,
+                "application/octet-stream",
+                new RandomInputStream(size));
+        return new BenchToolResult(size, System.currentTimeMillis() - time);
+    }
+
+    private BenchToolResult doRetrieve() throws IOException {
+        /* create an entity */
+        final Entity e = BenchToolEntities.createRandomEmptyEntity();
+        final String entityId = this.larchClient.postEntity(e);
+
+        /* add a binary */
+        final String binaryName =RandomStringUtils.randomAlphabetic(16);
+        this.larchClient.postBinary(entityId,
+                binaryName,
+                "application/octet-stream",
+                new RandomInputStream(size));
+
+        /* measure the retrieval duration */
+        long time = System.currentTimeMillis();
+        this.larchClient.retrieveBinaryContent(entityId, binaryName);
+        return new BenchToolResult(size, System.currentTimeMillis() - time);
     }
 
     private BenchToolResult doIngest() throws IOException {
