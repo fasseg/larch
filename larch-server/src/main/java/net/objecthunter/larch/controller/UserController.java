@@ -79,7 +79,7 @@ public class UserController extends AbstractLarchController {
             groupList.add(g);
         }
         u.setGroups(groupList);
-        this.credentialsService.createUser(u);
+        this.credentialsService.createNewUserRequest(u);
     }
     /**
      * Controller method for retrieving a HTML view via HTTP GET of all Users and Groups in the repository

@@ -161,6 +161,15 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
 
     @Override
     public void createNewUserRequest(User u) throws IOException {
+        if (u.getName() == null || u.getName().isEmpty()) {
+            throw new IOException("User name must be set");
+        }
+        if (u.getGroups() == null || u.getGroups().size() == 0) {
+            throw new IOException("The user has no groups associated with it");
+        }
+        if (u.getEmail() == null || u.getEmail().isEmpty()) {
+            throw new IOException("User's email can not be empty");
+        }
         final UserRequest request = new UserRequest();
         request.setUser(u);
         request.setValidUntil(ZonedDateTime.now().plusWeeks(1));

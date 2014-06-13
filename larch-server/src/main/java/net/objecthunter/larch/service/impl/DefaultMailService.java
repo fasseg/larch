@@ -20,6 +20,7 @@ import net.objecthunter.larch.service.MailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
+import javax.annotation.PostConstruct;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -29,14 +30,16 @@ import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.util.Properties;
 
+
 public class DefaultMailService implements MailService{
-    private final InternetAddress mailFrom;
-    private final String smtpHost;
+    private InternetAddress mailFrom;
+    private String smtpHost;
 
     @Autowired
     private Environment env;
 
-    public DefaultMailService() {
+    @PostConstruct
+    public void init() {
         try {
             final String value = env.getProperty("larch.mail.from");
             if (value.isEmpty()) {
