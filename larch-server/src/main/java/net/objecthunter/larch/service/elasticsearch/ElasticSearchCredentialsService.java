@@ -18,14 +18,15 @@ package net.objecthunter.larch.service.elasticsearch;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.model.security.Group;
 import net.objecthunter.larch.model.security.User;
+import net.objecthunter.larch.model.security.UserRequest;
 import net.objecthunter.larch.service.CredentialsService;
+import net.objecthunter.larch.service.MailService;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ import org.springframework.security.core.authority.AuthorityUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,14 +53,20 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
     public static final String INDEX_GROUPS = "groups";
     public static final String INDEX_USERS_TYPE = "user";
     public static final String INDEX_GROUPS_TYPE = "group";
+    public static final String INDEX_USERS_REQUEST = "user_requests";
+    public static final String INDEX_USERS_REQUEST_TYPE = "user_request";
 
     @Autowired
     private ObjectMapper mapper;
+
+    @Autowired
+    private MailService mailService;
 
     @PostConstruct
     public void setup() throws IOException {
         this.checkAndOrCreateIndex(INDEX_USERS);
         this.checkAndOrCreateIndex(INDEX_GROUPS);
+        this.checkAndOrCreateIndex(INDEX_USERS_REQUEST);
         checkAndOrCreateDefaultGroups();
         checkAndOrCreateDefaultUsers();
     }
@@ -147,6 +155,19 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
         }
         final IndexResponse resp = this.client.prepareIndex(INDEX_USERS, INDEX_USERS_TYPE, u.getName())
                 .setSource(mapper.writeValueAsBytes(u))
+                .execute()
+                .actionGet();
+    }
+
+    @Override
+    public void createNewUserRequest(User u) throws IOException {
+        final UserRequest request = new UserRequest();
+        request.setUser(u);
+        request.setValidUntil(ZonedDateTime.now().plusWeeks(1));
+        request.setToken(RandomStringUtils.randomAlphanumeric(128));
+        this.mailService.sendUserRequest(request);
+        this.client.prepareIndex(INDEX_USERS_REQUEST, INDEX_USERS_REQUEST_TYPE)
+                .setSource(this.mapper.writeValueAsBytes(request))
                 .execute()
                 .actionGet();
     }

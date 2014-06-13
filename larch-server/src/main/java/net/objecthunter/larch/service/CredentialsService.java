@@ -34,6 +34,13 @@ public interface CredentialsService {
     void createUser(User u) throws IOException;
 
     /**
+     * Create a new request to add a user. the user's email address should be employed to send a confirmation link to
+     * @param u the user for which a new confirmation request should be created
+     * @throws IOException
+     */
+    void createNewUserRequest(User u) throws IOException;
+
+    /**
      * Create a new Group in the repository
      *
      * @param g the group to create
