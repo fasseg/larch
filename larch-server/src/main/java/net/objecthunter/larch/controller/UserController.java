@@ -22,13 +22,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,6 +50,37 @@ public class UserController extends AbstractLarchController {
         return credentialsService.retrieveUsers();
     }
 
+    /**
+     * Controller method for creating a new {@link net.objecthunter.larch.model.security.User}
+     * @param userName  the name of the user
+     * @param firstName the user's first name
+     * @param lastName  the user's last name
+     * @param email the user's mail address
+     * @param groups the user's groups
+     * @throws IOException if the user could not be created
+     */
+    @RequestMapping(value = "/user", method = RequestMethod.POST, consumes = "multipart/form-data")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public void createUser(@RequestParam("name") final String userName,
+                           @RequestParam("first_name") final String firstName,
+                           @RequestParam("last_name") final String lastName,
+                           @RequestParam("email") final String email,
+                           @RequestParam("groups") final List<String> groups) throws IOException{
+        final User u = new User();
+        u.setName(userName);
+        u.setFirstName(firstName);
+        u.setLastName(lastName);
+        u.setEmail(email);
+        final List<Group> groupList = new ArrayList<>(groups.size());
+        for (String groupName: groups) {
+            final Group g = new Group();
+            g.setName(groupName);
+            groupList.add(g);
+        }
+        u.setGroups(groupList);
+        this.credentialsService.createUser(u);
+    }
     /**
      * Controller method for retrieving a HTML view via HTTP GET of all Users and Groups in the repository
      * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} used for redering the HTML view
