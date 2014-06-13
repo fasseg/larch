@@ -78,14 +78,33 @@ public class PerformanceIT {
 
     @Test
     public void ingestSingle100MBFile() throws Exception {
+        long size = 1024 * 1024 * 100;
+        int num = 1;
+        int threads = 1;
         BenchToolRunner bench = new BenchToolRunner(BenchTool.Action.INGEST,
                 URI.create("http://localhost:8080"),
                 "admin",
                 "admin",
-                1,
-                1,
-                1024 * 1024 * 100);
+                num,
+                threads,
+                size);
         List<BenchToolResult> results = bench.run();
-        ResultFormatter.printResults(results, 1, 1024 * 1024 * 100, System.out, 30f);
+        ResultFormatter.printResults(results, num, size, System.out, 30f);
+    }
+
+    @Test
+    public void ingestTen10MBFile() throws Exception {
+        long size = 1024 * 1024 * 10;
+        int num = 10;
+        int threads = 3;
+        BenchToolRunner bench = new BenchToolRunner(BenchTool.Action.INGEST,
+                URI.create("http://localhost:8080"),
+                "admin",
+                "admin",
+                num,
+                threads,
+                size);
+        List<BenchToolResult> results = bench.run();
+        ResultFormatter.printResults(results, num, size, System.out, 30f);
     }
 }
