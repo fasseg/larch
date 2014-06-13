@@ -23,10 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
 import javax.annotation.PostConstruct;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
+import javax.mail.*;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -39,6 +36,9 @@ public class DefaultMailService implements MailService {
 
     private InternetAddress mailFrom;
     private String smtpHost;
+    private int smtpPort;
+    private String mailUser;
+    private String mailPass;
     private boolean enabled;
 
     @Autowired
@@ -58,7 +58,12 @@ public class DefaultMailService implements MailService {
             }
             mailFrom = new InternetAddress(value);
             smtpHost = env.getProperty("larch.mail.smtp.host", "localhost");
+            smtpPort = Integer.parseInt(env.getProperty("larch.mail.smtp.port", "25"));
             enabled = Boolean.parseBoolean(env.getProperty("larch.mail.enabled","false"));
+            if (env.getProperty("larch.mail.smtp.user") != null) {
+                mailUser =env.getProperty("larch.mail.smtp.user");
+                mailPass = env.getProperty("larch.mail.smtp.pass");
+            }
         } catch (AddressException e) {
             throw new IllegalArgumentException(e);
         }
@@ -71,7 +76,24 @@ public class DefaultMailService implements MailService {
         }
         final Properties props = System.getProperties();
         props.setProperty("mail.smtp.host", smtpHost);
-        final Session sess = Session.getDefaultInstance(props);
+        props.put("mail.smtp.port", smtpPort);
+        final Session sess;
+        if (mailUser != null && !mailUser.isEmpty()) {
+            props.put("mail.smtp.auth", "true");
+            props.put("mail.smtp.starttls.enable", true);
+            props.setProperty("mail.user", mailUser);
+            props.setProperty("mail.password", mailPass);
+            final Authenticator auth = new Authenticator() {
+                final PasswordAuthentication pwAuth = new PasswordAuthentication(mailUser, mailPass);
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return pwAuth;
+                }
+            };
+            sess = Session.getDefaultInstance(props, auth);
+        }else {
+            sess = Session.getDefaultInstance(props);
+        }
         MimeMessage msg = new MimeMessage(sess);
         try {
             msg.setFrom(mailFrom);
