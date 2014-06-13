@@ -15,6 +15,7 @@
         <module>larch-integration-fs</module>
         <module>larch-integration-weedfs</module>
         <module>larch-benchtool</module>
+        <module>larch-integration-performance</module>
     </modules>
 
     <properties>
@@ -97,6 +98,11 @@
             <dependency>
                 <groupId>net.objecthunter.larch</groupId>
                 <artifactId>larch-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.objecthunter.larch</groupId>
+                <artifactId>larch-benchtool</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
