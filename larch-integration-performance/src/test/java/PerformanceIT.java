@@ -86,6 +86,6 @@ public class PerformanceIT {
                 1,
                 1024 * 1024 * 100);
         List<BenchToolResult> results = bench.run();
-        ResultFormatter.printResults(results, 1, 1024 * 1024 * 100, System.out, 100f);
+        ResultFormatter.printResults(results, 1, 1024 * 1024 * 100, System.out, 30f);
     }
 }
