@@ -46,9 +46,9 @@ public class DefaultMailService implements MailService {
 
     @PostConstruct
     public void init() {
-        if (env.getProperty("larch.mail.enabled") != null &&
+        if (env.getProperty("larch.mail.enabled") == null ||
                 env.getProperty("larch.mail.enabled").equalsIgnoreCase("false")){
-            /* mail sending disabled */
+            enabled = false;
             return;
         }
         try {
@@ -67,7 +67,7 @@ public class DefaultMailService implements MailService {
     @Override
     public void sendUserRequest(UserRequest req) throws IOException {
         if (!enabled) {
-            throw new IOException("Mail service is disabled unable to comply with request");
+            throw new IOException("Mail service is disabled. Unable to comply with request");
         }
         final Properties props = System.getProperties();
         props.setProperty("mail.smtp.host", smtpHost);
