@@ -38,7 +38,7 @@ function deleteUser(name) {
         headers: {
             "X-CSRF-TOKEN" : csrf_token
         },
-        url: "/credentials/" + name,
+        url: "/user/" + name,
         type: "DELETE",
         success: function(createdId){
             document.location.href = document.location.href;

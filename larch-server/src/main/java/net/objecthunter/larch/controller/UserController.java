@@ -38,6 +38,15 @@ public class UserController extends AbstractLarchController {
     private CredentialsService credentialsService;
 
     /**
+     * Controller method for deleting a given {@link net.objecthunter.larch.model.security.User}
+     *
+     */
+    @RequestMapping(value="/user/{name}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteUser(@PathVariable("name") final String name) throws IOException {
+        this.credentialsService.deleteUser(name);
+    }
+    /**
      * Controller method for retrieving a List of existing {@link net.objecthunter.larch.model.security.User}s in the
      * repository as a JSON representation
      * @return A JSON representation of the user list
