@@ -153,8 +153,8 @@
                 <form enctype="multipart/form-data" method="post"
                       th:action="@{'~/entity/' + ${entity.id} + '/identifier'} + '?_csrf=' + ${_csrf.token}">
                     <select id="identifierType" name="type" title="Select a valid identifier type">
-                        <option th:each="identifierType : ${identifierTypes}" th:label="ee"
-                                th:text="ee"></option>
+                        <option th:each="identifierType : ${identifierTypes}" th:label="${identifierType.name}"
+                                th:text="${identifierType.name}"></option>
                     </select>
                     <input id="identifierValue" type="text" name="value" title="Set the value of the identifier"/>
                     <input class="button" type="submit" value="Create identifier"/>
