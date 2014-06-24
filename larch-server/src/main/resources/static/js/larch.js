@@ -30,6 +30,22 @@ function createEntity(id, type, label, tags, parentId) {
     });
 }
 
+function deleteUser(name) {
+   $.ajax ({
+        xhrFields: {
+           withCredentials: true
+        },
+        headers: {
+            "X-CSRF-TOKEN" : csrf_token
+        },
+        url: "/credentials/" + name,
+        type: "DELETE",
+        success: function(createdId){
+            document.location.href = document.location.href;
+        }
+    });
+}
+
 function edit(td, name) {
     var currentValue = $(td).html();
     $(td).unbind('click');
