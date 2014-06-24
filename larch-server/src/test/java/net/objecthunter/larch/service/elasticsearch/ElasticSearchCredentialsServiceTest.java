@@ -266,6 +266,22 @@ public class ElasticSearchCredentialsServiceTest {
         expect(mockGetResponse.isExists()).andReturn(true);
 
         /* delete check */
+        expect(mockClient.prepareGet(ElasticSearchCredentialsService.INDEX_USERS,
+                ElasticSearchCredentialsService.INDEX_USERS_TYPE, u.getName())).andReturn(mockGetRequestBuilder);
+        expect(mockGetRequestBuilder.execute()).andReturn(mockFuture);
+        expect(mockFuture.actionGet()).andReturn(mockGetResponse);
+        expect(mockGetResponse.isExists()).andReturn(true);
+        expect(mockGetResponse.getSourceAsBytes()).andReturn(mapper.writeValueAsBytes(u));
+
+        Group adminGroup = new Group();
+        adminGroup.setName("ROLE_ADMIN");
+        expect(mockClient.prepareGet(ElasticSearchCredentialsService.INDEX_GROUPS,
+                ElasticSearchCredentialsService.INDEX_GROUPS_TYPE, adminGroup.getName())).andReturn(mockGetRequestBuilder);
+        expect(mockGetRequestBuilder.execute()).andReturn(mockFuture);
+        expect(mockFuture.actionGet()).andReturn(mockGetResponse);
+        expect(mockGetResponse.isExists()).andReturn(true);
+        expect(mockGetResponse.getSourceAsBytes()).andReturn(mapper.writeValueAsBytes(adminGroup));
+
         expect(mockClient.prepareDelete(ElasticSearchCredentialsService.INDEX_USERS,
                 ElasticSearchCredentialsService.INDEX_USERS_TYPE, u.getName())).andReturn(mockDeleteRequestBuilder);
         expect(mockDeleteRequestBuilder.execute()).andReturn(mockFuture);
@@ -381,7 +397,7 @@ public class ElasticSearchCredentialsServiceTest {
         GetRequestBuilder mockGetRequestBuilder = createMock(GetRequestBuilder.class);
         ListenableActionFuture mockFuture = createMock(ListenableActionFuture.class);
 
-        /* retrieve user */
+        /* retrieve group */
         expect(mockClient.prepareGet(ElasticSearchCredentialsService.INDEX_GROUPS,
                 ElasticSearchCredentialsService.INDEX_GROUPS_TYPE, g.getName())).andReturn(mockGetRequestBuilder);
         expect(mockGetRequestBuilder.execute()).andReturn(mockFuture);

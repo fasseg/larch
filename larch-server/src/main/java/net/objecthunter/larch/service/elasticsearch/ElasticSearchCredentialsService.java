@@ -254,6 +254,9 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
         if (name == null) {
             throw new IOException("User name can not be null");
         }
+        if (this.isLastAdminUser(name)) {
+            throw new IOException("Unable to delete last remaining Administrator");
+        }
         final GetResponse get = this.client.prepareGet(INDEX_USERS, INDEX_USERS_TYPE, name)
                 .execute()
                 .actionGet();
@@ -269,9 +272,6 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
     public void deleteGroup(String name) throws IOException {
         if (name == null) {
             throw new IOException("Group name can not be null");
-        }
-        if (this.isLastAdminUser(name)) {
-            throw new IOException("Unable to delete last remaining Administrator");
         }
         final GetResponse get = this.client.prepareGet(INDEX_GROUPS, INDEX_GROUPS_TYPE, name)
                 .execute()
