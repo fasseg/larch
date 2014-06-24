@@ -23,6 +23,7 @@ import net.objecthunter.larch.service.CredentialsService;
 import net.objecthunter.larch.service.MailService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.elasticsearch.action.count.CountResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
@@ -269,6 +270,9 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
         if (name == null) {
             throw new IOException("Group name can not be null");
         }
+        if (this.isLastAdminUser(name)) {
+            throw new IOException("Unable to delete last remaining Administrator");
+        }
         final GetResponse get = this.client.prepareGet(INDEX_GROUPS, INDEX_GROUPS_TYPE, name)
                 .execute()
                 .actionGet();
@@ -280,6 +284,8 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
                 .actionGet();
     }
 
+
+
     @Override
     public void removeUserFromGroup(String username, String groupname) throws IOException {
         final User u = this.retrieveUser(username);
@@ -289,6 +295,17 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
         }
         u.getGroups().remove(g);
         this.updateUser(u);
+    }
+
+    private boolean isLastAdminUser(String name) throws IOException{
+        if (!this.retrieveUser(name).getGroups().contains(this.retrieveGroup("ROLE_ADMIN"))) {
+            return false;
+        }
+        final CountResponse resp = this.client.prepareCount(INDEX_USERS)
+                .setQuery(QueryBuilders.matchQuery("groups.name", "ROLE_ADMIN"))
+                .execute()
+                .actionGet();
+        return resp.getCount() < 2; // at least one other admin must exist
     }
 
     @Override
