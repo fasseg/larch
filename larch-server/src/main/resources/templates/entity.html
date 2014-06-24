@@ -51,6 +51,13 @@
             <p class="property">Content</p>
             <a th:href="'/entity/' + ${entity.id} + '/metadata/' + ${md.key} + '/content'" th:text="'Download'"></a>
         </div>
+        <div th:each="identifier : ${entity.alternativeIdentifiers}" class="panel">
+            <p class="panel_title" th:text="'Identifiers: '"></p>
+            <p class="property">Type</p>
+            <p class="value" th:text="${identifier.type}"></p>
+            <p class="property">Value</p>
+            <p class="value" th:text="${identifier.value}"></p>
+        </div>
         <div class="panel clickable" th:each="bin : ${entity.binaries}">
             <p class="panel_title" th:text="'Binary: ' + ${bin.key}"></p>
             <p class="property">Mime type</p>
@@ -134,6 +141,23 @@
                                 th:text="${type.name}"></option>
                     </select>
                     <input class="button" type="submit" value="Create metadata"/>
+                </form>
+            </div>
+            <div class="panel">
+                <script>
+                $(document).ready(function() {
+                    $('#identifierValue').watermark('Value', {className: 'inactive'});
+                 });
+                </script>
+                <p class="panel_title">Create new identifier</p>
+                <form enctype="multipart/form-data" method="post"
+                      th:action="@{'~/entity/' + ${entity.id} + '/identifier'} + '?_csrf=' + ${_csrf.token}">
+                    <select id="identifierType" name="type" title="Select a valid identifier type">
+                        <option th:each="identifierType : ${identifierTypes}" th:label="ee"
+                                th:text="ee"></option>
+                    </select>
+                    <input id="identifierValue" type="text" name="value" title="Set the value of the identifier"/>
+                    <input class="button" type="submit" value="Create identifier"/>
                 </form>
             </div>
             <div class="panel">
