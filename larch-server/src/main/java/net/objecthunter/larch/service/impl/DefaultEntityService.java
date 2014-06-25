@@ -411,9 +411,6 @@ public class DefaultEntityService implements EntityService {
         final Entity newVersion = oldVersion;
         newVersion.setUtcLastModified(now);
         newVersion.setVersion(oldVersion.getVersion() + 1);
-        if (newVersion.getAlternativeIdentifiers() == null) {
-            newVersion.setAlternativeIdentifiers(new ArrayList<AlternativeIdentifier>());
-        }
         newVersion.getAlternativeIdentifiers().add(new AlternativeIdentifier(type, value));
 
         this.indexService.update(newVersion);
@@ -434,9 +431,6 @@ public class DefaultEntityService implements EntityService {
         final Entity newVersion = oldVersion;
         newVersion.setUtcLastModified(now);
         newVersion.setVersion(oldVersion.getVersion() + 1);
-        if (newVersion.getAlternativeIdentifiers() == null) {
-            throw new IOException("Identifier with given type/value not found");
-        }
         boolean found = false;
         for (AlternativeIdentifier alternativeIdentifier : newVersion.getAlternativeIdentifiers()) {
             if (alternativeIdentifier.getType().equals(type) && alternativeIdentifier.getValue().equals(value)) {

@@ -126,7 +126,7 @@ public class IdentifierController extends AbstractLarchController {
      *            the value of the identifier
      * @throws IOException
      */
-    @RequestMapping(value = "/entity/{id}/identifier/{type}/{value}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/entity/{id}/identifier/{type}/{value}", method = RequestMethod.DELETE, produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public String deleteHtml(@PathVariable("id")

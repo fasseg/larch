@@ -15,6 +15,7 @@
  */
 package net.objecthunter.larch.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -271,6 +272,9 @@ public class Entity {
      * @return the alternativeIdentifiers
      */
     public List<AlternativeIdentifier> getAlternativeIdentifiers() {
+        if (alternativeIdentifiers == null) {
+            alternativeIdentifiers = new ArrayList<AlternativeIdentifier>();
+        }
         return alternativeIdentifiers;
     }
 
