@@ -20,7 +20,8 @@
                 <input type="text" name="last_name"  th:value="${user.lastName}"/>
                 <input type="text" name="email" th:value="${user.email}"/>
                 <select name="groups" multiple="multiple" size="3">
-                    <option th:each="group : ${groups}" th:name="${group.name}" th:text="${group.name}"></option>
+                    <option th:each="group : ${groups}" th:name="${group.name}" th:text="${group.name}"
+                            th:selected="${#lists.contains(user.groups, group)}"></option>
                 </select>
                 <input type="submit" class="button" />
             </form>
