@@ -1,20 +1,21 @@
 /*
-* Copyright 2014 Frank Asseg
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2014 Frank Asseg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package net.objecthunter.larch.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,21 +26,37 @@ import java.util.Map;
 public class Entity {
 
     public static final String STATE_PUBLISHED = "published";
+
     public static final String STATE_ARCHIVED = "archived";
+
     public static final String STATE_INGESTED = "ingested";
 
     private int version;
+
     private String id;
+
     private String label;
+
     private String type;
+
     private String parentId;
+
     private String state;
+
     private String utcCreated;
+
     private String utcLastModified;
+
     private List<String> tags;
+
     private List<String> children;
+
     private Map<String, Metadata> metadata;
+
     private Map<String, Binary> binaries;
+
+    private List<AlternativeIdentifier> alternativeIdentifiers;
+
     private Map<String, List<String>> relations;
 
     /**
@@ -54,7 +71,8 @@ public class Entity {
     /**
      * Set the entity's relations
      *
-     * @param relations the relations to set
+     * @param relations
+     *            the relations to set
      */
     public void setRelations(Map<String, List<String>> relations) {
         this.relations = relations;
@@ -72,7 +90,8 @@ public class Entity {
     /**
      * Set the child entities of this entity
      *
-     * @param children the child entities to set
+     * @param children
+     *            the child entities to set
      */
     public void setChildren(List<String> children) {
         this.children = children;
@@ -90,7 +109,8 @@ public class Entity {
     /**
      * Set the last modified timestamp
      *
-     * @param utcLastModified the UTC timestamp to set
+     * @param utcLastModified
+     *            the UTC timestamp to set
      */
     public void setUtcLastModified(String utcLastModified) {
         this.utcLastModified = utcLastModified;
@@ -108,7 +128,8 @@ public class Entity {
     /**
      * Set the created timestamp
      *
-     * @param utcCreated the UTC timestamp to set
+     * @param utcCreated
+     *            the UTC timestamp to set
      */
     public void setUtcCreated(String utcCreated) {
         this.utcCreated = utcCreated;
@@ -126,7 +147,8 @@ public class Entity {
     /**
      * Set the if of the entity
      *
-     * @param id the id to set
+     * @param id
+     *            the id to set
      */
     public void setId(String id) {
         this.id = id;
@@ -144,7 +166,8 @@ public class Entity {
     /**
      * Set the entity's label
      *
-     * @param label the label to set
+     * @param label
+     *            the label to set
      */
     public void setLabel(String label) {
         this.label = label;
@@ -162,7 +185,8 @@ public class Entity {
     /**
      * Set the entity's tags
      *
-     * @param tags the tags to set
+     * @param tags
+     *            the tags to set
      */
     public void setTags(List<String> tags) {
         this.tags = tags;
@@ -180,7 +204,8 @@ public class Entity {
     /**
      * Set the parent id of the entity
      *
-     * @param parentId the parent id
+     * @param parentId
+     *            the parent id
      */
     public void setParentId(String parentId) {
         this.parentId = parentId;
@@ -188,6 +213,7 @@ public class Entity {
 
     /**
      * Get the metadata of an entity
+     * 
      * @return the metadata of the entity
      */
     public Map<String, Metadata> getMetadata() {
@@ -196,7 +222,9 @@ public class Entity {
 
     /**
      * Set the metadata of an entity
-     * @param metadata the metadata to set
+     * 
+     * @param metadata
+     *            the metadata to set
      */
     public void setMetadata(Map<String, Metadata> metadata) {
         this.metadata = metadata;
@@ -204,6 +232,7 @@ public class Entity {
 
     /**
      * Get the entity's type
+     * 
      * @return the type
      */
     public String getType() {
@@ -212,7 +241,9 @@ public class Entity {
 
     /**
      * Set the entity's type
-     * @param type the type to set
+     * 
+     * @param type
+     *            the type to set
      */
     public void setType(String type) {
         this.type = type;
@@ -220,6 +251,7 @@ public class Entity {
 
     /**
      * Get the entity's binaries
+     * 
      * @return the binaries
      */
     public Map<String, Binary> getBinaries() {
@@ -228,14 +260,35 @@ public class Entity {
 
     /**
      * Set the entity's binaries
-     * @param binaries the binaries to set
+     * 
+     * @param binaries
+     *            the binaries to set
      */
     public void setBinaries(Map<String, Binary> binaries) {
         this.binaries = binaries;
     }
 
     /**
+     * @return the alternativeIdentifiers
+     */
+    public List<AlternativeIdentifier> getAlternativeIdentifiers() {
+        if (alternativeIdentifiers == null) {
+            alternativeIdentifiers = new ArrayList<AlternativeIdentifier>();
+        }
+        return alternativeIdentifiers;
+    }
+
+    /**
+     * @param alternativeIdentifiers
+     *            the alternativeIdentifiers to set
+     */
+    public void setAlternativeIdentifiers(List<AlternativeIdentifier> alternativeIdentifiers) {
+        this.alternativeIdentifiers = alternativeIdentifiers;
+    }
+
+    /**
      * Get the version number of the entity
+     * 
      * @return the version number
      */
     public int getVersion() {
@@ -244,7 +297,9 @@ public class Entity {
 
     /**
      * Set the version number of an entity
-     * @param version the version number to set
+     * 
+     * @param version
+     *            the version number to set
      */
     public void setVersion(int version) {
         this.version = version;
@@ -252,6 +307,7 @@ public class Entity {
 
     /**
      * Get the state of the entity
+     * 
      * @return the state
      */
     public String getState() {
@@ -260,7 +316,9 @@ public class Entity {
 
     /**
      * Set the state of the entity
-     * @param state the state to set
+     * 
+     * @param state
+     *            the state to set
      */
     public void setState(String state) {
         this.state = state;
