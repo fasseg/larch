@@ -79,7 +79,7 @@ public class AlternativeIdentifier {
      *
      */
     public enum IdentifierType {
-        DOI("DOI");
+        DOI("DOI"), URN("URN");
 
         public final String name;
 
