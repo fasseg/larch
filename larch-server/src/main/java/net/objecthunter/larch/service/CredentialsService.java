@@ -148,4 +148,17 @@ public interface CredentialsService {
      * @param passwordRepeat the password repetition to check
      */
     User createUser(String token, String password, String passwordRepeat) throws IOException;
+
+    /**
+     * Delete a {@link net.objecthunter.larch.model.security.UserRequest} record
+     * @param token the token value of the {@link net.objecthunter.larch.model.security.UserRequest}
+     */
+    void deleteUserRequest(String token);
+
+    /**
+     * Check if a user name is already existing in the index
+     * @param name the name to check
+     * @return true if the user does exist, otherwise false
+     */
+    boolean isExistingUser(String name);
 }

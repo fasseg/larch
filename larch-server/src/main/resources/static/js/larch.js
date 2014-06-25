@@ -41,7 +41,7 @@ function deleteUser(name) {
         url: "/user/" + name,
         type: "DELETE",
         success: function(createdId){
-            document.location.href = document.location.href;
+           location.reload(false);
         }
     });
 }

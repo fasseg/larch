@@ -158,6 +158,7 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
                 .setSource(mapper.writeValueAsBytes(u))
                 .execute()
                 .actionGet();
+        this.refreshIndex(INDEX_USERS);
         return u;
     }
 
@@ -172,6 +173,9 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
         if (u.getEmail() == null || u.getEmail().isEmpty()) {
             throw new IOException("User's email can not be empty");
         }
+        if (this.isExistingUser(u.getName())) {
+            throw new IOException("The user " + u.getName() + " does already exist");
+        }
         final UserRequest request = new UserRequest();
         request.setUser(u);
         request.setValidUntil(ZonedDateTime.now().plusWeeks(1));
@@ -184,6 +188,7 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
                 .setId(request.getToken())
                 .execute()
                 .actionGet();
+        this.refreshIndex(INDEX_USERS_REQUEST);
         return request;
     }
 
@@ -202,6 +207,7 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
                 .setSource(mapper.writeValueAsBytes(g))
                 .execute()
                 .actionGet();
+        this.refreshIndex(INDEX_GROUPS);
     }
 
     @Override
@@ -219,6 +225,7 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
                 .setSource(mapper.writeValueAsBytes(u))
                 .execute()
                 .actionGet();
+        this.refreshIndex(INDEX_USERS);
     }
 
     @Override
@@ -271,6 +278,7 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
         final DeleteResponse resp = this.client.prepareDelete(INDEX_USERS, INDEX_USERS_TYPE, name)
                 .execute()
                 .actionGet();
+        this.refreshIndex(INDEX_USERS);
     }
 
     @Override
@@ -287,6 +295,7 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
         final DeleteResponse resp = this.client.prepareDelete(INDEX_GROUPS, INDEX_GROUPS_TYPE, name)
                 .execute()
                 .actionGet();
+        this.refreshIndex(INDEX_GROUPS);
     }
 
 
@@ -380,7 +389,29 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
             throw new IOException("Passwords do not match");
         }
         final UserRequest req = this.retrieveUserRequest(token);
+        if (req.getValidUntil().isBefore(ZonedDateTime.now())) {
+            this.deleteUserRequest(token);
+            throw new IOException("The User request is not valid anymore");
+        }
         req.getUser().setPwhash(DigestUtils.sha256Hex(password));
-        return this.createUser(req.getUser());
+        final User u = this.createUser(req.getUser());
+        this.deleteUserRequest(token);
+        return u;
+    }
+
+    @Override
+    public void deleteUserRequest(String token) {
+        final DeleteResponse resp = this.client.prepareDelete(INDEX_USERS_REQUEST, INDEX_USERS_REQUEST_TYPE, token)
+                .execute()
+                .actionGet();
+        refreshIndex(INDEX_USERS_REQUEST);
+    }
+
+    @Override
+    public boolean isExistingUser(String name) {
+        return this.client.prepareGet(INDEX_USERS, INDEX_USERS_TYPE, name)
+                .execute()
+                .actionGet()
+                .isExists();
     }
 }
