@@ -161,7 +161,7 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
     }
 
     @Override
-    public void createNewUserRequest(User u) throws IOException {
+    public UserRequest createNewUserRequest(User u) throws IOException {
         if (u.getName() == null || u.getName().isEmpty()) {
             throw new IOException("User name must be set");
         }
@@ -175,11 +175,15 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
         request.setUser(u);
         request.setValidUntil(ZonedDateTime.now().plusWeeks(1));
         request.setToken(RandomStringUtils.randomAlphanumeric(128));
-        this.mailService.sendUserRequest(request);
+        if (mailService.isEnabled()) {
+            this.mailService.sendUserRequest(request);
+        }
         this.client.prepareIndex(INDEX_USERS_REQUEST, INDEX_USERS_REQUEST_TYPE)
                 .setSource(this.mapper.writeValueAsBytes(request))
+                .setId(request.getToken())
                 .execute()
                 .actionGet();
+        return request;
     }
 
     @Override
@@ -285,7 +289,6 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
     }
 
 
-
     @Override
     public void removeUserFromGroup(String username, String groupname) throws IOException {
         final User u = this.retrieveUser(username);
@@ -297,7 +300,7 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
         this.updateUser(u);
     }
 
-    private boolean isLastAdminUser(String name) throws IOException{
+    private boolean isLastAdminUser(String name) throws IOException {
         if (!this.retrieveUser(name).getGroups().contains(this.retrieveGroup("ROLE_ADMIN"))) {
             return false;
         }
@@ -337,8 +340,8 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
                 .execute()
                 .actionGet();
         final List<User> users = new ArrayList<>(resp.getHits().getHits().length);
-        for (SearchHit hit: resp.getHits()) {
-            users.add(mapper.readValue(hit.getSourceAsString(),User.class));
+        for (SearchHit hit : resp.getHits()) {
+            users.add(mapper.readValue(hit.getSourceAsString(), User.class));
         }
         return users;
     }
@@ -350,9 +353,17 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
                 .execute()
                 .actionGet();
         final List<Group> groups = new ArrayList<>(resp.getHits().getHits().length);
-        for (SearchHit hit: resp.getHits()) {
+        for (SearchHit hit : resp.getHits()) {
             groups.add(mapper.readValue(hit.getSourceAsString(), Group.class));
         }
         return groups;
+    }
+
+    @Override
+    public UserRequest retrieveUserRequest(String token) throws IOException {
+        final GetResponse resp = this.client.prepareGet(INDEX_USERS_REQUEST, INDEX_USERS_REQUEST_TYPE, token)
+                .execute()
+                .actionGet();
+        return mapper.readValue(resp.getSourceAsBytes(), UserRequest.class);
     }
 }

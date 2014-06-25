@@ -21,4 +21,5 @@ import java.io.IOException;
 
 public interface MailService {
     public void sendUserRequest(UserRequest req) throws IOException;
+    public boolean isEnabled();
 }

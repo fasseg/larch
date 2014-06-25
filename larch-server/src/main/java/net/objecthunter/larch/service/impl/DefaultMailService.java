@@ -107,4 +107,9 @@ public class DefaultMailService implements MailService {
             throw new IOException(e);
         }
     }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
 }

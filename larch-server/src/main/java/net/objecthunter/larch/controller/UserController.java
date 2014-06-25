@@ -17,6 +17,7 @@ package net.objecthunter.larch.controller;
 
 import net.objecthunter.larch.model.security.Group;
 import net.objecthunter.larch.model.security.User;
+import net.objecthunter.larch.model.security.UserRequest;
 import net.objecthunter.larch.service.CredentialsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,19 @@ import java.util.List;
 public class UserController extends AbstractLarchController {
     @Autowired
     private CredentialsService credentialsService;
+
+    /**
+     * Controller method for deleting a given {@link net.objecthunter.larch.model.security.User}
+     *
+     */
+    @RequestMapping(value="/confirm", method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    public ModelAndView confirmUserRequest(@PathVariable("token") final String token) throws IOException {
+        final User u = this.credentialsService.createUserFromRequestToken(token);
+        final ModelMap model = new ModelMap();
+        model.addAttribute("user", u);
+        return new ModelAndView("confirm", model);
+    }
 
     /**
      * Controller method for deleting a given {@link net.objecthunter.larch.model.security.User}
@@ -72,7 +86,7 @@ public class UserController extends AbstractLarchController {
     @RequestMapping(value = "/user", method = RequestMethod.POST, consumes = "multipart/form-data")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public void createUser(@RequestParam("name") final String userName,
+    public String createUser(@RequestParam("name") final String userName,
                            @RequestParam("first_name") final String firstName,
                            @RequestParam("last_name") final String lastName,
                            @RequestParam("email") final String email,
@@ -89,7 +103,8 @@ public class UserController extends AbstractLarchController {
             groupList.add(g);
         }
         u.setGroups(groupList);
-        this.credentialsService.createNewUserRequest(u);
+        UserRequest request = this.credentialsService.createNewUserRequest(u);
+        return "http://localhost:8080/confirm?token=" + request.getToken();
     }
 
     /**

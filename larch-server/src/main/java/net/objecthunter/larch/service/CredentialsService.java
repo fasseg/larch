@@ -17,6 +17,7 @@ package net.objecthunter.larch.service;
 
 import net.objecthunter.larch.model.security.Group;
 import net.objecthunter.larch.model.security.User;
+import net.objecthunter.larch.model.security.UserRequest;
 
 import java.io.IOException;
 import java.util.List;
@@ -38,7 +39,7 @@ public interface CredentialsService {
      * @param u the user for which a new confirmation request should be created
      * @throws IOException
      */
-    void createNewUserRequest(User u) throws IOException;
+    net.objecthunter.larch.model.security.UserRequest createNewUserRequest(User u) throws IOException;
 
     /**
      * Create a new Group in the repository
@@ -131,4 +132,11 @@ public interface CredentialsService {
      * @throws IOException
      */
     List<Group> retrieveGroups() throws IOException;
+
+    /**
+     * Retrieve an existing {@link net.objecthunter.larch.model.security.UserRequest}
+     * @param token the token of the user request
+     * @return the existing {@link net.objecthunter.larch.model.security.UserRequest}
+     */
+    UserRequest retrieveUserRequest(String token) throws IOException;
 }
