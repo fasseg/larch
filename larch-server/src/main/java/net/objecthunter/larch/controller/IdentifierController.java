@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
@@ -48,7 +49,7 @@ public class IdentifierController extends AbstractLarchController {
     /**
      * Controller method for adding a new identifier using a HTTP POST
      * 
-     * @param id
+     * @param entityId
      *            the id of the Entity to which the identifier is added
      * @param type
      *            the type of the identifier
@@ -59,19 +60,19 @@ public class IdentifierController extends AbstractLarchController {
     @RequestMapping(value = "/entity/{id}/identifier", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public void create(@PathVariable("id")
-    final String id, @RequestParam("type")
+    final String entityId, @RequestParam("type")
     final String type, @RequestParam("value")
     final String value) throws IOException {
-        this.entityService.createIdentifier(id, type, value);
-        this.auditService.create(AuditRecords.createIdentifier(id));
-        this.messagingService.publishCreateIdentifier(id, type, value);
+        this.entityService.createIdentifier(entityId, type, value);
+        this.auditService.create(AuditRecords.createIdentifier(entityId));
+        this.messagingService.publishCreateIdentifier(entityId, type, value);
     }
 
     /**
      * Controller method for adding a new identifier using a HTTP POST that redirects to an HTML view of the
      * {@link net.objecthunter.larch.model.Entity}
      * 
-     * @param id
+     * @param entityId
      *            the id of the Entity to which the identifier is added
      * @param type
      *            the type of the identifier
@@ -82,12 +83,60 @@ public class IdentifierController extends AbstractLarchController {
     @RequestMapping(value = "/entity/{id}/identifier", method = RequestMethod.POST, produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
     public String createHtml(@PathVariable("id")
-    final String id, @RequestParam("type")
+    final String entityId, @RequestParam("type")
     final String type, @RequestParam("value")
     final String value) throws IOException {
-        this.entityService.createIdentifier(id, type, value);
-        this.auditService.create(AuditRecords.createIdentifier(id));
-        this.messagingService.publishCreateIdentifier(id, type, value);
-        return "redirect:/entity/" + id;
+        this.entityService.createIdentifier(entityId, type, value);
+        this.auditService.create(AuditRecords.createIdentifier(entityId));
+        this.messagingService.publishCreateIdentifier(entityId, type, value);
+        return "redirect:/entity/" + entityId;
     }
+
+    /**
+     * Controller method to delete an identifier
+     *
+     * @param entityId
+     *            the entity's id
+     * @param type
+     *            the type of the identifier
+     * @param value
+     *            the value of the identifier
+     * @throws IOException
+     */
+    @RequestMapping(value = "/entity/{id}/identifier/{type}/{value}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public void delete(@PathVariable("id")
+    final String entityId, @PathVariable("type")
+    final String type, @PathVariable("value")
+    final String value) throws IOException {
+        this.entityService.deleteIdentifier(entityId, type, value);
+        this.auditService.create(AuditRecords.deleteEntityRecord(entityId));
+        this.messagingService.publishDeleteIdentifier(entityId, type, value);
+    }
+
+    /**
+     * Controller method to delete an identifier
+     *
+     * @param entityId
+     *            the entity's id
+     * @param type
+     *            the type of the identifier
+     * @param value
+     *            the value of the identifier
+     * @throws IOException
+     */
+    @RequestMapping(value = "/entity/{id}/identifier/{type}/{value}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public String deleteHtml(@PathVariable("id")
+    final String entityId, @PathVariable("type")
+    final String type, @PathVariable("value")
+    final String value) throws IOException {
+        this.entityService.deleteIdentifier(entityId, type, value);
+        this.auditService.create(AuditRecords.deleteEntityRecord(entityId));
+        this.messagingService.publishDeleteIdentifier(entityId, type, value);
+        return "redirect:/entity/" + entityId;
+    }
+
 }
