@@ -144,7 +144,7 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
     }
 
     @Override
-    public void createUser(User u) throws IOException {
+    public User createUser(User u) throws IOException {
         if (u.getName() == null) {
             throw new IOException("User name can not be null");
         }
@@ -158,6 +158,7 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
                 .setSource(mapper.writeValueAsBytes(u))
                 .execute()
                 .actionGet();
+        return u;
     }
 
     @Override
@@ -365,5 +366,21 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
                 .execute()
                 .actionGet();
         return mapper.readValue(resp.getSourceAsBytes(), UserRequest.class);
+    }
+
+    @Override
+    public User createUser(final String token, final String password, final String passwordRepeat) throws IOException {
+        if (password == null || password.isEmpty()) {
+            throw new IOException("Password can not be empty");
+        }
+        if (password.length() < 6) {
+            throw new IOException("Password must have six characters at least");
+        }
+        if (!password.equals(passwordRepeat)) {
+            throw new IOException("Passwords do not match");
+        }
+        final UserRequest req = this.retrieveUserRequest(token);
+        req.getUser().setPwhash(DigestUtils.sha256Hex(password));
+        return this.createUser(req.getUser());
     }
 }

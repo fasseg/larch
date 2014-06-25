@@ -19,6 +19,7 @@ import net.objecthunter.larch.model.security.Group;
 import net.objecthunter.larch.model.security.User;
 import net.objecthunter.larch.model.security.UserRequest;
 import net.objecthunter.larch.service.CredentialsService;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -40,9 +41,8 @@ public class UserController extends AbstractLarchController {
 
     /**
      * Controller method for confirming a {@link net.objecthunter.larch.model.security.UserRequest}
-     *
      */
-    @RequestMapping(value="/confirm/{token}", method = RequestMethod.GET)
+    @RequestMapping(value = "/confirm/{token}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public ModelAndView confirmUserRequest(@PathVariable("token") final String token) throws IOException {
         final UserRequest req = this.credentialsService.retrieveUserRequest(token);
@@ -52,14 +52,29 @@ public class UserController extends AbstractLarchController {
     }
 
     /**
-     * Controller method for deleting a given {@link net.objecthunter.larch.model.security.User}
-     *
+     * Controller method for confirming a {@link net.objecthunter.larch.model.security.UserRequest}
      */
-    @RequestMapping(value="/user/{name}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/confirm/{token}", method = RequestMethod.POST, consumes = "multipart/form-data")
+    @ResponseStatus(HttpStatus.OK)
+    public ModelAndView confirmUserRequest(@PathVariable("token") final String token,
+                                           @RequestParam("password") final String password,
+                                           @RequestParam("passwordRepeat") final String passwordRepeat) throws IOException {
+        final User u = this.credentialsService.createUser(token, password, passwordRepeat);
+        final ModelMap model = new ModelMap();
+        model.addAttribute("successMessage", "The user " + u.getName() + " has been created.");
+        return new ModelAndView("success", model);
+
+    }
+
+    /**
+     * Controller method for deleting a given {@link net.objecthunter.larch.model.security.User}
+     */
+    @RequestMapping(value = "/user/{name}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
     public void deleteUser(@PathVariable("name") final String name) throws IOException {
         this.credentialsService.deleteUser(name);
     }
+
     /**
      * Controller method for retrieving a List of existing {@link net.objecthunter.larch.model.security.User}s in the
      * repository as a JSON representation
@@ -76,28 +91,29 @@ public class UserController extends AbstractLarchController {
 
     /**
      * Controller method for creating a new {@link net.objecthunter.larch.model.security.User}
+     *
      * @param userName  the name of the user
      * @param firstName the user's first name
      * @param lastName  the user's last name
-     * @param email the user's mail address
-     * @param groups the user's groups
+     * @param email     the user's mail address
+     * @param groups    the user's groups
      * @throws IOException if the user could not be created
      */
     @RequestMapping(value = "/user", method = RequestMethod.POST, consumes = "multipart/form-data")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public String createUser(@RequestParam("name") final String userName,
-                           @RequestParam("first_name") final String firstName,
-                           @RequestParam("last_name") final String lastName,
-                           @RequestParam("email") final String email,
-                           @RequestParam("groups") final List<String> groups) throws IOException{
+                             @RequestParam("first_name") final String firstName,
+                             @RequestParam("last_name") final String lastName,
+                             @RequestParam("email") final String email,
+                             @RequestParam("groups") final List<String> groups) throws IOException {
         final User u = new User();
         u.setName(userName);
         u.setFirstName(firstName);
         u.setLastName(lastName);
         u.setEmail(email);
         final List<Group> groupList = new ArrayList<>(groups.size());
-        for (String groupName: groups) {
+        for (String groupName : groups) {
             final Group g = new Group();
             g.setName(groupName);
             groupList.add(g);

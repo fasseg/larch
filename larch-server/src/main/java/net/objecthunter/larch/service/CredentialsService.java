@@ -32,7 +32,7 @@ public interface CredentialsService {
      * @param u The user to create
      * @throws IOException
      */
-    void createUser(User u) throws IOException;
+    User createUser(User u) throws IOException;
 
     /**
      * Create a new request to add a user. the user's email address should be employed to send a confirmation link to
@@ -139,4 +139,13 @@ public interface CredentialsService {
      * @return the existing {@link net.objecthunter.larch.model.security.UserRequest}
      */
     UserRequest retrieveUserRequest(String token) throws IOException;
+
+    /**
+     * Create a new {@link net.objecthunter.larch.model.security.User} from an existing {@link net.objecthunter.larch
+     * .model.security.UserRequest} with a given token value
+     * @param token the token value
+     * @param password the password to use
+     * @param passwordRepeat the password repetition to check
+     */
+    User createUser(String token, String password, String passwordRepeat) throws IOException;
 }

@@ -14,14 +14,8 @@
         <div th:include="fragments :: banner" class="title">
         </div>
         <div class="panel clickable">
-            <p class="panel_title">Create password</p>
-            <form th:action="'/confirm/' + ${token}" method="post" enctype="multipart/form-data">
-                <input type="password" name="password" />
-                <input type="password" name="passwordRepeat" />
-                <input type="submit" class="button" />
-            </form>
-        </div>
-        <div class="right">
+            <p class="panel_title">Success</p>
+            <p class="value" th:text="${successMessage}"/>
         </div>
     </div>
 </div>
