@@ -39,15 +39,15 @@ public class UserController extends AbstractLarchController {
     private CredentialsService credentialsService;
 
     /**
-     * Controller method for deleting a given {@link net.objecthunter.larch.model.security.User}
+     * Controller method for confirming a {@link net.objecthunter.larch.model.security.UserRequest}
      *
      */
-    @RequestMapping(value="/confirm", method = RequestMethod.GET)
+    @RequestMapping(value="/confirm/{token}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public ModelAndView confirmUserRequest(@PathVariable("token") final String token) throws IOException {
-        final User u = this.credentialsService.createUserFromRequestToken(token);
+        final UserRequest req = this.credentialsService.retrieveUserRequest(token);
         final ModelMap model = new ModelMap();
-        model.addAttribute("user", u);
+        model.addAttribute("token", token);
         return new ModelAndView("confirm", model);
     }
 
@@ -104,7 +104,7 @@ public class UserController extends AbstractLarchController {
         }
         u.setGroups(groupList);
         UserRequest request = this.credentialsService.createNewUserRequest(u);
-        return "http://localhost:8080/confirm?token=" + request.getToken();
+        return "http://localhost:8080/confirm/" + request.getToken();
     }
 
     /**

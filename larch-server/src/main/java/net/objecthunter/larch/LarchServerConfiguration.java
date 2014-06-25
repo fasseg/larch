@@ -17,6 +17,7 @@ package net.objecthunter.larch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationConfig;
+import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import net.objecthunter.larch.service.*;
 import net.objecthunter.larch.service.elasticsearch.*;
 import net.objecthunter.larch.service.fs.FilesystemBlobstoreService;
@@ -197,7 +198,9 @@ public class LarchServerConfiguration {
     @Bean
     @Primary
     public ObjectMapper objectMapper() {
-        return new ObjectMapper();
+        final ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JSR310Module());
+        return mapper;
     }
 
     /**
