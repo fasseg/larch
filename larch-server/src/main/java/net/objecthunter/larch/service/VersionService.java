@@ -1,8 +1,8 @@
 package net.objecthunter.larch.service;
 
 import java.io.IOException;
-import java.util.List;
 
+import net.objecthunter.larch.model.Entities;
 import net.objecthunter.larch.model.Entity;
 
 /**
@@ -34,8 +34,8 @@ public interface VersionService {
      * 
      * @param id
      *            the id of the entity to retrieve
-     * @return the requested old versions of the entity
+     * @return the requested old versions of the entity as Entities-Object
      */
-    List<Entity> getOldVersions(String id) throws IOException;
+    Entities getOldVersions(String id) throws IOException;
 
 }

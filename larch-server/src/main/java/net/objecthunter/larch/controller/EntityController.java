@@ -17,9 +17,9 @@ package net.objecthunter.larch.controller;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 import net.objecthunter.larch.helpers.AuditRecords;
+import net.objecthunter.larch.model.Entities;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.service.AuditService;
 import net.objecthunter.larch.service.EntityService;
@@ -171,16 +171,16 @@ public class EntityController extends AbstractLarchController {
      *
      * @param id
      *            the {@link net.objecthunter.larch.model.Entity}'s id
-     * @return An Entity object which gets transformed into a JSON response by Spring MVC
+     * @return An Entities object which gets transformed into a JSON response by Spring MVC
      * @throws IOException
      */
     @RequestMapping("/{id}/versions")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public List<Entity> retrieveVersions(@PathVariable("id")
+    public Entities retrieveVersions(@PathVariable("id")
     final String id) throws IOException {
-        List<Entity> entities = versionService.getOldVersions(id);
-        entities.add(0, entityService.retrieve(id));
+        Entities entities = versionService.getOldVersions(id);
+        entities.getEntities().add(0, entityService.retrieve(id));
         return entities;
     }
 
@@ -198,8 +198,8 @@ public class EntityController extends AbstractLarchController {
     public ModelAndView retrieveVersionsHtml(@PathVariable("id")
     final String id) throws IOException {
         final ModelMap model = new ModelMap();
-        List<Entity> entities = versionService.getOldVersions(id);
-        entities.add(0, entityService.retrieve(id));
+        Entities entities = versionService.getOldVersions(id);
+        entities.getEntities().add(0, entityService.retrieve(id));
         model.addAttribute("entities", entities);
         return new ModelAndView("versions", model);
     }

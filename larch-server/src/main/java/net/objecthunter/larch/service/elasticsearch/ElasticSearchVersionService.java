@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import net.objecthunter.larch.model.Entities;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.Version;
 import net.objecthunter.larch.service.BlobstoreService;
@@ -95,20 +96,22 @@ public class ElasticSearchVersionService implements VersionService {
     }
 
     @Override
-    public List<Entity> getOldVersions(String id) throws IOException {
+    public Entities getOldVersions(String id) throws IOException {
         final SearchResponse resp =
             client
                 .prepareSearch(INDEX_VERSIONS)
-                .setQuery(QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("entityId", id)))
+                .setQuery(QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("entityId", id))).setSize(1000)
                 .addSort("versionNumber", SortOrder.DESC).execute().actionGet();
-        final List<Entity> entities = new ArrayList<>();
+        final List<Entity> entities = new ArrayList<Entity>();
         for (final SearchHit hit : resp.getHits()) {
             final Version v = this.mapper.readValue(hit.getSourceAsString(), Version.class);
             final Entity e =
                 this.mapper.readValue(this.blobstoreService.retrieveOldVersionBlob(v.getPath()), Entity.class);
             entities.add(e);
         }
-        return entities;
+        Entities entit = new Entities();
+        entit.setEntities(entities);
+        return entit;
     }
 
 }
