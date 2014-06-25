@@ -15,8 +15,10 @@
 */
 package net.objecthunter.larch.service;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import net.objecthunter.larch.model.security.Group;
 import net.objecthunter.larch.model.security.User;
+import net.objecthunter.larch.model.security.UserRequest;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,7 +33,14 @@ public interface CredentialsService {
      * @param u The user to create
      * @throws IOException
      */
-    void createUser(User u) throws IOException;
+    User createUser(User u) throws IOException;
+
+    /**
+     * Create a new request to add a user. the user's email address should be employed to send a confirmation link to
+     * @param u the user for which a new confirmation request should be created
+     * @throws IOException
+     */
+    net.objecthunter.larch.model.security.UserRequest createNewUserRequest(User u) throws IOException;
 
     /**
      * Create a new Group in the repository
@@ -124,4 +133,40 @@ public interface CredentialsService {
      * @throws IOException
      */
     List<Group> retrieveGroups() throws IOException;
+
+    /**
+     * Retrieve an existing {@link net.objecthunter.larch.model.security.UserRequest}
+     * @param token the token of the user request
+     * @return the existing {@link net.objecthunter.larch.model.security.UserRequest}
+     */
+    UserRequest retrieveUserRequest(String token) throws IOException;
+
+    /**
+     * Create a new {@link net.objecthunter.larch.model.security.User} from an existing {@link net.objecthunter.larch
+     * .model.security.UserRequest} with a given token value
+     * @param token the token value
+     * @param password the password to use
+     * @param passwordRepeat the password repetition to check
+     */
+    User createUser(String token, String password, String passwordRepeat) throws IOException;
+
+    /**
+     * Delete a {@link net.objecthunter.larch.model.security.UserRequest} record
+     * @param token the token value of the {@link net.objecthunter.larch.model.security.UserRequest}
+     */
+    void deleteUserRequest(String token);
+
+    /**
+     * Check if a user name is already existing in the index
+     * @param name the name to check
+     * @return true if the user does exist, otherwise false
+     */
+    boolean isExistingUser(String name);
+
+    /**
+     * Retrieve a list of groups from the repo
+     * @param groupNames the names of the groups to retrieve
+     * @return a List containing the corresponding {@link net.objecthunter.larch.model.security.Group} instances
+     */
+    List<Group> retrieveGroups(List<String> groupNames) throws IOException;
 }

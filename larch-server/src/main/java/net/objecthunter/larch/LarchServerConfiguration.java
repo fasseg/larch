@@ -17,13 +17,11 @@ package net.objecthunter.larch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationConfig;
+import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import net.objecthunter.larch.service.*;
 import net.objecthunter.larch.service.elasticsearch.*;
 import net.objecthunter.larch.service.fs.FilesystemBlobstoreService;
-import net.objecthunter.larch.service.impl.DefaultEntityService;
-import net.objecthunter.larch.service.impl.DefaultExportService;
-import net.objecthunter.larch.service.impl.DefaultMessagingService;
-import net.objecthunter.larch.service.impl.DefaultRepositoryService;
+import net.objecthunter.larch.service.impl.*;
 import net.objecthunter.larch.service.weedfs.WeedFSBlobstoreService;
 import net.objecthunter.larch.service.weedfs.WeedFsMaster;
 import net.objecthunter.larch.service.weedfs.WeedFsVolume;
@@ -116,6 +114,10 @@ public class LarchServerConfiguration {
         return new ElasticSearchPublishService();
     }
 
+    @Bean
+    public MailService mailService() {
+        return new DefaultMailService();
+    }
     /**
      * Get a ElasticSearch {@link org.elasticsearch.client.Client} Spring bean
      *
@@ -196,7 +198,9 @@ public class LarchServerConfiguration {
     @Bean
     @Primary
     public ObjectMapper objectMapper() {
-        return new ObjectMapper();
+        final ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JSR310Module());
+        return mapper;
     }
 
     /**
