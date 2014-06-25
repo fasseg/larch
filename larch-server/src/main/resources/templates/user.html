@@ -11,14 +11,16 @@
     <div th:include="fragments :: left" class="left">
     </div>
     <div class="main">
-        <div th:include="fragments :: banner" class="title">
+        <div class="panel clickable">
+            <div th:include="fragments :: banner" class="title">
+            </div>
+            <p class="panel_title" th:text="${user.name}"></p>
+            <p class="property">First name</p><p class="value" th:text="${user.firstName}"></p>
+            <p class="property">Last name</p><p class="value" th:text="${user.lastName}"></p>
+            <p class="property">Email</p><p class="value" th:text="${user.email}"></p>
+            <p class="property">Groups</p>
+            <p class="value" th:each="group : ${user.groups}" th:text="${group.name}"></p>
         </div>
-        <p class="panel_title" th:text="${user.name}"></p>
-        <p class="property">First name</p><p class="value" th:text="${user.firstName}"></p>
-        <p class="property">Last name</p><p class="value" th:text="${user.lastName}"></p>
-        <p class="property">Email</p><p class="value" th:text="${user.email}"></p>
-        <p class="property">Groups</p>
-        <p class="value" th:each="group : ${user.groups}" th:text="${group.name}"></p>
     </div>
 </div>
 

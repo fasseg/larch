@@ -46,6 +46,10 @@ function deleteUser(name) {
     });
 }
 
+function openUser(name) {
+    document.location.href = '/user/' + name;
+}
+
 function edit(td, name) {
     var currentValue = $(td).html();
     $(td).unbind('click');
