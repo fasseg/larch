@@ -15,6 +15,7 @@
 */
 package net.objecthunter.larch.service.elasticsearch;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.objecthunter.larch.model.security.Group;
 import net.objecthunter.larch.model.security.User;
@@ -28,6 +29,7 @@ import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -413,5 +415,19 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
                 .execute()
                 .actionGet()
                 .isExists();
+    }
+
+    @Override
+    public List<Group> retrieveGroups(List<String> groupNames) throws IOException {
+        final SearchResponse resp = this.client.prepareSearch(INDEX_GROUPS)
+                .setQuery(QueryBuilders.idsQuery()
+                        .ids(groupNames.toArray(new String[groupNames.size()])))
+                .execute()
+                .actionGet();
+        final List<Group> groups = new ArrayList<>(resp.getHits().getHits().length);
+        for (SearchHit hit : resp.getHits()) {
+            groups.add(mapper.readValue(hit.getSourceAsString(), Group.class));
+        }
+        return groups;
     }
 }

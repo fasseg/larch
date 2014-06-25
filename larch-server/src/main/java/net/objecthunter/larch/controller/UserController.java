@@ -19,7 +19,6 @@ import net.objecthunter.larch.model.security.Group;
 import net.objecthunter.larch.model.security.User;
 import net.objecthunter.larch.model.security.UserRequest;
 import net.objecthunter.larch.service.CredentialsService;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -61,9 +60,7 @@ public class UserController extends AbstractLarchController {
                                            @RequestParam("passwordRepeat") final String passwordRepeat) throws IOException {
         final User u = this.credentialsService.createUser(token, password, passwordRepeat);
         final ModelMap model = new ModelMap();
-        model.addAttribute("successMessage", "The user " + u.getName() + " has been created.");
-        return new ModelAndView("success", model);
-
+        return success("The user " + u.getName() + " has been created.");
     }
 
     /**
@@ -183,6 +180,23 @@ public class UserController extends AbstractLarchController {
     @ResponseBody
     public List<Group> retrieveGroups() throws IOException {
         return credentialsService.retrieveGroups();
+    }
+
+    @RequestMapping(value = "/user/{name}", method = RequestMethod.POST, consumes = "multipart/form-data")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public ModelAndView updateUserDetails(@PathVariable("name") final String username,
+                                          @RequestParam("firstName") final String firstName,
+                                          @RequestParam("lastName") final String lastName,
+                                          @RequestParam("email") final String email,
+                                          @RequestParam("groups") final List<String> groupNames) throws IOException {
+        final User u = this.credentialsService.retrieveUser(username);
+        u.setLastName(lastName);
+        u.setFirstName(firstName);
+        u.setEmail(email);
+        u.setGroups(this.credentialsService.retrieveGroups(groupNames));
+        this.credentialsService.updateUser(u);
+        return success("The user " + username + " has been updated");
     }
 
 

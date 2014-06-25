@@ -15,6 +15,7 @@
 */
 package net.objecthunter.larch.service;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import net.objecthunter.larch.model.security.Group;
 import net.objecthunter.larch.model.security.User;
 import net.objecthunter.larch.model.security.UserRequest;
@@ -161,4 +162,11 @@ public interface CredentialsService {
      * @return true if the user does exist, otherwise false
      */
     boolean isExistingUser(String name);
+
+    /**
+     * Retrieve a list of groups from the repo
+     * @param groupNames the names of the groups to retrieve
+     * @return a List containing the corresponding {@link net.objecthunter.larch.model.security.Group} instances
+     */
+    List<Group> retrieveGroups(List<String> groupNames) throws IOException;
 }

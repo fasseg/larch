@@ -15,9 +15,9 @@
         </div>
         <div class="panel clickable">
             <p class="panel_title" th:text="${user.name}"></p>
-            <form method="POST" action="'/">
-                <input type="text" name="first_name" th:value="${user.firstName}"/>
-                <input type="text" name="last_name"  th:value="${user.lastName}"/>
+            <form method="POST" th:action="'/user/' + ${user.name}" enctype="multipart/form-data">
+                <input type="text" name="firstName" th:value="${user.firstName}"/>
+                <input type="text" name="lastName"  th:value="${user.lastName}"/>
                 <input type="text" name="email" th:value="${user.email}"/>
                 <select name="groups" multiple="multiple" size="3">
                     <option th:each="group : ${groups}" th:name="${group.name}" th:text="${group.name}"
