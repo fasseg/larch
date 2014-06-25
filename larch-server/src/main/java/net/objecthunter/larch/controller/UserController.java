@@ -49,6 +49,7 @@ public class UserController extends AbstractLarchController {
     /**
      * Controller method for retrieving a List of existing {@link net.objecthunter.larch.model.security.User}s in the
      * repository as a JSON representation
+     *
      * @return A JSON representation of the user list
      * @throws IOException
      */
@@ -90,8 +91,41 @@ public class UserController extends AbstractLarchController {
         u.setGroups(groupList);
         this.credentialsService.createNewUserRequest(u);
     }
+
+    /**
+     * Controller method for retrieving an existing {@link net.objecthunter.larch.model.security.User}s in the
+     * repository as a JSON representation
+     *
+     * @return A JSON representation of the user
+     * @throws IOException
+     */
+    @RequestMapping(value = "/user/{name}", method = RequestMethod.GET, produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public User retrieveUser(@PathVariable("name") final String name) throws IOException {
+        return credentialsService.retrieveUser(name);
+    }
+
+    /**
+     * Controller method for retrieving an existing {@link net.objecthunter.larch.model.security.User}s in the
+     * repository as a JSON representation
+     *
+     * @param name The user's name
+     * @return A JSON representation of the user
+     * @throws IOException
+     */
+    @RequestMapping(value = "/user/{name}", method = RequestMethod.GET, produces = "text/html")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public ModelAndView retrieveUserHtml(@PathVariable("name") final String name) throws IOException {
+        final ModelMap model = new ModelMap();
+        model.addAttribute("user", credentialsService.retrieveUser(name));
+        return new ModelAndView("user", model);
+    }
+
     /**
      * Controller method for retrieving a HTML view via HTTP GET of all Users and Groups in the repository
+     *
      * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} used for redering the HTML view
      * @throws IOException
      */
@@ -118,7 +152,6 @@ public class UserController extends AbstractLarchController {
     public List<Group> retrieveGroups() throws IOException {
         return credentialsService.retrieveGroups();
     }
-
 
 
 }
