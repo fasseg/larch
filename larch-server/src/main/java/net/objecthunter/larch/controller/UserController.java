@@ -120,6 +120,7 @@ public class UserController extends AbstractLarchController {
     public ModelAndView retrieveUserHtml(@PathVariable("name") final String name) throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("user", credentialsService.retrieveUser(name));
+        model.addAttribute("groups", credentialsService.retrieveGroups());
         return new ModelAndView("user", model);
     }
 

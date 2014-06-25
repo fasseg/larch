@@ -15,11 +15,15 @@
         </div>
         <div class="panel clickable">
             <p class="panel_title" th:text="${user.name}"></p>
-            <p class="property">First name</p><p class="value" th:text="${user.firstName}"></p>
-            <p class="property">Last name</p><p class="value" th:text="${user.lastName}"></p>
-            <p class="property">Email</p><p class="value" th:text="${user.email}"></p>
-            <p class="property">Groups</p>
-            <p class="value" th:each="group : ${user.groups}" th:text="${group.name}"></p>
+            <form method="POST" action="'/">
+                <input type="text" name="first_name" th:value="${user.firstName}"/>
+                <input type="text" name="last_name"  th:value="${user.lastName}"/>
+                <input type="text" name="email" th:value="${user.email}"/>
+                <select name="groups" multiple="multiple" size="3">
+                    <option th:each="group : ${groups}" th:name="${group.name}" th:text="${group.name}"></option>
+                </select>
+                <input type="submit" class="button" />
+            </form>
         </div>
     </div>
 </div>
