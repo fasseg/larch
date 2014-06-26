@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.service.weedfs;
+package net.objecthunter.larch.service.backend.weedfs;
 
 import net.objecthunter.larch.helpers.InputStreamLoggerTask;
 import org.slf4j.Logger;
