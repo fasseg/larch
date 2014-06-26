@@ -49,9 +49,8 @@ import net.objecthunter.larch.service.backend.BackendBlobstoreService;
 import net.objecthunter.larch.service.backend.BackendEntityService;
 import net.objecthunter.larch.service.backend.BackendPublishService;
 import net.objecthunter.larch.service.backend.BackendSchemaService;
-import net.objecthunter.larch.service.backend.BackendSearchService;
 import net.objecthunter.larch.service.backend.BackendVersionService;
-import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchSearchService.EntitiesSearchField;
+import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchEntityService.EntitiesSearchField;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -95,9 +94,6 @@ public class DefaultEntityService implements EntityService {
 
     @Autowired
     private BackendSchemaService backendSchemaService;
-
-    @Autowired
-    private BackendSearchService backendSearchService;
 
     @Autowired
     private Environment env;
@@ -491,17 +487,17 @@ public class DefaultEntityService implements EntityService {
 
     @Override
     public SearchResult scanIndex(int offset) {
-        return backendSearchService.scanIndex(offset);
+        return backendEntityService.scanIndex(offset);
     }
 
     @Override
     public SearchResult scanIndex(int offset, int numRecords) {
-        return backendSearchService.scanIndex(offset, numRecords);
+        return backendEntityService.scanIndex(offset, numRecords);
     }
 
     @Override
     public SearchResult searchEntities(Map<EntitiesSearchField, String[]> searchFields) {
-        return backendSearchService.searchEntities(searchFields);
+        return backendEntityService.searchEntities(searchFields);
     }
 
     @Override

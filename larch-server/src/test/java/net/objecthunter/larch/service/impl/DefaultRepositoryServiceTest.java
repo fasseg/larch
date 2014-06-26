@@ -70,8 +70,8 @@ public class DefaultRepositoryServiceTest {
         mockAdminClient = createMock(AdminClient.class);
         mockClusterAdminClient = createMock(ClusterAdminClient.class);
         ReflectionTestUtils.setField(repositoryService, "client", mockClient);
-        ReflectionTestUtils.setField(repositoryService, "blobstoreService", mockBlobstoreService);
-        ReflectionTestUtils.setField(repositoryService, "entitiesService", mockEntitiesService);
+        ReflectionTestUtils.setField(repositoryService, "backendBlobstoreService", mockBlobstoreService);
+        ReflectionTestUtils.setField(repositoryService, "backendEntityService", mockEntitiesService);
         ReflectionTestUtils.setField(repositoryService, "env", mockEnv);
     }
 

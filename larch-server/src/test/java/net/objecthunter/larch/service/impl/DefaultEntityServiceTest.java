@@ -58,10 +58,10 @@ public class DefaultEntityServiceTest {
         mockExportService = createMock(ExportService.class);
         mockVersionService = createMock(BackendVersionService.class);
         ReflectionTestUtils.setField(entityService, "mapper", new ObjectMapper());
-        ReflectionTestUtils.setField(entityService, "entitiesService", mockEntitiesService);
+        ReflectionTestUtils.setField(entityService, "backendEntityService", mockEntitiesService);
         ReflectionTestUtils.setField(entityService, "exportService", mockExportService);
-        ReflectionTestUtils.setField(entityService, "blobstoreService", mockBlobstoreService);
-        ReflectionTestUtils.setField(entityService, "versionService", mockVersionService);
+        ReflectionTestUtils.setField(entityService, "backendBlobstoreService", mockBlobstoreService);
+        ReflectionTestUtils.setField(entityService, "backendVersionService", mockVersionService);
     }
 
     @Test

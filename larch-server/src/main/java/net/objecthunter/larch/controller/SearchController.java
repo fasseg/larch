@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import net.objecthunter.larch.model.SearchResult;
 import net.objecthunter.larch.service.EntityService;
-import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchSearchService.EntitiesSearchField;
+import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchEntityService.EntitiesSearchField;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

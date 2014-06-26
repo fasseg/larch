@@ -24,7 +24,7 @@ import net.objecthunter.larch.model.AuditRecord;
 import net.objecthunter.larch.model.Entities;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.SearchResult;
-import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchSearchService.EntitiesSearchField;
+import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchEntityService.EntitiesSearchField;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

@@ -29,7 +29,6 @@ import net.objecthunter.larch.service.backend.BackendAuditService;
 import net.objecthunter.larch.service.backend.BackendEntityService;
 import net.objecthunter.larch.service.backend.BackendPublishService;
 import net.objecthunter.larch.service.backend.BackendSchemaService;
-import net.objecthunter.larch.service.backend.BackendSearchService;
 import net.objecthunter.larch.service.backend.BackendVersionService;
 import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchAuditService;
 import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchCredentialsService;
@@ -37,7 +36,6 @@ import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchEntityS
 import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchNode;
 import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchPublishService;
 import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchSchemaService;
-import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchSearchService;
 import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchVersionService;
 import net.objecthunter.larch.service.backend.fs.FilesystemBlobstoreService;
 import net.objecthunter.larch.service.impl.DefaultEntityService;
@@ -177,16 +175,6 @@ public class LarchServerConfiguration {
     @Bean
     public BackendPublishService backendPublishService() {
         return new ElasticSearchPublishService();
-    }
-
-    /**
-     * Get a {@link net.objecthunter.larch.service.backend.BackendSearchService} Spring bean
-     *
-     * @return a {@link net.objecthunter.larch.service.backend.BackendSearchService} implementation
-     */
-    @Bean
-    public BackendSearchService backendSearchService() {
-        return new ElasticSearchSearchService();
     }
 
     /**

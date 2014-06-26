@@ -1,6 +1,12 @@
 package net.objecthunter.larch.service.elasticsearch;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+
+import java.io.ByteArrayInputStream;
 
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.Version;
@@ -22,27 +28,28 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import javax.annotation.PostConstruct;
-
-import java.io.ByteArrayInputStream;
-
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ElasticSearchVersionServiceTest {
 
     private Client mockClient = createMock(Client.class);
+
     private AdminClient mockAdminClient = createMock(AdminClient.class);
+
     private IndicesAdminClient mockIndicesAdminClient = createMock(IndicesAdminClient.class);
+
     private BackendBlobstoreService mockBlobstoreService = createMock(BackendBlobstoreService.class);
+
     private ElasticSearchVersionService versionService = new ElasticSearchVersionService();
+
     private ListenableActionFuture mockFuture = createMock(ListenableActionFuture.class);
+
     private ObjectMapper mapper = new ObjectMapper();
 
     @Before
     public void setup() {
         ReflectionTestUtils.setField(versionService, "client", mockClient);
-        ReflectionTestUtils.setField(versionService, "blobstoreService", mockBlobstoreService);
+        ReflectionTestUtils.setField(versionService, "backendBlobstoreService", mockBlobstoreService);
         ReflectionTestUtils.setField(versionService, "mapper", mapper);
     }
 
@@ -54,8 +61,9 @@ public class ElasticSearchVersionServiceTest {
         expect(mockBlobstoreService.createOldVersionBlob(anyObject(Entity.class))).andReturn("bar");
 
         /* index */
-        expect(mockClient.prepareIndex(ElasticSearchVersionService.INDEX_VERSIONS, ElasticSearchVersionService.TYPE_VERSIONS))
-                .andReturn(mockIndexRequestBuilder);
+        expect(
+            mockClient.prepareIndex(ElasticSearchVersionService.INDEX_VERSIONS,
+                ElasticSearchVersionService.TYPE_VERSIONS)).andReturn(mockIndexRequestBuilder);
         expect(mockIndexRequestBuilder.setSource((byte[]) anyObject())).andReturn(mockIndexRequestBuilder);
         expect(mockIndexRequestBuilder.execute()).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(null);
@@ -66,9 +74,11 @@ public class ElasticSearchVersionServiceTest {
         expect(mockIndicesAdminClient.refresh(anyObject())).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(null);
 
-        replay(mockIndexRequestBuilder, mockClient, mockAdminClient, mockIndicesAdminClient, mockBlobstoreService, mockFuture);
+        replay(mockIndexRequestBuilder, mockClient, mockAdminClient, mockIndicesAdminClient, mockBlobstoreService,
+            mockFuture);
         this.versionService.addOldVersion(Fixtures.createEntity());
-        verify(mockIndexRequestBuilder, mockClient, mockAdminClient, mockIndicesAdminClient, mockBlobstoreService, mockFuture);
+        verify(mockIndexRequestBuilder, mockClient, mockAdminClient, mockIndicesAdminClient, mockBlobstoreService,
+            mockFuture);
     }
 
     @SuppressWarnings("unchecked")
@@ -85,7 +95,7 @@ public class ElasticSearchVersionServiceTest {
         v.setPath("bar");
 
         expect(mockClient.prepareSearch(ElasticSearchVersionService.INDEX_VERSIONS))
-                .andReturn(mockSearchRequestBuilder);
+            .andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setQuery(anyObject(QueryBuilder.class))).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setFrom(0)).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setSize(1)).andReturn(mockSearchRequestBuilder);
@@ -95,10 +105,13 @@ public class ElasticSearchVersionServiceTest {
         expect(mockSearchHits.getTotalHits()).andReturn(1l);
         expect(mockSearchHits.getAt(0)).andReturn(mockHit);
         expect(mockHit.getSourceAsString()).andReturn(mapper.writeValueAsString(v));
-        expect(mockBlobstoreService.retrieveOldVersionBlob(v.getPath())).andReturn(new ByteArrayInputStream("{}".getBytes()));
+        expect(mockBlobstoreService.retrieveOldVersionBlob(v.getPath())).andReturn(
+            new ByteArrayInputStream("{}".getBytes()));
 
-        replay(mockClient, mockSearchHits, mockSearchRequestBuilder, mockSearchResponse, mockAdminClient, mockIndicesAdminClient, mockBlobstoreService, mockHit, mockFuture);
+        replay(mockClient, mockSearchHits, mockSearchRequestBuilder, mockSearchResponse, mockAdminClient,
+            mockIndicesAdminClient, mockBlobstoreService, mockHit, mockFuture);
         this.versionService.getOldVersion("foo", 1);
-        verify(mockClient, mockSearchHits, mockSearchRequestBuilder, mockSearchResponse, mockAdminClient, mockIndicesAdminClient, mockBlobstoreService, mockHit, mockFuture);
+        verify(mockClient, mockSearchHits, mockSearchRequestBuilder, mockSearchResponse, mockAdminClient,
+            mockIndicesAdminClient, mockBlobstoreService, mockHit, mockFuture);
     }
 }
