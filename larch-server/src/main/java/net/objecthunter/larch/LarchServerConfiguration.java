@@ -18,14 +18,22 @@ package net.objecthunter.larch;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
+
 import net.objecthunter.larch.service.*;
-import net.objecthunter.larch.service.elasticsearch.*;
-import net.objecthunter.larch.service.fs.FilesystemBlobstoreService;
+import net.objecthunter.larch.service.backend.BackendAuditService;
+import net.objecthunter.larch.service.backend.BackendEntityService;
+import net.objecthunter.larch.service.backend.BackendPublishService;
+import net.objecthunter.larch.service.backend.BackendSchemaService;
+import net.objecthunter.larch.service.backend.BackendSearchService;
+import net.objecthunter.larch.service.backend.BackendVersionService;
+import net.objecthunter.larch.service.backend.elasticsearch.*;
+import net.objecthunter.larch.service.backend.fs.FilesystemBlobstoreService;
 import net.objecthunter.larch.service.impl.*;
 import net.objecthunter.larch.service.weedfs.WeedFSBlobstoreService;
 import net.objecthunter.larch.service.weedfs.WeedFsMaster;
 import net.objecthunter.larch.service.weedfs.WeedFsVolume;
 import net.objecthunter.larch.util.FileSystemUtil;
+
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.command.ActiveMQQueue;
@@ -40,6 +48,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.jms.Queue;
+
 import java.io.File;
 
 /**
@@ -55,29 +64,29 @@ public class LarchServerConfiguration {
     public Environment env;
 
     /**
-     * Get a {@link net.objecthunter.larch.service.AuditService} Spring bean
+     * Get a {@link net.objecthunter.larch.service.backend.BackendAuditService} Spring bean
      *
-     * @return the {@link net.objecthunter.larch.service.AuditService} implementation
+     * @return the {@link net.objecthunter.larch.service.backend.BackendAuditService} implementation
      */
     @Bean
-    public AuditService auditService() {
+    public BackendAuditService backendAuditService() {
         return new ElasticSearchAuditService();
     }
 
     /**
-     * Get a {@link net.objecthunter.larch.service.SchemaService} Spring bean
+     * Get a {@link net.objecthunter.larch.service.backend.BackendSchemaService} Spring bean
      *
-     * @return the {@link net.objecthunter.larch.service.SchemaService} implementation
+     * @return the {@link net.objecthunter.larch.service.backend.BackendSchemaService} implementation
      */
     @Bean
-    public SchemaService schemaService() {
+    public BackendSchemaService backendSchemaService() {
         return new ElasticSearchSchemaService();
     }
 
     /**
      * Get a {@link net.objecthunter.larch.service.impl.DefaultEntityService} Spring bean
      *
-     * @return the {@link net.objecthunter.larch.service.SchemaService} implementation
+     * @return the {@link net.objecthunter.larch.service.backend.BackendSchemaService} implementation
      */
     @Bean
     public EntityService defaultEntityService() {
@@ -95,22 +104,22 @@ public class LarchServerConfiguration {
     }
 
     /**
-     * Get a {@link net.objecthunter.larch.service.SearchService} implementation Spring bean
+     * Get a {@link net.objecthunter.larch.service.backend.BackendSearchService} implementation Spring bean
      *
-     * @return a {@link net.objecthunter.larch.service.elasticsearch.ElasticSearchSearchService} implementation
+     * @return a {@link net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchSearchService} implementation
      */
     @Bean
-    public IndexService elasticSearchIndexService() {
-        return new ElasticSearchIndexService();
+    public BackendEntityService elasticSearchIndexService() {
+        return new ElasticSearchEntityService();
     }
 
     /**
-     * Get a {@link net.objecthunter.larch.service.PublishService} implementation Spring bean
+     * Get a {@link net.objecthunter.larch.service.backend.BackendPublishService} implementation Spring bean
      *
-     * @return a {@link net.objecthunter.larch.service.PublishService} implementation
+     * @return a {@link net.objecthunter.larch.service.backend.BackendPublishService} implementation
      */
     @Bean
-    public PublishService publishService() {
+    public BackendPublishService backendPublishService() {
         return new ElasticSearchPublishService();
     }
 
@@ -129,10 +138,10 @@ public class LarchServerConfiguration {
     }
 
     /**
-     * Get {@link net.objecthunter.larch.service.elasticsearch.ElasticSearchNode} Spring bean responsible for
+     * Get {@link net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchNode} Spring bean responsible for
      * starting and stopping the ElasticSearch services
      *
-     * @return the {@link net.objecthunter.larch.service.elasticsearch.ElasticSearchNode} object
+     * @return the {@link net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchNode} object
      */
     @Bean
     public ElasticSearchNode elasticSearchNode() {
@@ -140,10 +149,9 @@ public class LarchServerConfiguration {
     }
 
     /**
-     * Get a {@link net.objecthunter.larch.service.fs.FilesystemBlobstoreService} implementation for usage as a {@link net
-     * .objecthunter.larch.service.BlobstoreService} in the repository
+     * Get a {@link net.objecthunter.larch.service.backend.fs.FilesystemBlobstoreService} implementation for usage as a {@link net.objecthunter.larch.service.backend.BackendBlobstoreService} in the repository
      *
-     * @return the {@link net.objecthunter.larch.service.fs.FilesystemBlobstoreService} implementation
+     * @return the {@link net.objecthunter.larch.service.backend.fs.FilesystemBlobstoreService} implementation
      */
     @Bean
     @Profile("fs")
@@ -178,8 +186,7 @@ public class LarchServerConfiguration {
     }
 
     /**
-     * Get a {@link net.objecthunter.larch.service.weedfs.WeedFSBlobstoreService} implementation as the {@link net
-     * .objecthunter.larch.service.BlobstoreService} fro the repository
+     * Get a {@link net.objecthunter.larch.service.weedfs.WeedFSBlobstoreService} implementation as the {@link net.objecthunter.larch.service.backend.BackendBlobstoreService} fro the repository
      *
      * @return the {@link net.objecthunter.larch.service.weedfs.WeedFSBlobstoreService} object
      */
@@ -224,12 +231,12 @@ public class LarchServerConfiguration {
     }
 
     /**
-     * Get a {@link net.objecthunter.larch.service.SearchService} Spring bean
+     * Get a {@link net.objecthunter.larch.service.backend.BackendSearchService} Spring bean
      *
-     * @return a {@link net.objecthunter.larch.service.SearchService} implementation
+     * @return a {@link net.objecthunter.larch.service.backend.BackendSearchService} implementation
      */
     @Bean
-    public SearchService searchService() {
+    public BackendSearchService backendSearchService() {
         return new ElasticSearchSearchService();
     }
 
@@ -245,12 +252,12 @@ public class LarchServerConfiguration {
     }
 
     /**
-     * Get a  {@link net.objecthunter.larch.service.VersionService} Spring bean
+     * Get a  {@link net.objecthunter.larch.service.backend.BackendVersionService} Spring bean
      *
-     * @return a VersionService implementation
+     * @return a BackendVersionService implementation
      */
     @Bean
-    public VersionService versionService() {
+    public BackendVersionService backendVersionService() {
         return new ElasticSearchVersionService();
     }
 
@@ -266,9 +273,9 @@ public class LarchServerConfiguration {
     }
 
     /**
-     * Get a {@link net.objecthunter.larch.service.CredentialsService} implementation for use by the repository
+     * Get a {@link net.objecthunter.larch.service.backend.BackendCredentialsService} implementation for use by the repository
      *
-     * @return a {@link net.objecthunter.larch.service.CredentialsService} implementation
+     * @return a {@link net.objecthunter.larch.service.backend.BackendCredentialsService} implementation
      */
     @Bean
     @Order(Ordered.LOWEST_PRECEDENCE - 9)

@@ -1,22 +1,23 @@
 /* 
-* Copyright 2014 Frank Asseg
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License. 
-*/
+ * Copyright 2014 Frank Asseg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
 package net.objecthunter.larch.controller;
 
 import net.objecthunter.larch.model.SearchResult;
-import net.objecthunter.larch.service.SearchService;
+import net.objecthunter.larch.service.EntityService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -32,14 +33,15 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/list")
 public class ListController extends AbstractLarchController {
     @Autowired
-    private SearchService searchService;
+    private EntityService entityService;
 
     /**
-     * Controller method for a retrieving a HTML view using a HTTP GET containing a list of {@link net.objecthunter
-     * .larch.model.Entity}s
+     * Controller method for a retrieving a HTML view using a HTTP GET containing a list of
+     * {@link net.objecthunter .larch.model.Entity}s
+     * 
      * @return a Spring MVC {@link org.springframework.web.servlet.ModelAndView} for rendering the HTML view
      */
-    @RequestMapping(method = RequestMethod.GET, produces = {"text/html"})
+    @RequestMapping(method = RequestMethod.GET, produces = { "text/html" })
     @ResponseBody
     public ModelAndView listHtml() {
         final ModelMap model = new ModelMap();
@@ -48,15 +50,15 @@ public class ListController extends AbstractLarchController {
     }
 
     /**
-     * Controller method to receive a JSON representation using an HTTP GET of a {@link net.objecthunter.larch.model
-     * .SearchResult} object
+     * Controller method to receive a JSON representation using an HTTP GET of a
+     * {@link net.objecthunter.larch.model .SearchResult} object
+     * 
      * @return A SearchResult containing the Entities
      */
-    @RequestMapping(method = RequestMethod.GET, produces = {"application/json", "application/xml", "text/xml"})
+    @RequestMapping(method = RequestMethod.GET, produces = { "application/json", "application/xml", "text/xml" })
     @ResponseBody
     public SearchResult list() {
-        return searchService.scanIndex(0);
+        return entityService.scanIndex(0);
     }
-
 
 }

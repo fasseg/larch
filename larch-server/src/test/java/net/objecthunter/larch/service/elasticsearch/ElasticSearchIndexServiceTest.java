@@ -16,9 +16,12 @@
 package net.objecthunter.larch.service.elasticsearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.state.IndexState;
+import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchEntityService;
 import net.objecthunter.larch.test.util.Fixtures;
+
 import org.elasticsearch.action.ListenableActionFuture;
 import org.elasticsearch.action.admin.indices.stats.IndicesStatsResponse;
 import org.elasticsearch.action.admin.indices.status.*;
@@ -50,7 +53,7 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.assertTrue;
 
 public class ElasticSearchIndexServiceTest {
-    private ElasticSearchIndexService indexService;
+    private ElasticSearchEntityService indexService;
     private Client mockClient;
     private AdminClient mockAdminClient;
     private IndicesAdminClient mockIndicesAdminClient;
@@ -61,7 +64,7 @@ public class ElasticSearchIndexServiceTest {
         mockClient = createMock(Client.class);
         mockAdminClient = createMock(AdminClient.class);
         mockIndicesAdminClient = createMock(IndicesAdminClient.class);
-        indexService = new ElasticSearchIndexService();
+        indexService = new ElasticSearchEntityService();
         ReflectionTestUtils.setField(indexService, "mapper", mapper);
         ReflectionTestUtils.setField(indexService, "client", mockClient);
     }
@@ -76,15 +79,15 @@ public class ElasticSearchIndexServiceTest {
         IndexRequestBuilder mockIndexRequestBuilder = createMock(IndexRequestBuilder.class);
 
         /* existence check */
-        expect(mockClient.prepareGet(ElasticSearchIndexService.INDEX_ENTITIES,
-                ElasticSearchIndexService.INDEX_ENTITY_TYPE, e.getId())).andReturn(mockGetRequestBuilder);
+        expect(mockClient.prepareGet(ElasticSearchEntityService.INDEX_ENTITIES,
+                ElasticSearchEntityService.INDEX_ENTITY_TYPE, e.getId())).andReturn(mockGetRequestBuilder);
         expect(mockGetRequestBuilder.execute()).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(mockGetResponse);
         expect(mockGetResponse.isExists()).andReturn(false);
 
         /* user indexing */
-        expect(mockClient.prepareIndex(ElasticSearchIndexService.INDEX_ENTITIES,
-                ElasticSearchIndexService.INDEX_ENTITY_TYPE,
+        expect(mockClient.prepareIndex(ElasticSearchEntityService.INDEX_ENTITIES,
+                ElasticSearchEntityService.INDEX_ENTITY_TYPE,
                 e.getId())).andReturn(mockIndexRequestBuilder);
         expect(mockIndexRequestBuilder.setSource((byte[]) anyObject())).andReturn(mockIndexRequestBuilder);
         expect(mockIndexRequestBuilder.execute()).andReturn(mockFuture);
@@ -113,8 +116,8 @@ public class ElasticSearchIndexServiceTest {
         IndexRequestBuilder mockIndexRequestBuilder = createMock(IndexRequestBuilder.class);
 
         /* indexing */
-        expect(mockClient.prepareIndex(ElasticSearchIndexService.INDEX_ENTITIES,
-                ElasticSearchIndexService.INDEX_ENTITY_TYPE,
+        expect(mockClient.prepareIndex(ElasticSearchEntityService.INDEX_ENTITIES,
+                ElasticSearchEntityService.INDEX_ENTITY_TYPE,
                 e.getId())).andReturn(mockIndexRequestBuilder);
         expect(mockIndexRequestBuilder.setSource((byte[]) anyObject())).andReturn(mockIndexRequestBuilder);
         expect(mockIndexRequestBuilder.execute()).andReturn(mockFuture);
@@ -147,15 +150,15 @@ public class ElasticSearchIndexServiceTest {
         SearchHits mockHits = createMock(SearchHits.class);
 
         /* retrieve */
-        expect(mockClient.prepareGet(ElasticSearchIndexService.INDEX_ENTITIES,
-                ElasticSearchIndexService.INDEX_ENTITY_TYPE, e.getId())).andReturn(mockGetRequestBuilder);
+        expect(mockClient.prepareGet(ElasticSearchEntityService.INDEX_ENTITIES,
+                ElasticSearchEntityService.INDEX_ENTITY_TYPE, e.getId())).andReturn(mockGetRequestBuilder);
         expect(mockGetRequestBuilder.execute()).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(mockGetResponse);
         expect(mockGetResponse.getSourceAsBytes()).andReturn(mapper.writeValueAsBytes(e));
 
         /* retrieve children */
-        expect(mockClient.prepareSearch(ElasticSearchIndexService.INDEX_ENTITIES)).andReturn(mockSearchRequestBuilder);
-        expect(mockSearchRequestBuilder.setTypes(ElasticSearchIndexService.INDEX_ENTITY_TYPE)).andReturn(mockSearchRequestBuilder);
+        expect(mockClient.prepareSearch(ElasticSearchEntityService.INDEX_ENTITIES)).andReturn(mockSearchRequestBuilder);
+        expect(mockSearchRequestBuilder.setTypes(ElasticSearchEntityService.INDEX_ENTITY_TYPE)).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setQuery(anyObject(QueryBuilder.class))).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setFrom(0)).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setSize(anyInt())).andReturn(mockSearchRequestBuilder);
@@ -181,8 +184,8 @@ public class ElasticSearchIndexServiceTest {
         DeleteRequestBuilder mockDeleteRequest = createMock(DeleteRequestBuilder.class);
         ListenableActionFuture mockFuture = createMock(ListenableActionFuture.class);
 
-        expect(mockClient.prepareDelete(ElasticSearchIndexService.INDEX_ENTITIES,
-                ElasticSearchIndexService.INDEX_ENTITY_TYPE, e.getId())).andReturn(mockDeleteRequest);
+        expect(mockClient.prepareDelete(ElasticSearchEntityService.INDEX_ENTITIES,
+                ElasticSearchEntityService.INDEX_ENTITY_TYPE, e.getId())).andReturn(mockDeleteRequest);
         expect(mockDeleteRequest.execute()).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(mockDeleteResponse);
 
@@ -213,7 +216,7 @@ public class ElasticSearchIndexServiceTest {
 
 
         Map<String, IndexStatus> indexStates = new HashMap<>();
-        indexStates.put(ElasticSearchIndexService.INDEX_ENTITIES, mockIndexStatus);
+        indexStates.put(ElasticSearchEntityService.INDEX_ENTITIES, mockIndexStatus);
         Map<Integer, IndexShardStatus> shardStates = new HashMap<>();
         shardStates.put(0, mockShardStatus);
 
@@ -255,8 +258,8 @@ public class ElasticSearchIndexServiceTest {
         ListenableActionFuture mockFuture = createMock(ListenableActionFuture.class);
 
         /* existence check */
-        expect(mockClient.prepareGet(ElasticSearchIndexService.INDEX_ENTITIES,
-                ElasticSearchIndexService.INDEX_ENTITY_TYPE, e.getId())).andReturn(mockGetRequestBuilder);
+        expect(mockClient.prepareGet(ElasticSearchEntityService.INDEX_ENTITIES,
+                ElasticSearchEntityService.INDEX_ENTITY_TYPE, e.getId())).andReturn(mockGetRequestBuilder);
         expect(mockGetRequestBuilder.execute()).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(mockGetResponse);
         expect(mockGetResponse.isExists()).andReturn(true);

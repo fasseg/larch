@@ -1,10 +1,13 @@
 package net.objecthunter.larch.service.elasticsearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.Version;
-import net.objecthunter.larch.service.BlobstoreService;
+import net.objecthunter.larch.service.backend.BackendBlobstoreService;
+import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchVersionService;
 import net.objecthunter.larch.test.util.Fixtures;
+
 import org.elasticsearch.action.ListenableActionFuture;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -24,8 +27,6 @@ import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 
 import static org.easymock.EasyMock.*;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.*;
 
 public class ElasticSearchVersionServiceTest {
@@ -33,7 +34,7 @@ public class ElasticSearchVersionServiceTest {
     private Client mockClient = createMock(Client.class);
     private AdminClient mockAdminClient = createMock(AdminClient.class);
     private IndicesAdminClient mockIndicesAdminClient = createMock(IndicesAdminClient.class);
-    private BlobstoreService mockBlobstoreService = createMock(BlobstoreService.class);
+    private BackendBlobstoreService mockBlobstoreService = createMock(BackendBlobstoreService.class);
     private ElasticSearchVersionService versionService = new ElasticSearchVersionService();
     private ListenableActionFuture mockFuture = createMock(ListenableActionFuture.class);
     private ObjectMapper mapper = new ObjectMapper();

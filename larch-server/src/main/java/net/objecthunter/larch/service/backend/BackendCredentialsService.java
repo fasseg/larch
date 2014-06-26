@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.service;
+package net.objecthunter.larch.service.backend;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import net.objecthunter.larch.model.security.Group;
@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Service definition for the AuthZ/AuthN service
  */
-public interface CredentialsService {
+public interface BackendCredentialsService {
     /**
      * Create a new User in the repository
      *

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
-package net.objecthunter.larch.service.elasticsearch;
+package net.objecthunter.larch.service.backend.elasticsearch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,7 @@ import java.util.Map.Entry;
 
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.SearchResult;
-import net.objecthunter.larch.service.SearchService;
+import net.objecthunter.larch.service.backend.BackendSearchService;
 
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.ActionFuture;
@@ -38,9 +38,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An implementation of a {@link net.objecthunter.larch.service.SearchService} built on top of ElasticSearch
+ * An implementation of a {@link net.objecthunter.larch.service.backend.BackendSearchService} built on top of ElasticSearch
  */
-public class ElasticSearchSearchService extends AbstractElasticSearchService implements SearchService {
+public class ElasticSearchSearchService extends AbstractElasticSearchService implements BackendSearchService {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticSearchSearchService.class);
 
     private int maxRecords = 50;
@@ -55,7 +55,7 @@ public class ElasticSearchSearchService extends AbstractElasticSearchService imp
         numRecords = numRecords > maxRecords ? maxRecords : numRecords;
         final SearchResponse resp =
             this.client
-                .prepareSearch(ElasticSearchIndexService.INDEX_ENTITIES).setQuery(QueryBuilders.matchAllQuery())
+                .prepareSearch(ElasticSearchEntityService.INDEX_ENTITIES).setQuery(QueryBuilders.matchAllQuery())
                 .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(offset).setSize(numRecords)
                 .addFields("id", "label", "type", "tags").execute().actionGet();
 
@@ -112,12 +112,12 @@ public class ElasticSearchSearchService extends AbstractElasticSearchService imp
         int numRecords = 20;
         final long time = System.currentTimeMillis();
         final ActionFuture<RefreshResponse> refresh =
-            this.client.admin().indices().refresh(new RefreshRequest(ElasticSearchIndexService.INDEX_ENTITIES));
+            this.client.admin().indices().refresh(new RefreshRequest(ElasticSearchEntityService.INDEX_ENTITIES));
         refresh.actionGet();
 
         final SearchResponse resp =
             this.client
-                .prepareSearch(ElasticSearchIndexService.INDEX_ENTITIES).addFields("id", "label", "type", "tags")
+                .prepareSearch(ElasticSearchEntityService.INDEX_ENTITIES).addFields("id", "label", "type", "tags")
                 .setQuery(queryBuilder).setSearchType(SearchType.DFS_QUERY_THEN_FETCH).execute().actionGet();
         LOG.debug("ES returned {} results for '{}'", resp.getHits().getHits().length, new String(queryBuilder
             .buildAsBytes().toBytes()));

@@ -13,11 +13,13 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.service.elasticsearch;
+package net.objecthunter.larch.service.backend.elasticsearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import net.objecthunter.larch.model.Entity;
-import net.objecthunter.larch.service.PublishService;
+import net.objecthunter.larch.service.backend.BackendPublishService;
+
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
@@ -28,12 +30,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ElasticSearchPublishService extends AbstractElasticSearchService implements PublishService {
+public class ElasticSearchPublishService extends AbstractElasticSearchService implements BackendPublishService {
     private static final Logger log = LoggerFactory.getLogger(ElasticSearchPublishService.class);
     public static final String INDEX_PUBLISHED = "publish";
     public static final String TYPE_PUBLISHED = "publishedentity";

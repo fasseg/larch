@@ -13,12 +13,14 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.service.elasticsearch;
+package net.objecthunter.larch.service.backend.elasticsearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.state.IndexState;
-import net.objecthunter.larch.service.IndexService;
+import net.objecthunter.larch.service.backend.BackendEntityService;
+
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
@@ -37,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
+
 import java.io.IOException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -44,20 +47,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * An {@link net.objecthunter.larch.service.IndexService} implementation built on top of ElasticSearch.
+ * An {@link net.objecthunter.larch.service.backend.BackendEntityService} implementation built on top of ElasticSearch.
  */
-public class ElasticSearchIndexService extends AbstractElasticSearchService implements IndexService {
+public class ElasticSearchEntityService extends AbstractElasticSearchService implements BackendEntityService {
     public static final String INDEX_ENTITIES = "entities";
     public static final String INDEX_ENTITY_TYPE = "entity";
 
-    private static final Logger log = LoggerFactory.getLogger(ElasticSearchIndexService.class);
+    private static final Logger log = LoggerFactory.getLogger(ElasticSearchEntityService.class);
 
     @Autowired
     private ObjectMapper mapper;
 
     @PostConstruct
     public void init() {
-        log.debug("initialising ElasticSearchIndexService");
+        log.debug("initialising ElasticSearchEntityService");
         this.checkAndOrCreateIndex(INDEX_ENTITIES);
         this.waitForIndex(INDEX_ENTITIES);
     }

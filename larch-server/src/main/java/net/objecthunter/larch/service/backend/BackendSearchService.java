@@ -13,17 +13,17 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.service;
+package net.objecthunter.larch.service.backend;
 
 import java.util.Map;
 
 import net.objecthunter.larch.model.SearchResult;
-import net.objecthunter.larch.service.elasticsearch.ElasticSearchSearchService.EntitiesSearchField;
+import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchSearchService.EntitiesSearchField;
 
 /**
  * Search service definition allowing for different searches in the repository
  */
-public interface SearchService {
+public interface BackendSearchService {
 
     /**
      * Retrieve a {@link net.objecthunter.larch.model.SearchResult} containing all {@link net.objecthunter.larch.model

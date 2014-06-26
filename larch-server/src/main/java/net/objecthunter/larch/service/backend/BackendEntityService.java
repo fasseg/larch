@@ -13,17 +13,26 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.service;
+package net.objecthunter.larch.service.backend;
 
 import net.objecthunter.larch.model.Entity;
+import net.objecthunter.larch.model.state.IndexState;
 
 import java.io.IOException;
-import java.util.List;
 
-public interface PublishService {
-    void publish(Entity e) throws IOException;
+/**
+ * Service definition for CRUD operations on index operations
+ */
+public interface BackendEntityService {
+    String create(Entity e) throws IOException;
 
-    Entity retrievePublishedEntity(String publishId) throws IOException;
+    void update(Entity e) throws IOException;
 
-    List<Entity> retrievePublishedEntities(String entityId) throws IOException;
+    Entity retrieve(String id) throws IOException;
+
+    void delete(String id) throws IOException;
+
+    IndexState status() throws IOException;
+
+    boolean exists(String id) throws IOException;
 }

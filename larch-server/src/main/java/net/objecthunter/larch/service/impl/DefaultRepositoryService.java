@@ -17,9 +17,10 @@ package net.objecthunter.larch.service.impl;
 
 import net.objecthunter.larch.model.Describe;
 import net.objecthunter.larch.model.state.LarchState;
-import net.objecthunter.larch.service.BlobstoreService;
-import net.objecthunter.larch.service.IndexService;
 import net.objecthunter.larch.service.RepositoryService;
+import net.objecthunter.larch.service.backend.BackendBlobstoreService;
+import net.objecthunter.larch.service.backend.BackendEntityService;
+
 import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
 import org.elasticsearch.action.admin.cluster.stats.ClusterStatsResponse;
 import org.elasticsearch.client.Client;
@@ -31,15 +32,14 @@ import java.io.IOException;
 
 /**
  * Default implementation of a {@link net.objecthunter.larch.service.RepositoryService} which is able to fetch state
- * information from the underlying {@link net.objecthunter.larch.service.IndexService} and {@link net.objecthunter
- * .larch.service.BlobstoreService} implementations
+ * information from the underlying {@link net.objecthunter.larch.service.backend.BackendEntityService} and {@link net.objecthunter.larch.service.backend.BackendBlobstoreService} implementations
  */
 public class DefaultRepositoryService implements RepositoryService {
     @Autowired
-    private IndexService indexService;
+    private BackendEntityService backendEntityService;
 
     @Autowired
-    private BlobstoreService blobstoreService;
+    private BackendBlobstoreService backendBlobstoreService;
 
     @Autowired
     private Environment env;
@@ -51,8 +51,8 @@ public class DefaultRepositoryService implements RepositoryService {
     @Secured("ROLE_ADMIN")
     public LarchState status() throws IOException {
         final LarchState state = new LarchState();
-        state.setBlobstoreState(blobstoreService.status());
-        state.setIndexState(indexService.status());
+        state.setBlobstoreState(backendBlobstoreService.status());
+        state.setIndexState(backendEntityService.status());
         return state;
     }
 

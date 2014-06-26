@@ -17,12 +17,14 @@ package net.objecthunter.larch.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
 
+import net.objecthunter.larch.model.AuditRecord;
+import net.objecthunter.larch.model.Entities;
 import net.objecthunter.larch.model.Entity;
-
-import com.fasterxml.jackson.databind.JsonNode;
-
-import net.objecthunter.larch.model.Entity;
+import net.objecthunter.larch.model.SearchResult;
+import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchSearchService.EntitiesSearchField;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -50,6 +52,8 @@ public interface EntityService {
 
     void deleteBinary(String entityId, String name) throws IOException;
 
+    InputStream retrieveBinary(String path) throws IOException;
+
     void deleteMetadata(String entityId, String mdName) throws IOException;
 
     void deleteBinaryMetadata(String entityId, String binaryName, String mdName) throws IOException;
@@ -59,4 +63,50 @@ public interface EntityService {
     void deleteIdentifier(String entityId, String type, String value) throws IOException;
 
     void publish(String id) throws IOException;
+
+    List<AuditRecord> retrieveAuditRecords(String entityId, int offset, int count) throws IOException;
+
+    void createAuditRecord(AuditRecord auditRecord) throws IOException;
+
+    /**
+     * Retrieve a {@link net.objecthunter.larch.model.SearchResult} containing all
+     * {@link net.objecthunter.larch.model .Entity}s from the index from a given offset with the default number of
+     * {@link net.objecthunter.larch.model.Entity}s returned
+     *
+     * @param offset
+     *            the offset from which to return {@link net.objecthunter.larch.model.Entity}s from
+     * @return a list of {@link net.objecthunter.larch.model.Entity}s available in the repository
+     */
+    SearchResult scanIndex(int offset);
+
+    /**
+     * Retrieve a {@link net.objecthunter.larch.model.SearchResult} containing all
+     * {@link net.objecthunter.larch.model .Entity}s from the index from a given offset with a given maximum number of
+     * {@link net.objecthunter.larch.model.Entity}s returned
+     *
+     * @param offset
+     *            the offset from which to return {@link net.objecthunter.larch.model.Entity}s from
+     * @param numRecords
+     *            the number of {@link net.objecthunter.larch.model.Entity}s to return
+     * @return a list of {@link net.objecthunter.larch.model.Entity}s available in the repository
+     */
+    SearchResult scanIndex(int offset, int numRecords);
+
+    /**
+     * Search {@link net.objecthunter.larch.model.Entity}s in the repository.
+     *
+     * @param searchFields
+     *            Map with key: EntitiesSearchField and value searchStrings as array.
+     * @return A {@link net.objecthunter.larch.model.SearchResult} containig the search hits
+     */
+    SearchResult searchEntities(Map<EntitiesSearchField, String[]> searchFields);
+
+    /**
+     * Retrieve all old versions of an entity from the version storage
+     * 
+     * @param id
+     *            the id of the entity to retrieve
+     * @return the requested old versions of the entity as Entities-Object
+     */
+    Entities getOldVersions(String id) throws IOException;
 }
