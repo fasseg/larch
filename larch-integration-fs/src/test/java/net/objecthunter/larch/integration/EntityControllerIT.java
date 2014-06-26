@@ -172,7 +172,9 @@ public class EntityControllerIT extends AbstractLarchIT {
         Message msg = listener.getLastMessage();
         assertNotNull(msg);
         assertTrue(msg instanceof TextMessage);
-        assertTrue(((TextMessage) msg).getText().startsWith("Created entity"));
+        TextMessage txtMessage = (TextMessage) msg;
+        assertNotNull(txtMessage.getText());
+        assertTrue(txtMessage.getText().startsWith("Created entity"));
     }
 
     @Test
