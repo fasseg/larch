@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.service;
+package net.objecthunter.larch.service.backend;
 
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.state.BlobstoreState;
@@ -24,7 +24,7 @@ import java.io.InputStream;
 /**
  * Service definition for CRUD operations on Blobs
  */
-public interface BlobstoreService {
+public interface BackendBlobstoreService {
     /**
      * Store the contents of an {@link java.io.InputStream} in the blob store
      * @param src The {@link java.io.InputStream} containing the data to be stored

@@ -18,7 +18,8 @@ package net.objecthunter.larch.controller;
 import net.objecthunter.larch.model.security.Group;
 import net.objecthunter.larch.model.security.User;
 import net.objecthunter.larch.model.security.UserRequest;
-import net.objecthunter.larch.service.CredentialsService;
+import net.objecthunter.larch.service.backend.BackendCredentialsService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -36,7 +37,7 @@ import java.util.List;
 @Controller
 public class UserController extends AbstractLarchController {
     @Autowired
-    private CredentialsService credentialsService;
+    private BackendCredentialsService backendCredentialsService;
 
     /**
      * Controller method for confirming a {@link net.objecthunter.larch.model.security.UserRequest}
@@ -44,7 +45,7 @@ public class UserController extends AbstractLarchController {
     @RequestMapping(value = "/confirm/{token}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public ModelAndView confirmUserRequest(@PathVariable("token") final String token) throws IOException {
-        final UserRequest req = this.credentialsService.retrieveUserRequest(token);
+        final UserRequest req = this.backendCredentialsService.retrieveUserRequest(token);
         final ModelMap model = new ModelMap();
         model.addAttribute("token", token);
         return new ModelAndView("confirm", model);
@@ -58,7 +59,7 @@ public class UserController extends AbstractLarchController {
     public ModelAndView confirmUserRequest(@PathVariable("token") final String token,
                                            @RequestParam("password") final String password,
                                            @RequestParam("passwordRepeat") final String passwordRepeat) throws IOException {
-        final User u = this.credentialsService.createUser(token, password, passwordRepeat);
+        final User u = this.backendCredentialsService.createUser(token, password, passwordRepeat);
         final ModelMap model = new ModelMap();
         return success("The user " + u.getName() + " has been created.");
     }
@@ -69,7 +70,7 @@ public class UserController extends AbstractLarchController {
     @RequestMapping(value = "/user/{name}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
     public void deleteUser(@PathVariable("name") final String name) throws IOException {
-        this.credentialsService.deleteUser(name);
+        this.backendCredentialsService.deleteUser(name);
     }
 
     /**
@@ -83,7 +84,7 @@ public class UserController extends AbstractLarchController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public List<User> retrieveUsers() throws IOException {
-        return credentialsService.retrieveUsers();
+        return backendCredentialsService.retrieveUsers();
     }
 
     /**
@@ -116,7 +117,7 @@ public class UserController extends AbstractLarchController {
             groupList.add(g);
         }
         u.setGroups(groupList);
-        UserRequest request = this.credentialsService.createNewUserRequest(u);
+        UserRequest request = this.backendCredentialsService.createNewUserRequest(u);
         return "http://localhost:8080/confirm/" + request.getToken();
     }
 
@@ -131,7 +132,7 @@ public class UserController extends AbstractLarchController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public User retrieveUser(@PathVariable("name") final String name) throws IOException {
-        return credentialsService.retrieveUser(name);
+        return backendCredentialsService.retrieveUser(name);
     }
 
     /**
@@ -147,8 +148,8 @@ public class UserController extends AbstractLarchController {
     @ResponseBody
     public ModelAndView retrieveUserHtml(@PathVariable("name") final String name) throws IOException {
         final ModelMap model = new ModelMap();
-        model.addAttribute("user", credentialsService.retrieveUser(name));
-        model.addAttribute("groups", credentialsService.retrieveGroups());
+        model.addAttribute("user", backendCredentialsService.retrieveUser(name));
+        model.addAttribute("groups", backendCredentialsService.retrieveGroups());
         return new ModelAndView("user", model);
     }
 
@@ -163,8 +164,8 @@ public class UserController extends AbstractLarchController {
     @ResponseBody
     public ModelAndView retrieveCredentials() throws IOException {
         final ModelMap model = new ModelMap();
-        model.addAttribute("users", this.credentialsService.retrieveUsers());
-        model.addAttribute("groups", this.credentialsService.retrieveGroups());
+        model.addAttribute("users", this.backendCredentialsService.retrieveUsers());
+        model.addAttribute("groups", this.backendCredentialsService.retrieveGroups());
         return new ModelAndView("credentials", model);
     }
 
@@ -179,7 +180,7 @@ public class UserController extends AbstractLarchController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public List<Group> retrieveGroups() throws IOException {
-        return credentialsService.retrieveGroups();
+        return backendCredentialsService.retrieveGroups();
     }
 
     @RequestMapping(value = "/user/{name}", method = RequestMethod.POST, consumes = "multipart/form-data")
@@ -190,12 +191,12 @@ public class UserController extends AbstractLarchController {
                                           @RequestParam("lastName") final String lastName,
                                           @RequestParam("email") final String email,
                                           @RequestParam("groups") final List<String> groupNames) throws IOException {
-        final User u = this.credentialsService.retrieveUser(username);
+        final User u = this.backendCredentialsService.retrieveUser(username);
         u.setLastName(lastName);
         u.setFirstName(firstName);
         u.setEmail(email);
-        u.setGroups(this.credentialsService.retrieveGroups(groupNames));
-        this.credentialsService.updateUser(u);
+        u.setGroups(this.backendCredentialsService.retrieveGroups(groupNames));
+        this.backendCredentialsService.updateUser(u);
         return success("The user " + username + " has been updated");
     }
 

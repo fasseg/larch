@@ -17,9 +17,11 @@ package net.objecthunter.larch.integration;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import net.objecthunter.larch.LarchServerConfiguration;
-import net.objecthunter.larch.service.weedfs.WeedFsMaster;
-import net.objecthunter.larch.service.weedfs.WeedFsVolume;
+import net.objecthunter.larch.service.backend.weedfs.WeedFsMaster;
+import net.objecthunter.larch.service.backend.weedfs.WeedFsVolume;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.junit.Test;

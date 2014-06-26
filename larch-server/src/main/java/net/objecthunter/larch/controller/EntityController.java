@@ -22,11 +22,9 @@ import net.objecthunter.larch.helpers.AuditRecords;
 import net.objecthunter.larch.model.AlternativeIdentifier;
 import net.objecthunter.larch.model.Entities;
 import net.objecthunter.larch.model.Entity;
-import net.objecthunter.larch.service.AuditService;
 import net.objecthunter.larch.service.EntityService;
 import net.objecthunter.larch.service.MessagingService;
 import net.objecthunter.larch.service.SchemaService;
-import net.objecthunter.larch.service.VersionService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -53,19 +51,13 @@ public class EntityController extends AbstractLarchController {
     private EntityService entityService;
 
     @Autowired
-    private VersionService versionService;
+    private SchemaService schemaService;
 
     @Autowired
     private MessagingService messagingService;
 
     @Autowired
-    private AuditService auditService;
-
-    @Autowired
     private ObjectMapper mapper;
-
-    @Autowired
-    private SchemaService schemaService;
 
     /**
      * Controller method for patching an {@link net.objecthunter.larch.model.Entity} stored in the repository. The patch
@@ -83,7 +75,7 @@ public class EntityController extends AbstractLarchController {
     final String id, final InputStream src) throws IOException {
         final JsonNode node = mapper.readTree(src);
         this.entityService.patch(id, node);
-        this.auditService.create(AuditRecords.updateEntityRecord(id));
+        this.entityService.createAuditRecord(AuditRecords.updateEntityRecord(id));
         this.messagingService.publishUpdateEntity(id);
     }
 
@@ -181,7 +173,7 @@ public class EntityController extends AbstractLarchController {
     @ResponseStatus(HttpStatus.OK)
     public Entities retrieveVersions(@PathVariable("id")
     final String id) throws IOException {
-        Entities entities = versionService.getOldVersions(id);
+        Entities entities = entityService.getOldVersions(id);
         entities.getEntities().add(0, entityService.retrieve(id));
         return entities;
     }
@@ -200,7 +192,7 @@ public class EntityController extends AbstractLarchController {
     public ModelAndView retrieveVersionsHtml(@PathVariable("id")
     final String id) throws IOException {
         final ModelMap model = new ModelMap();
-        Entities entities = versionService.getOldVersions(id);
+        Entities entities = entityService.getOldVersions(id);
         entities.getEntities().add(0, entityService.retrieve(id));
         model.addAttribute("entities", entities);
         return new ModelAndView("versions", model);
@@ -220,7 +212,7 @@ public class EntityController extends AbstractLarchController {
     @ResponseBody
     public String create(final InputStream src) throws IOException {
         final String id = this.entityService.create(mapper.readValue(src, Entity.class));
-        this.auditService.create(AuditRecords.createEntityRecord(id));
+        this.entityService.createAuditRecord(AuditRecords.createEntityRecord(id));
         this.messagingService.publishCreateEntity(id);
         return id;
     }
@@ -247,7 +239,7 @@ public class EntityController extends AbstractLarchController {
             throw new IOException("The id of the Entity and the id used in the PUT request are not the same");
         }
         this.entityService.update(e);
-        this.auditService.create(AuditRecords.updateEntityRecord(id));
+        this.entityService.createAuditRecord(AuditRecords.updateEntityRecord(id));
         this.messagingService.publishUpdateEntity(id);
     }
 
@@ -256,7 +248,7 @@ public class EntityController extends AbstractLarchController {
     public void publish(@PathVariable("id")
     final String id) throws IOException {
         this.entityService.publish(id);
-        this.auditService.create(AuditRecords.publishEntityRecord(id));
+        this.entityService.createAuditRecord(AuditRecords.publishEntityRecord(id));
         this.messagingService.publishPublishEntity(id);
     }
 

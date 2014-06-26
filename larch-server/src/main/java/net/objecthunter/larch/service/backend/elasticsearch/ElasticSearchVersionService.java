@@ -1,4 +1,4 @@
-package net.objecthunter.larch.service.elasticsearch;
+package net.objecthunter.larch.service.backend.elasticsearch;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -10,8 +10,8 @@ import javax.annotation.PostConstruct;
 import net.objecthunter.larch.model.Entities;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.Version;
-import net.objecthunter.larch.service.BlobstoreService;
-import net.objecthunter.larch.service.VersionService;
+import net.objecthunter.larch.service.backend.BackendBlobstoreService;
+import net.objecthunter.larch.service.backend.BackendVersionService;
 
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * Service implementation on top of ElasticSearch
  */
-public class ElasticSearchVersionService implements VersionService {
+public class ElasticSearchVersionService implements BackendVersionService {
     public static final String INDEX_VERSIONS = "versions";
 
     public static final String TYPE_VERSIONS = "version";
@@ -39,7 +39,7 @@ public class ElasticSearchVersionService implements VersionService {
     private static final Logger log = LoggerFactory.getLogger(ElasticSearchVersionService.class);
 
     @Autowired
-    private BlobstoreService blobstoreService;
+    private BackendBlobstoreService backendBlobstoreService;
 
     @Autowired
     private Client client;
@@ -65,7 +65,7 @@ public class ElasticSearchVersionService implements VersionService {
 
     @Override
     public void addOldVersion(Entity e) throws IOException {
-        final String path = this.blobstoreService.createOldVersionBlob(e);
+        final String path = this.backendBlobstoreService.createOldVersionBlob(e);
         final Version version = new Version();
         version.setEntityId(e.getId());
         version.setVersionNumber(e.getVersion());
@@ -92,7 +92,7 @@ public class ElasticSearchVersionService implements VersionService {
             throw new FileNotFoundException("Entity " + id + " does not exists with version " + versionNumber);
         }
         final Version v = this.mapper.readValue(resp.getHits().getAt(0).getSourceAsString(), Version.class);
-        return this.mapper.readValue(this.blobstoreService.retrieveOldVersionBlob(v.getPath()), Entity.class);
+        return this.mapper.readValue(this.backendBlobstoreService.retrieveOldVersionBlob(v.getPath()), Entity.class);
     }
 
     @Override
@@ -106,7 +106,7 @@ public class ElasticSearchVersionService implements VersionService {
         for (final SearchHit hit : resp.getHits()) {
             final Version v = this.mapper.readValue(hit.getSourceAsString(), Version.class);
             final Entity e =
-                this.mapper.readValue(this.blobstoreService.retrieveOldVersionBlob(v.getPath()), Entity.class);
+                this.mapper.readValue(this.backendBlobstoreService.retrieveOldVersionBlob(v.getPath()), Entity.class);
             entities.add(e);
         }
         Entities entit = new Entities();

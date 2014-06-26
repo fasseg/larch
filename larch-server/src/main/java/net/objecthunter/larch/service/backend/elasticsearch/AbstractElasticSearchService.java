@@ -1,4 +1,4 @@
-package net.objecthunter.larch.service.elasticsearch;
+package net.objecthunter.larch.service.backend.elasticsearch;
 
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;

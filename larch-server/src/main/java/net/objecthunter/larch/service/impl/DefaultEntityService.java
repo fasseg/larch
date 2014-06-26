@@ -27,23 +27,30 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
 import net.objecthunter.larch.helpers.SizeCalculatingDigestInputStream;
 import net.objecthunter.larch.model.AlternativeIdentifier;
+import net.objecthunter.larch.model.AuditRecord;
 import net.objecthunter.larch.model.Binary;
+import net.objecthunter.larch.model.Entities;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.LarchConstants;
 import net.objecthunter.larch.model.Metadata;
+import net.objecthunter.larch.model.SearchResult;
 import net.objecthunter.larch.model.source.UrlSource;
-import net.objecthunter.larch.service.BlobstoreService;
 import net.objecthunter.larch.service.EntityService;
 import net.objecthunter.larch.service.ExportService;
-import net.objecthunter.larch.service.IndexService;
-import net.objecthunter.larch.service.PublishService;
-import net.objecthunter.larch.service.VersionService;
+import net.objecthunter.larch.service.backend.BackendAuditService;
+import net.objecthunter.larch.service.backend.BackendBlobstoreService;
+import net.objecthunter.larch.service.backend.BackendEntityService;
+import net.objecthunter.larch.service.backend.BackendPublishService;
+import net.objecthunter.larch.service.backend.BackendSchemaService;
+import net.objecthunter.larch.service.backend.BackendVersionService;
+import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchEntityService.EntitiesSearchField;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -65,13 +72,16 @@ public class DefaultEntityService implements EntityService {
     private static final Logger log = LoggerFactory.getLogger(DefaultEntityService.class);
 
     @Autowired
-    private BlobstoreService blobstoreService;
+    private BackendAuditService backendAuditService;
 
     @Autowired
-    private VersionService versionService;
+    private BackendBlobstoreService backendBlobstoreService;
 
     @Autowired
-    private IndexService indexService;
+    private BackendVersionService backendVersionService;
+
+    @Autowired
+    private BackendEntityService backendEntityService;
 
     @Autowired
     private ObjectMapper mapper;
@@ -80,7 +90,10 @@ public class DefaultEntityService implements EntityService {
     private ExportService exportService;
 
     @Autowired
-    private PublishService publishService;
+    private BackendPublishService backendPublishService;
+
+    @Autowired
+    private BackendSchemaService backendSchemaService;
 
     @Autowired
     private Environment env;
@@ -100,7 +113,7 @@ public class DefaultEntityService implements EntityService {
             e.setId(generateId());
         }
         else {
-            if (this.indexService.exists(e.getId())) {
+            if (this.backendEntityService.exists(e.getId())) {
                 throw new IOException("Entity with id " + e.getId()
                     + " could not be created because it already exists in the index");
             }
@@ -123,7 +136,7 @@ public class DefaultEntityService implements EntityService {
         e.setVersion(1);
         e.setUtcCreated(now);
         e.setUtcLastModified(now);
-        final String id = this.indexService.create(e);
+        final String id = this.backendEntityService.create(e);
         log.debug("finished creating Entity {}", id);
 
         // export the created entity
@@ -150,7 +163,7 @@ public class DefaultEntityService implements EntityService {
         try (final SizeCalculatingDigestInputStream src =
             new SizeCalculatingDigestInputStream(b.getSource().getInputStream(), digest)) {
             final ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
-            final String path = this.blobstoreService.create(src);
+            final String path = this.backendBlobstoreService.create(src);
             final String checksum = new BigInteger(1, digest.digest()).toString(16);
             b.setChecksum(checksum);
             b.setSize(src.getCalculatedSize());
@@ -175,14 +188,14 @@ public class DefaultEntityService implements EntityService {
         do {
             generated = RandomStringUtils.randomAlphabetic(16);
         }
-        while (indexService.exists(generated));
+        while (backendEntityService.exists(generated));
         return generated;
     }
 
     @Override
     public void update(Entity e) throws IOException {
-        final Entity oldVersion = this.indexService.retrieve(e.getId());
-        this.versionService.addOldVersion(oldVersion);
+        final Entity oldVersion = this.backendEntityService.retrieve(e.getId());
+        this.backendVersionService.addOldVersion(oldVersion);
         final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
         e.setVersion(oldVersion.getVersion() + 1);
         if (e.getMetadata() != null) {
@@ -217,7 +230,7 @@ public class DefaultEntityService implements EntityService {
                 }
             }
         }
-        this.indexService.update(e);
+        this.backendEntityService.update(e);
         if (autoExport) {
             exportService.export(e);
             log.debug("exported entity {} ", e.getId());
@@ -226,41 +239,41 @@ public class DefaultEntityService implements EntityService {
 
     @Override
     public Entity retrieve(String id) throws IOException {
-        return indexService.retrieve(id);
+        return backendEntityService.retrieve(id);
     }
 
     @Override
     public void delete(String id) throws IOException {
-        final Entity e = indexService.retrieve(id);
+        final Entity e = backendEntityService.retrieve(id);
         for (Binary b : e.getBinaries().values()) {
             if (b.getPath() != null && !b.getPath().isEmpty()) {
-                blobstoreService.delete(b.getPath());
+                backendBlobstoreService.delete(b.getPath());
             }
         }
-        this.indexService.delete(id);
+        this.backendEntityService.delete(id);
     }
 
     @Override
     public InputStream getContent(String id, String name) throws IOException {
-        final Entity e = indexService.retrieve(id);
+        final Entity e = backendEntityService.retrieve(id);
         final Binary b = e.getBinaries().get(name);
-        return blobstoreService.retrieve(b.getPath());
+        return backendBlobstoreService.retrieve(b.getPath());
     }
 
     @Override
     public Entity retrieve(String id, int i) throws IOException {
-        final Entity e = this.indexService.retrieve(id);
+        final Entity e = this.backendEntityService.retrieve(id);
         if (i == e.getVersion()) {
             return e; // the current version
         }
-        return this.versionService.getOldVersion(id, i);
+        return this.backendVersionService.getOldVersion(id, i);
     }
 
     @Override
     public void createBinary(String entityId, String name, String contentType, InputStream inputStream)
         throws IOException {
-        final Entity e = indexService.retrieve(entityId);
-        this.versionService.addOldVersion(e);
+        final Entity e = backendEntityService.retrieve(entityId);
+        this.backendVersionService.addOldVersion(e);
         final MessageDigest digest;
         try {
             digest = MessageDigest.getInstance("MD5");
@@ -269,7 +282,7 @@ public class DefaultEntityService implements EntityService {
             throw new IOException(e1);
         }
         try (final SizeCalculatingDigestInputStream src = new SizeCalculatingDigestInputStream(inputStream, digest)) {
-            final String path = blobstoreService.create(src);
+            final String path = backendBlobstoreService.create(src);
             final Binary b = new Binary();
             final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
             b.setUtcCreated(now);
@@ -290,7 +303,7 @@ public class DefaultEntityService implements EntityService {
             e.getBinaries().put(name, b);
             e.setVersion(e.getVersion() + 1);
             e.setUtcLastModified(now);
-            this.indexService.update(e);
+            this.backendEntityService.update(e);
         }
         if (autoExport) {
             exportService.export(e);
@@ -300,7 +313,7 @@ public class DefaultEntityService implements EntityService {
 
     @Override
     public void patch(final String id, final JsonNode node) throws IOException {
-        final Entity e = this.indexService.retrieve(id);
+        final Entity e = this.backendEntityService.retrieve(id);
         final Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
         while (fields.hasNext()) {
             final Map.Entry<String, JsonNode> field = fields.next();
@@ -340,13 +353,13 @@ public class DefaultEntityService implements EntityService {
         if (object.startsWith("<" + LarchConstants.NAMESPACE_LARCH)) {
             // the object is an internal entity
             final String objId = object.substring(1 + LarchConstants.NAMESPACE_LARCH.length(), object.length() - 1);
-            if (!this.indexService.exists(objId)) {
+            if (!this.backendEntityService.exists(objId)) {
                 throw new FileNotFoundException("The entity " + object
                     + " referenced in the object of the relation does not exist in the repository");
             }
         }
-        final Entity oldVersion = this.indexService.retrieve(id);
-        this.versionService.addOldVersion(oldVersion);
+        final Entity oldVersion = this.backendEntityService.retrieve(id);
+        this.backendVersionService.addOldVersion(oldVersion);
         final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
         final Entity newVersion = oldVersion;
         newVersion.setUtcLastModified(now);
@@ -358,12 +371,12 @@ public class DefaultEntityService implements EntityService {
             newVersion.getRelations().put(predicate, new ArrayList<>(1));
         }
         newVersion.getRelations().get(predicate).add(object);
-        this.indexService.update(newVersion);
+        this.backendEntityService.update(newVersion);
     }
 
     @Override
     public void deleteBinary(String entityId, String name) throws IOException {
-        final Entity e = this.indexService.retrieve(entityId);
+        final Entity e = this.backendEntityService.retrieve(entityId);
         if (e.getBinaries().get(name) == null) {
             throw new FileNotFoundException("Binary " + name + " does not exist on entity " + entityId);
         }
@@ -372,8 +385,13 @@ public class DefaultEntityService implements EntityService {
     }
 
     @Override
+    public InputStream retrieveBinary(String path) throws IOException {
+        return backendBlobstoreService.retrieve(path);
+    }
+
+    @Override
     public void deleteMetadata(String entityId, String mdName) throws IOException {
-        final Entity e = this.indexService.retrieve(entityId);
+        final Entity e = this.backendEntityService.retrieve(entityId);
         if (e.getMetadata().get(mdName) == null) {
             throw new FileNotFoundException("Meta data " + mdName + " does not exist on entity " + entityId);
         }
@@ -383,7 +401,7 @@ public class DefaultEntityService implements EntityService {
 
     @Override
     public void deleteBinaryMetadata(String entityId, String binaryName, String mdName) throws IOException {
-        final Entity e = this.indexService.retrieve(entityId);
+        final Entity e = this.backendEntityService.retrieve(entityId);
         if (e.getBinaries() == null || !e.getBinaries().containsKey(binaryName)) {
             throw new FileNotFoundException("The binary " + binaryName + " does not exist in the entity " + entityId);
         }
@@ -398,35 +416,35 @@ public class DefaultEntityService implements EntityService {
 
     @Override
     public void createIdentifier(String entityId, String type, String value) throws IOException {
-        if (!this.indexService.exists(entityId)) {
+        if (!this.backendEntityService.exists(entityId)) {
             throw new FileNotFoundException("The entity-id " + entityId + " does not exist in the repository");
         }
         if (StringUtils.isBlank(type) || StringUtils.isBlank(value)
             || AlternativeIdentifier.IdentifierType.valueOf(type) == null) {
             throw new IOException("wrong or empty type or value given");
         }
-        final Entity oldVersion = this.indexService.retrieve(entityId);
-        this.versionService.addOldVersion(oldVersion);
+        final Entity oldVersion = this.backendEntityService.retrieve(entityId);
+        this.backendVersionService.addOldVersion(oldVersion);
         final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
         final Entity newVersion = oldVersion;
         newVersion.setUtcLastModified(now);
         newVersion.setVersion(oldVersion.getVersion() + 1);
         newVersion.getAlternativeIdentifiers().add(new AlternativeIdentifier(type, value));
 
-        this.indexService.update(newVersion);
+        this.backendEntityService.update(newVersion);
     }
 
     @Override
     public void deleteIdentifier(String entityId, String type, String value) throws IOException {
-        if (!this.indexService.exists(entityId)) {
+        if (!this.backendEntityService.exists(entityId)) {
             throw new FileNotFoundException("The entity-id " + entityId + " does not exist in the repository");
         }
         if (StringUtils.isBlank(type) || StringUtils.isBlank(value)
             || AlternativeIdentifier.IdentifierType.valueOf(type) == null) {
             throw new IOException("wrong or empty type or value given");
         }
-        final Entity oldVersion = this.indexService.retrieve(entityId);
-        this.versionService.addOldVersion(oldVersion);
+        final Entity oldVersion = this.backendEntityService.retrieve(entityId);
+        this.backendVersionService.addOldVersion(oldVersion);
         final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
         final Entity newVersion = oldVersion;
         newVersion.setUtcLastModified(now);
@@ -443,17 +461,47 @@ public class DefaultEntityService implements EntityService {
             throw new IOException("Identifier of type " + type + " with value " + value + " not found");
         }
 
-        this.indexService.update(newVersion);
+        this.backendEntityService.update(newVersion);
     }
 
     @Override
     public void publish(String id) throws IOException {
-        final Entity e = this.indexService.retrieve(id);
+        final Entity e = this.backendEntityService.retrieve(id);
         if (e.getState().equals(Entity.STATE_PUBLISHED)) {
             throw new IOException("The entity with the id " + id + " is already published");
         }
         e.setState(Entity.STATE_PUBLISHED);
-        this.indexService.update(e);
-        this.publishService.publish(e);
+        this.backendEntityService.update(e);
+        this.backendPublishService.publish(e);
+    }
+
+    @Override
+    public List<AuditRecord> retrieveAuditRecords(String entityId, int offset, int count) throws IOException {
+        return backendAuditService.retrieve(entityId, offset, count);
+    }
+
+    @Override
+    public void createAuditRecord(AuditRecord auditRecord) throws IOException {
+        backendAuditService.create(auditRecord);
+    }
+
+    @Override
+    public SearchResult scanIndex(int offset) {
+        return backendEntityService.scanIndex(offset);
+    }
+
+    @Override
+    public SearchResult scanIndex(int offset, int numRecords) {
+        return backendEntityService.scanIndex(offset, numRecords);
+    }
+
+    @Override
+    public SearchResult searchEntities(Map<EntitiesSearchField, String[]> searchFields) {
+        return backendEntityService.searchEntities(searchFields);
+    }
+
+    @Override
+    public Entities getOldVersions(String id) throws IOException {
+        return backendVersionService.getOldVersions(id);
     }
 }

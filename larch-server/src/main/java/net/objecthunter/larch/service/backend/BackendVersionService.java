@@ -1,4 +1,4 @@
-package net.objecthunter.larch.service;
+package net.objecthunter.larch.service.backend;
 
 import java.io.IOException;
 
@@ -8,7 +8,7 @@ import net.objecthunter.larch.model.Entity;
 /**
  * Service definition for entity version storage
  */
-public interface VersionService {
+public interface BackendVersionService {
     /**
      * Add an old version of an entity to the old version storage and return the path
      * 

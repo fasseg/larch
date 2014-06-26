@@ -13,13 +13,15 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.service.weedfs;
+package net.objecthunter.larch.service.backend.weedfs;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.state.WeedFsBlobstoreState;
-import net.objecthunter.larch.service.BlobstoreService;
+import net.objecthunter.larch.service.backend.BackendBlobstoreService;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -30,15 +32,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
 import javax.annotation.PostConstruct;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Implementation of a {@link net.objecthunter.larch.service.BlobstoreService} built on top of the distributed
+ * Implementation of a {@link net.objecthunter.larch.service.backend.BackendBlobstoreService} built on top of the distributed
  * file system WeedFS
  */
-public class WeedFSBlobstoreService implements BlobstoreService {
+public class WeedFSBlobstoreService implements BackendBlobstoreService {
     private static final Logger log = LoggerFactory.getLogger(WeedFSBlobstoreService.class);
     @Autowired
     private Environment env;

@@ -16,8 +16,12 @@
 package net.objecthunter.larch.service.elasticsearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import net.objecthunter.larch.model.MetadataType;
+import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchEntityService;
+import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchSchemaService;
 import net.objecthunter.larch.test.util.Fixtures;
+
 import org.elasticsearch.action.ListenableActionFuture;
 import org.elasticsearch.action.count.CountRequestBuilder;
 import org.elasticsearch.action.count.CountResponse;
@@ -165,7 +169,7 @@ public class ElasticSearchSchemaServiceTest {
         DeleteResponse mockDeleteResponse = createMock(DeleteResponse.class);
         DeleteRequestBuilder mockDeleteRequest = createMock(DeleteRequestBuilder.class);
 
-        expect(mockClient.prepareCount(ElasticSearchIndexService.INDEX_ENTITIES)).andReturn(mockCountRequest);
+        expect(mockClient.prepareCount(ElasticSearchEntityService.INDEX_ENTITIES)).andReturn(mockCountRequest);
         expect(mockCountRequest.setQuery(anyObject(QueryBuilder.class))).andReturn(mockCountRequest);
         expect(mockCountRequest.execute()).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(mockCountResponse);

@@ -16,9 +16,11 @@
 package net.objecthunter.larch.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import net.objecthunter.larch.model.Entity;
-import net.objecthunter.larch.service.BlobstoreService;
+import net.objecthunter.larch.service.backend.BackendBlobstoreService;
 import net.objecthunter.larch.test.util.Fixtures;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -29,12 +31,12 @@ import static org.easymock.EasyMock.*;
 
 public class DefaultExportServiceTest {
     private DefaultExportService exportService;
-    private BlobstoreService mockBlobstoreService;
+    private BackendBlobstoreService mockBlobstoreService;
 
     @Before
     public void setup() {
         exportService = new DefaultExportService();
-        mockBlobstoreService = createMock(BlobstoreService.class);
+        mockBlobstoreService = createMock(BackendBlobstoreService.class);
         ReflectionTestUtils.setField(exportService, "mapper", new ObjectMapper());
         ReflectionTestUtils.setField(exportService, "directory", new File(System.getProperty("java.io.tmpdir")));
     }

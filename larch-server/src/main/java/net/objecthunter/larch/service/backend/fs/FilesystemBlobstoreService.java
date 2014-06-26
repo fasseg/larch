@@ -13,12 +13,14 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.service.fs;
+package net.objecthunter.larch.service.backend.fs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.state.FilesystemBlobstoreState;
-import net.objecthunter.larch.service.BlobstoreService;
+import net.objecthunter.larch.service.backend.BackendBlobstoreService;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
@@ -27,15 +29,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
 import javax.annotation.PostConstruct;
+
 import java.io.*;
 
 import static net.objecthunter.larch.util.FileSystemUtil.checkAndCreate;
 
 /**
- * Implementation of a {@link net.objecthunter.larch.service.BlobstoreService} on a Posix file system.
+ * Implementation of a {@link net.objecthunter.larch.service.backend.BackendBlobstoreService} on a Posix file system.
  * The service gets initialized using two user set directories for saving the content of the repository
  */
-public class FilesystemBlobstoreService implements BlobstoreService {
+public class FilesystemBlobstoreService implements BackendBlobstoreService {
 
     private static final Logger log = LoggerFactory.getLogger(FilesystemBlobstoreService.class);
 

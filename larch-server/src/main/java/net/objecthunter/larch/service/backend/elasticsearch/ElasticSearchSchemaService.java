@@ -13,12 +13,14 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.service.elasticsearch;
+package net.objecthunter.larch.service.backend.elasticsearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import net.objecthunter.larch.helpers.MetadataTypes;
 import net.objecthunter.larch.model.*;
-import net.objecthunter.larch.service.SchemaService;
+import net.objecthunter.larch.service.backend.BackendSchemaService;
+
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
@@ -43,6 +45,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
+
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -52,7 +55,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ElasticSearchSchemaService extends AbstractElasticSearchService implements SchemaService {
+public class ElasticSearchSchemaService extends AbstractElasticSearchService implements BackendSchemaService {
     public static final String INDEX_MD_SCHEMATA = "mdschema";
     public static final String INDEX_MD_SCHEMATA_TYPE = "mdschema-type";
     private static final Logger log = LoggerFactory.getLogger(ElasticSearchSchemaService.class);
@@ -125,7 +128,7 @@ public class ElasticSearchSchemaService extends AbstractElasticSearchService imp
     @Override
     public void deleteMetadataType(String name) throws IOException {
         /* first check if the type is still used by Entities or Binaries */
-        final CountResponse count = this.client.prepareCount(ElasticSearchIndexService.INDEX_ENTITIES)
+        final CountResponse count = this.client.prepareCount(ElasticSearchEntityService.INDEX_ENTITIES)
                 .setQuery(QueryBuilders.nestedQuery("metadata", QueryBuilders.matchQuery("type", name)))
                 .execute()
                 .actionGet();
@@ -143,9 +146,9 @@ public class ElasticSearchSchemaService extends AbstractElasticSearchService imp
     @Override
     public MetadataValidationResult validate(String id, String metadataName) throws IOException {
         /* fetch the entity first */
-        final GetResponse resp = this.client.prepareGet(ElasticSearchIndexService
+        final GetResponse resp = this.client.prepareGet(ElasticSearchEntityService
                         .INDEX_ENTITIES,
-                ElasticSearchIndexService.INDEX_ENTITY_TYPE, id
+                ElasticSearchEntityService.INDEX_ENTITY_TYPE, id
         )
                 .execute()
                 .actionGet();
@@ -165,9 +168,9 @@ public class ElasticSearchSchemaService extends AbstractElasticSearchService imp
     @Override
     public MetadataValidationResult validate(String id, String binaryName, String metadataName) throws IOException {
         /* fetch the entity first */
-        final GetResponse resp = this.client.prepareGet(ElasticSearchIndexService
+        final GetResponse resp = this.client.prepareGet(ElasticSearchEntityService
                         .INDEX_ENTITIES,
-                ElasticSearchIndexService.INDEX_ENTITY_TYPE, id
+                ElasticSearchEntityService.INDEX_ENTITY_TYPE, id
         )
                 .execute()
                 .actionGet();

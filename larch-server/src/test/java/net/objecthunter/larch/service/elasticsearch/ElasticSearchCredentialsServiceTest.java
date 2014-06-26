@@ -16,9 +16,12 @@
 package net.objecthunter.larch.service.elasticsearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import net.objecthunter.larch.model.security.Group;
 import net.objecthunter.larch.model.security.User;
+import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchCredentialsService;
 import net.objecthunter.larch.test.util.Fixtures;
+
 import org.elasticsearch.action.ListenableActionFuture;
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.action.get.GetRequestBuilder;

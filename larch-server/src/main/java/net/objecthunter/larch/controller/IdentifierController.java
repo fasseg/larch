@@ -18,7 +18,6 @@ package net.objecthunter.larch.controller;
 import java.io.IOException;
 
 import net.objecthunter.larch.helpers.AuditRecords;
-import net.objecthunter.larch.service.AuditService;
 import net.objecthunter.larch.service.EntityService;
 import net.objecthunter.larch.service.MessagingService;
 
@@ -41,9 +40,6 @@ public class IdentifierController extends AbstractLarchController {
     private EntityService entityService;
 
     @Autowired
-    private AuditService auditService;
-
-    @Autowired
     private MessagingService messagingService;
 
     /**
@@ -64,7 +60,7 @@ public class IdentifierController extends AbstractLarchController {
     final String type, @RequestParam("value")
     final String value) throws IOException {
         this.entityService.createIdentifier(entityId, type, value);
-        this.auditService.create(AuditRecords.createIdentifier(entityId));
+        this.entityService.createAuditRecord(AuditRecords.createIdentifier(entityId));
         this.messagingService.publishCreateIdentifier(entityId, type, value);
     }
 
@@ -87,7 +83,7 @@ public class IdentifierController extends AbstractLarchController {
     final String type, @RequestParam("value")
     final String value) throws IOException {
         this.entityService.createIdentifier(entityId, type, value);
-        this.auditService.create(AuditRecords.createIdentifier(entityId));
+        this.entityService.createAuditRecord(AuditRecords.createIdentifier(entityId));
         this.messagingService.publishCreateIdentifier(entityId, type, value);
         return "redirect:/entity/" + entityId;
     }
@@ -111,7 +107,7 @@ public class IdentifierController extends AbstractLarchController {
     final String type, @PathVariable("value")
     final String value) throws IOException {
         this.entityService.deleteIdentifier(entityId, type, value);
-        this.auditService.create(AuditRecords.deleteEntityRecord(entityId));
+        this.entityService.createAuditRecord(AuditRecords.deleteEntityRecord(entityId));
         this.messagingService.publishDeleteIdentifier(entityId, type, value);
     }
 
@@ -134,7 +130,7 @@ public class IdentifierController extends AbstractLarchController {
     final String type, @PathVariable("value")
     final String value) throws IOException {
         this.entityService.deleteIdentifier(entityId, type, value);
-        this.auditService.create(AuditRecords.deleteEntityRecord(entityId));
+        this.entityService.createAuditRecord(AuditRecords.deleteEntityRecord(entityId));
         this.messagingService.publishDeleteIdentifier(entityId, type, value);
         return "redirect:/entity/" + entityId;
     }

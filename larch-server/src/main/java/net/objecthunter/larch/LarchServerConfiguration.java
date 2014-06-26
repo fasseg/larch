@@ -1,50 +1,78 @@
 /*
-* Copyright 2014 Frank Asseg
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2014 Frank Asseg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package net.objecthunter.larch;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationConfig;
-import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
-import net.objecthunter.larch.service.*;
-import net.objecthunter.larch.service.elasticsearch.*;
-import net.objecthunter.larch.service.fs.FilesystemBlobstoreService;
-import net.objecthunter.larch.service.impl.*;
-import net.objecthunter.larch.service.weedfs.WeedFSBlobstoreService;
-import net.objecthunter.larch.service.weedfs.WeedFsMaster;
-import net.objecthunter.larch.service.weedfs.WeedFsVolume;
+import java.io.File;
+
+import javax.jms.Queue;
+
+import net.objecthunter.larch.service.EntityService;
+import net.objecthunter.larch.service.ExportService;
+import net.objecthunter.larch.service.MailService;
+import net.objecthunter.larch.service.MessagingService;
+import net.objecthunter.larch.service.RepositoryService;
+import net.objecthunter.larch.service.SchemaService;
+import net.objecthunter.larch.service.backend.BackendAuditService;
+import net.objecthunter.larch.service.backend.BackendEntityService;
+import net.objecthunter.larch.service.backend.BackendPublishService;
+import net.objecthunter.larch.service.backend.BackendSchemaService;
+import net.objecthunter.larch.service.backend.BackendVersionService;
+import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchAuditService;
+import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchCredentialsService;
+import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchEntityService;
+import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchNode;
+import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchPublishService;
+import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchSchemaService;
+import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchVersionService;
+import net.objecthunter.larch.service.backend.fs.FilesystemBlobstoreService;
+import net.objecthunter.larch.service.backend.weedfs.WeedFSBlobstoreService;
+import net.objecthunter.larch.service.backend.weedfs.WeedFsMaster;
+import net.objecthunter.larch.service.backend.weedfs.WeedFsVolume;
+import net.objecthunter.larch.service.impl.DefaultEntityService;
+import net.objecthunter.larch.service.impl.DefaultExportService;
+import net.objecthunter.larch.service.impl.DefaultMailService;
+import net.objecthunter.larch.service.impl.DefaultMessagingService;
+import net.objecthunter.larch.service.impl.DefaultRepositoryService;
+import net.objecthunter.larch.service.impl.DefaultSchemaService;
 import net.objecthunter.larch.util.FileSystemUtil;
+
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.elasticsearch.client.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
-import javax.jms.Queue;
-import java.io.File;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationConfig;
+import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 
 /**
- * General JavaConfig class for the larch repository containing all the necessary beans for a larch
- * repository except the security context configuration
+ * General JavaConfig class for the larch repository containing all the necessary beans for a larch repository except
+ * the security context configuration
  */
 @EnableAutoConfiguration
 @ComponentScan(basePackages = "net.objecthunter.larch.controller")
@@ -55,33 +83,23 @@ public class LarchServerConfiguration {
     public Environment env;
 
     /**
-     * Get a {@link net.objecthunter.larch.service.AuditService} Spring bean
-     *
-     * @return the {@link net.objecthunter.larch.service.AuditService} implementation
-     */
-    @Bean
-    public AuditService auditService() {
-        return new ElasticSearchAuditService();
-    }
-
-    /**
-     * Get a {@link net.objecthunter.larch.service.SchemaService} Spring bean
-     *
-     * @return the {@link net.objecthunter.larch.service.SchemaService} implementation
-     */
-    @Bean
-    public SchemaService schemaService() {
-        return new ElasticSearchSchemaService();
-    }
-
-    /**
      * Get a {@link net.objecthunter.larch.service.impl.DefaultEntityService} Spring bean
      *
-     * @return the {@link net.objecthunter.larch.service.SchemaService} implementation
+     * @return the {@link net.objecthunter.larch.service.DefaultEntityService} implementation
      */
     @Bean
     public EntityService defaultEntityService() {
         return new DefaultEntityService();
+    }
+
+    /**
+     * Get a {@link net.objecthunter.larch.service.impl.DefaultSchemaService} Spring bean
+     *
+     * @return the {@link net.objecthunter.larch.service.DefaultSchemaService} implementation
+     */
+    @Bean
+    public SchemaService defaultSchemaService() {
+        return new DefaultSchemaService();
     }
 
     /**
@@ -94,30 +112,21 @@ public class LarchServerConfiguration {
         return new DefaultRepositoryService();
     }
 
-    /**
-     * Get a {@link net.objecthunter.larch.service.SearchService} implementation Spring bean
-     *
-     * @return a {@link net.objecthunter.larch.service.elasticsearch.ElasticSearchSearchService} implementation
-     */
-    @Bean
-    public IndexService elasticSearchIndexService() {
-        return new ElasticSearchIndexService();
-    }
-
-    /**
-     * Get a {@link net.objecthunter.larch.service.PublishService} implementation Spring bean
-     *
-     * @return a {@link net.objecthunter.larch.service.PublishService} implementation
-     */
-    @Bean
-    public PublishService publishService() {
-        return new ElasticSearchPublishService();
-    }
-
     @Bean
     public MailService mailService() {
         return new DefaultMailService();
     }
+
+    /**
+     * Get the {@link net.objecthunter.larch.service.ExportService} Spring bean
+     *
+     * @return a {@link net.objecthunter.larch.service.ExportService} implementation to be used by the repository
+     */
+    @Bean
+    public ExportService exportService() {
+        return new DefaultExportService();
+    }
+
     /**
      * Get a ElasticSearch {@link org.elasticsearch.client.Client} Spring bean
      *
@@ -129,10 +138,60 @@ public class LarchServerConfiguration {
     }
 
     /**
-     * Get {@link net.objecthunter.larch.service.elasticsearch.ElasticSearchNode} Spring bean responsible for
+     * Get a {@link net.objecthunter.larch.service.backend.BackendAuditService} Spring bean
+     *
+     * @return the {@link net.objecthunter.larch.service.backend.BackendAuditService} implementation
+     */
+    @Bean
+    public BackendAuditService backendAuditService() {
+        return new ElasticSearchAuditService();
+    }
+
+    /**
+     * Get a {@link net.objecthunter.larch.service.backend.BackendSchemaService} Spring bean
+     *
+     * @return the {@link net.objecthunter.larch.service.backend.BackendSchemaService} implementation
+     */
+    @Bean
+    public BackendSchemaService backendSchemaService() {
+        return new ElasticSearchSchemaService();
+    }
+
+    /**
+     * Get a {@link net.objecthunter.larch.service.backend.BackendSearchService} implementation Spring bean
+     *
+     * @return a {@link net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchSearchService} implementation
+     */
+    @Bean
+    public BackendEntityService elasticSearchIndexService() {
+        return new ElasticSearchEntityService();
+    }
+
+    /**
+     * Get a {@link net.objecthunter.larch.service.backend.BackendPublishService} implementation Spring bean
+     *
+     * @return a {@link net.objecthunter.larch.service.backend.BackendPublishService} implementation
+     */
+    @Bean
+    public BackendPublishService backendPublishService() {
+        return new ElasticSearchPublishService();
+    }
+
+    /**
+     * Get a {@link net.objecthunter.larch.service.backend.BackendVersionService} Spring bean
+     *
+     * @return a BackendVersionService implementation
+     */
+    @Bean
+    public BackendVersionService backendVersionService() {
+        return new ElasticSearchVersionService();
+    }
+
+    /**
+     * Get {@link net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchNode} Spring bean responsible for
      * starting and stopping the ElasticSearch services
      *
-     * @return the {@link net.objecthunter.larch.service.elasticsearch.ElasticSearchNode} object
+     * @return the {@link net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchNode} object
      */
     @Bean
     public ElasticSearchNode elasticSearchNode() {
@@ -140,10 +199,10 @@ public class LarchServerConfiguration {
     }
 
     /**
-     * Get a {@link net.objecthunter.larch.service.fs.FilesystemBlobstoreService} implementation for usage as a {@link net
-     * .objecthunter.larch.service.BlobstoreService} in the repository
+     * Get a {@link net.objecthunter.larch.service.backend.fs.FilesystemBlobstoreService} implementation for usage as a
+     * {@link net.objecthunter.larch.service.backend.BackendBlobstoreService} in the repository
      *
-     * @return the {@link net.objecthunter.larch.service.fs.FilesystemBlobstoreService} implementation
+     * @return the {@link net.objecthunter.larch.service.backend.fs.FilesystemBlobstoreService} implementation
      */
     @Bean
     @Profile("fs")
@@ -152,10 +211,10 @@ public class LarchServerConfiguration {
     }
 
     /**
-     * Get a {@link net.objecthunter.larch.service.weedfs.WeedFsMaster} object responsible for starting and stopping the Weed
-     * FS master node
+     * Get a {@link net.objecthunter.larch.service.backend.weedfs.WeedFsMaster} object responsible for starting and stopping the
+     * Weed FS master node
      *
-     * @return the {@link net.objecthunter.larch.service.weedfs.WeedFsMaster} object
+     * @return the {@link net.objecthunter.larch.service.backend.weedfs.WeedFsMaster} object
      */
     @Bean
     @Profile("weedfs")
@@ -165,10 +224,10 @@ public class LarchServerConfiguration {
     }
 
     /**
-     * Get a {@link net.objecthunter.larch.service.weedfs.WeedFsVolume} object responsible for starting and stopping a Weed
-     * FS volume node
+     * Get a {@link net.objecthunter.larch.service.backend.weedfs.WeedFsVolume} object responsible for starting and stopping a
+     * Weed FS volume node
      *
-     * @return the {@link net.objecthunter.larch.service.weedfs.WeedFsVolume} object
+     * @return the {@link net.objecthunter.larch.service.backend.weedfs.WeedFsVolume} object
      */
     @Bean
     @Profile("weedfs")
@@ -178,10 +237,10 @@ public class LarchServerConfiguration {
     }
 
     /**
-     * Get a {@link net.objecthunter.larch.service.weedfs.WeedFSBlobstoreService} implementation as the {@link net
-     * .objecthunter.larch.service.BlobstoreService} fro the repository
+     * Get a {@link net.objecthunter.larch.service.backend.weedfs.WeedFSBlobstoreService} implementation as the
+     * {@link net.objecthunter.larch.service.backend.BackendBlobstoreService} fro the repository
      *
-     * @return the {@link net.objecthunter.larch.service.weedfs.WeedFSBlobstoreService} object
+     * @return the {@link net.objecthunter.larch.service.backend.weedfs.WeedFSBlobstoreService} object
      */
     @Bean
     @Profile("weedfs")
@@ -204,33 +263,14 @@ public class LarchServerConfiguration {
     }
 
     /**
-     * Get the {@link com.fasterxml.jackson.databind.SerializationConfig} Spring bean for the Jackson {@link com.fasterxml.jackson.databind.ObjectMapper}
+     * Get the {@link com.fasterxml.jackson.databind.SerializationConfig} Spring bean for the Jackson
+     * {@link com.fasterxml.jackson.databind.ObjectMapper}
      *
      * @return the {@link com.fasterxml.jackson.databind.SerializationConfig} that should be used by the Jackson mapper
      */
     @Bean
     public SerializationConfig serializationConfig() {
         return objectMapper().getSerializationConfig();
-    }
-
-    /**
-     * Get the {@link net.objecthunter.larch.service.ExportService} Spring bean
-     *
-     * @return a {@link net.objecthunter.larch.service.ExportService} implementation to be used by the repository
-     */
-    @Bean
-    public ExportService exportService() {
-        return new DefaultExportService();
-    }
-
-    /**
-     * Get a {@link net.objecthunter.larch.service.SearchService} Spring bean
-     *
-     * @return a {@link net.objecthunter.larch.service.SearchService} implementation
-     */
-    @Bean
-    public SearchService searchService() {
-        return new ElasticSearchSearchService();
     }
 
     /**
@@ -245,16 +285,6 @@ public class LarchServerConfiguration {
     }
 
     /**
-     * Get a  {@link net.objecthunter.larch.service.VersionService} Spring bean
-     *
-     * @return a VersionService implementation
-     */
-    @Bean
-    public VersionService versionService() {
-        return new ElasticSearchVersionService();
-    }
-
-    /**
      * The Spring-security JavaConfig class containing the relevan AuthZ/AuthN definitions
      *
      * @return the {@link LarchServerSecurityConfiguration} used
@@ -266,9 +296,10 @@ public class LarchServerConfiguration {
     }
 
     /**
-     * Get a {@link net.objecthunter.larch.service.CredentialsService} implementation for use by the repository
+     * Get a {@link net.objecthunter.larch.service.backend.BackendCredentialsService} implementation for use by the
+     * repository
      *
-     * @return a {@link net.objecthunter.larch.service.CredentialsService} implementation
+     * @return a {@link net.objecthunter.larch.service.backend.BackendCredentialsService} implementation
      */
     @Bean
     @Order(Ordered.LOWEST_PRECEDENCE - 9)
@@ -286,7 +317,9 @@ public class LarchServerConfiguration {
 
     @Bean
     public BrokerService brokerService() throws Exception {
-        final File dir = new File(env.getProperty("larch.messaging.path.data", System.getProperty("java.io.tmpdir") + "/larch-jms-data"));
+        final File dir =
+            new File(env.getProperty("larch.messaging.path.data", System.getProperty("java.io.tmpdir")
+                + "/larch-jms-data"));
         FileSystemUtil.checkAndCreate(dir);
         final BrokerService broker = new BrokerService();
         broker.addConnector(brokerUri());

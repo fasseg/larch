@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.service;
+package net.objecthunter.larch.service.backend;
 
 import net.objecthunter.larch.model.AuditRecord;
 
@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Service definition for interactions of {@link net.objecthunter.larch.model.AuditRecord} objects
  */
-public interface AuditService {
+public interface BackendAuditService {
     /**
      * Retrieve a list of {@link net.objecthunter.larch.helpers.AuditRecord} form the repository for a given Entity
      * @param entityId The id of the {@link net.objecthunter.larch.model.Entity}

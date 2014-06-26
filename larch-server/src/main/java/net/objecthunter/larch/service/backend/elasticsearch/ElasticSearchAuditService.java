@@ -13,11 +13,13 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.service.elasticsearch;
+package net.objecthunter.larch.service.backend.elasticsearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import net.objecthunter.larch.model.AuditRecord;
-import net.objecthunter.larch.service.AuditService;
+import net.objecthunter.larch.service.backend.BackendAuditService;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
@@ -32,6 +34,7 @@ import org.elasticsearch.search.SearchHit;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
+
 import java.io.IOException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -39,9 +42,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Implementation of an {@link net.objecthunter.larch.service.AuditService} built on top of ElasticSearch
+ * Implementation of an {@link net.objecthunter.larch.service.backend.BackendAuditService} built on top of ElasticSearch
  */
-public class ElasticSearchAuditService extends AbstractElasticSearchService implements AuditService {
+public class ElasticSearchAuditService extends AbstractElasticSearchService implements BackendAuditService {
     public static final String INDEX_AUDIT = "audit";
     private static final Logger log = Logger.getLogger(ElasticSearchAuditService.class);
 
@@ -52,7 +55,7 @@ public class ElasticSearchAuditService extends AbstractElasticSearchService impl
 
     @PostConstruct
     public void init() {
-        log.debug("initialising ElasticSearchIndexService");
+        log.debug("initialising ElasticSearchEntityService");
         this.checkAndOrCreateIndex(INDEX_AUDIT);
         this.waitForIndex(INDEX_AUDIT);
     }

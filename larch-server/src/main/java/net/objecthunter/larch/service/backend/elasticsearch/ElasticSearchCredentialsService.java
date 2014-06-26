@@ -13,15 +13,17 @@
 * See the License for the specific language governing permissions and
 * limitations under the License. 
 */
-package net.objecthunter.larch.service.elasticsearch;
+package net.objecthunter.larch.service.backend.elasticsearch;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import net.objecthunter.larch.model.security.Group;
 import net.objecthunter.larch.model.security.User;
 import net.objecthunter.larch.model.security.UserRequest;
-import net.objecthunter.larch.service.CredentialsService;
 import net.objecthunter.larch.service.MailService;
+import net.objecthunter.larch.service.backend.BackendCredentialsService;
+
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.elasticsearch.action.count.CountResponse;
@@ -41,6 +43,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.AuthorityUtils;
 
 import javax.annotation.PostConstruct;
+
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -51,7 +54,7 @@ import java.util.List;
  * Implementation of a spring-security {@link org.springframework.security.authentication.AuthenticationManager}
  * which uses ElasticSearch indices as a persistence layer
  */
-public class ElasticSearchCredentialsService extends AbstractElasticSearchService implements AuthenticationManager, CredentialsService {
+public class ElasticSearchCredentialsService extends AbstractElasticSearchService implements AuthenticationManager, BackendCredentialsService {
     public static final String INDEX_USERS = "users";
     public static final String INDEX_GROUPS = "groups";
     public static final String INDEX_USERS_TYPE = "user";

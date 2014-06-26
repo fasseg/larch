@@ -16,8 +16,10 @@
 package net.objecthunter.larch.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import net.objecthunter.larch.model.state.IndexState;
-import net.objecthunter.larch.service.elasticsearch.ElasticSearchIndexService;
+import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchEntityService;
+
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,7 +27,7 @@ import static org.junit.Assert.assertEquals;
 
 public class ElasticSearchIndexServiceIT extends AbstractLarchIT {
     @Autowired
-    private ElasticSearchIndexService service;
+    private ElasticSearchEntityService service;
 
     @Autowired
     private ObjectMapper mapper;
