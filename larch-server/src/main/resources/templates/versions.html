@@ -13,7 +13,7 @@
     <div class="main">
         <div th:include="fragments :: banner" class="title">
         </div>
-        <a th:each="entity : ${entities}" th:href="@{~/entity/} + ${entity.id} + '/version/' + ${entity.version}">
+        <a th:each="entity : ${entities.entities}" th:href="@{~/entity/} + ${entity.id} + '/version/' + ${entity.version}">
             <div class="panel clickable">
                 <p class="panel_title" th:text="'Version: ' + ${entity.version} + ' of id: ' + ${entity.id}"></p>
                 <p class="property">Label</p><p class="value" th:text="${entity.label}"></p>
