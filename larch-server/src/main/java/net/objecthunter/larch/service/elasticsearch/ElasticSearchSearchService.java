@@ -36,7 +36,6 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * An implementation of a {@link net.objecthunter.larch.service.SearchService} built on top of ElasticSearch
@@ -120,7 +119,8 @@ public class ElasticSearchSearchService extends AbstractElasticSearchService imp
             this.client
                 .prepareSearch(ElasticSearchIndexService.INDEX_ENTITIES).addFields("id", "label", "type", "tags")
                 .setQuery(queryBuilder).setSearchType(SearchType.DFS_QUERY_THEN_FETCH).execute().actionGet();
-        LOG.debug("ES returned {} results for '{}'", resp.getHits().getHits().length, new String(queryBuilder.buildAsBytes().toBytes()));
+        LOG.debug("ES returned {} results for '{}'", resp.getHits().getHits().length, new String(queryBuilder
+            .buildAsBytes().toBytes()));
         final SearchResult result = new SearchResult();
 
         final List<Entity> entities = new ArrayList<>();
@@ -161,21 +161,15 @@ public class ElasticSearchSearchService extends AbstractElasticSearchService imp
     }
 
     /**
-     * Holds enabled search-fields in entities-index.
-     * Differentiate between name of GET/POST-Parameter and name of Search-Field in index.
+     * Holds enabled search-fields in entities-index. Differentiate between name of GET/POST-Parameter and name of
+     * Search-Field in index.
      * 
      * @author mih
      *
      */
     public static enum EntitiesSearchField {
-        ID("id", "id"), 
-        LABEL("label", "label"), 
-        TYPE("type", "type"), 
-        PARENT("parent", "parentId"), 
-        TAG("tag", "tags"), 
-        STATE("state", "state"), 
-        VERSION("version", "version"), 
-        ALL("term", "_all");
+        ID("id", "id"), LABEL("label", "label"), TYPE("type", "type"), PARENT("parent", "parentId"), TAG("tag", "tags"), STATE(
+            "state", "state"), VERSION("version", "version"), ALL("term", "_all");
 
         private final String requestParameterName;
 

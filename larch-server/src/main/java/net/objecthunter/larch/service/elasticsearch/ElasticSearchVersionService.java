@@ -1,10 +1,18 @@
 package net.objecthunter.larch.service.elasticsearch;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+
+import net.objecthunter.larch.model.Entities;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.Version;
 import net.objecthunter.larch.service.BlobstoreService;
 import net.objecthunter.larch.service.VersionService;
+
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
@@ -13,20 +21,21 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Service implementation on top of ElasticSearch
  */
 public class ElasticSearchVersionService implements VersionService {
     public static final String INDEX_VERSIONS = "versions";
+
     public static final String TYPE_VERSIONS = "version";
+
     private static final Logger log = LoggerFactory.getLogger(ElasticSearchVersionService.class);
 
     @Autowired
@@ -40,22 +49,18 @@ public class ElasticSearchVersionService implements VersionService {
 
     @PostConstruct
     public void init() throws IOException {
-        final IndicesExistsResponse existsResp = client.admin().indices().prepareExists(INDEX_VERSIONS)
-                .execute()
-                .actionGet();
+        final IndicesExistsResponse existsResp =
+            client.admin().indices().prepareExists(INDEX_VERSIONS).execute().actionGet();
         if (!existsResp.isExists()) {
             log.info("Creating non existant versions index");
-            final CreateIndexResponse indexResp = client.admin().indices().prepareCreate(INDEX_VERSIONS)
-                    .execute()
-                    .actionGet();
+            final CreateIndexResponse indexResp =
+                client.admin().indices().prepareCreate(INDEX_VERSIONS).execute().actionGet();
         }
 
     }
+
     private void refreshIndex(String... indices) {
-        client.admin()
-                .indices()
-                .refresh(new RefreshRequest(indices))
-                .actionGet();
+        client.admin().indices().refresh(new RefreshRequest(indices)).actionGet();
     }
 
     @Override
@@ -65,28 +70,48 @@ public class ElasticSearchVersionService implements VersionService {
         version.setEntityId(e.getId());
         version.setVersionNumber(e.getVersion());
         version.setPath(path);
-        final IndexResponse resp = this.client.prepareIndex(INDEX_VERSIONS, TYPE_VERSIONS)
-                .setSource(this.mapper.writeValueAsBytes(version))
-                .execute()
-                .actionGet();
+        final IndexResponse resp =
+            this.client
+                .prepareIndex(INDEX_VERSIONS, TYPE_VERSIONS).setSource(this.mapper.writeValueAsBytes(version))
+                .execute().actionGet();
         this.refreshIndex(INDEX_VERSIONS);
         log.info("added entity {} version {}", version.getEntityId(), version.getVersionNumber());
     }
 
     @Override
     public Entity getOldVersion(String id, int versionNumber) throws IOException {
-        final SearchResponse resp = client.prepareSearch(INDEX_VERSIONS)
-                .setQuery(QueryBuilders.boolQuery()
-                    .must(QueryBuilders.matchQuery("entityId", id))
-                    .must(QueryBuilders.matchQuery("versionNumber", versionNumber)))
-                .setFrom(0)
-                .setSize(1)
-                .execute()
-                .actionGet();
+        final SearchResponse resp =
+            client
+                .prepareSearch(INDEX_VERSIONS)
+                .setQuery(
+                    QueryBuilders
+                        .boolQuery().must(QueryBuilders.matchQuery("entityId", id))
+                        .must(QueryBuilders.matchQuery("versionNumber", versionNumber))).setFrom(0).setSize(1)
+                .execute().actionGet();
         if (resp.getHits().getTotalHits() == 0) {
             throw new FileNotFoundException("Entity " + id + " does not exists with version " + versionNumber);
         }
         final Version v = this.mapper.readValue(resp.getHits().getAt(0).getSourceAsString(), Version.class);
         return this.mapper.readValue(this.blobstoreService.retrieveOldVersionBlob(v.getPath()), Entity.class);
     }
+
+    @Override
+    public Entities getOldVersions(String id) throws IOException {
+        final SearchResponse resp =
+            client
+                .prepareSearch(INDEX_VERSIONS)
+                .setQuery(QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("entityId", id))).setSize(1000)
+                .addSort("versionNumber", SortOrder.DESC).execute().actionGet();
+        final List<Entity> entities = new ArrayList<Entity>();
+        for (final SearchHit hit : resp.getHits()) {
+            final Version v = this.mapper.readValue(hit.getSourceAsString(), Version.class);
+            final Entity e =
+                this.mapper.readValue(this.blobstoreService.retrieveOldVersionBlob(v.getPath()), Entity.class);
+            entities.add(e);
+        }
+        Entities entit = new Entities();
+        entit.setEntities(entities);
+        return entit;
+    }
+
 }

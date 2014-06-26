@@ -22,6 +22,10 @@ import net.objecthunter.larch.model.Entity;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import net.objecthunter.larch.model.Entity;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
 /**
  * Service definition for CRUD operations on {@link net.objecthunter.larch.model.Entity} objects
  */

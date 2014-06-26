@@ -20,11 +20,13 @@ import java.io.InputStream;
 
 import net.objecthunter.larch.helpers.AuditRecords;
 import net.objecthunter.larch.model.AlternativeIdentifier;
+import net.objecthunter.larch.model.Entities;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.service.AuditService;
 import net.objecthunter.larch.service.EntityService;
 import net.objecthunter.larch.service.MessagingService;
 import net.objecthunter.larch.service.SchemaService;
+import net.objecthunter.larch.service.VersionService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,6 +51,9 @@ public class EntityController extends AbstractLarchController {
 
     @Autowired
     private EntityService entityService;
+
+    @Autowired
+    private VersionService versionService;
 
     @Autowired
     private MessagingService messagingService;
@@ -138,6 +143,67 @@ public class EntityController extends AbstractLarchController {
     final String id, @PathVariable("version")
     final int version) throws IOException {
         return entityService.retrieve(id, version);
+    }
+
+    /**
+     * Controller method for retrieval of a HTML view of a given version of an
+     * {@link net.objecthunter.larch.model.Entity}
+     *
+     * @param id
+     *            the {@link net.objecthunter.larch.model.Entity}'s id
+     * @param version
+     *            the version number of the Entity version to retrieve
+     * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} for rendering the HTML view
+     * @throws IOException
+     */
+    @RequestMapping(value = "/{id}/version/{version}", produces = "text/html")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public ModelAndView retrieveHtml(@PathVariable("id")
+    final String id, @PathVariable("version")
+    final int version) throws IOException {
+        final ModelMap model = new ModelMap();
+        model.addAttribute("entity", entityService.retrieve(id, version));
+        return new ModelAndView("entity", model);
+    }
+
+    /**
+     * Controller method for retrieval of a JSON representation of all versions of an
+     * {@link net.objecthunter.larch.model.Entity}
+     *
+     * @param id
+     *            the {@link net.objecthunter.larch.model.Entity}'s id
+     * @return An Entities object which gets transformed into a JSON response by Spring MVC
+     * @throws IOException
+     */
+    @RequestMapping("/{id}/versions")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public Entities retrieveVersions(@PathVariable("id")
+    final String id) throws IOException {
+        Entities entities = versionService.getOldVersions(id);
+        entities.getEntities().add(0, entityService.retrieve(id));
+        return entities;
+    }
+
+    /**
+     * Controller method for retrieval of a HTML view of all versions of an {@link net.objecthunter.larch.model.Entity}
+     *
+     * @param id
+     *            the {@link net.objecthunter.larch.model.Entity}'s id
+     * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} for rendering the HTML view
+     * @throws IOException
+     */
+    @RequestMapping(value = "/{id}/versions", produces = "text/html")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public ModelAndView retrieveVersionsHtml(@PathVariable("id")
+    final String id) throws IOException {
+        final ModelMap model = new ModelMap();
+        Entities entities = versionService.getOldVersions(id);
+        entities.getEntities().add(0, entityService.retrieve(id));
+        model.addAttribute("entities", entities);
+        return new ModelAndView("versions", model);
     }
 
     /**
