@@ -1,0 +1,8 @@
+{
+     "audit" : {
+        "properties" : {
+           "entityId" : {"type" : "string","index" : "not_analyzed"}
+           }
+     }
+   }
+}
