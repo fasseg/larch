@@ -5,26 +5,26 @@ import org.slf4j.LoggerFactory;
 
 import javax.jms.Message;
 import javax.jms.MessageListener;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by ruckus on 20.05.14.
  */
 public class TestMessageListener implements MessageListener {
     private static final Logger log = LoggerFactory.getLogger(TestMessageListener.class);
-    private boolean messageReceived = false;
-    private Message lastMessage;
+    private LinkedList<Message> messages = new LinkedList<>();
     @Override
     public void onMessage(Message message) {
-        messageReceived = true;
-        lastMessage = message;
+        messages.add(message);
         log.info("Received message");
     }
 
     public boolean isMessageReceived() {
-        return messageReceived;
+        return messages.size() > 0;
     }
 
-    public Message getLastMessage() {
-        return lastMessage;
+    public Message getLastMessages() {
+        return messages.poll();
     }
 }

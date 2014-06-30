@@ -167,10 +167,12 @@ public class EntityControllerIT extends AbstractLarchIT {
                 .returnResponse();
         assertEquals(201, resp.getStatusLine().getStatusCode());
         assertTrue(listener.isMessageReceived());
-        Message msg = listener.getLastMessage();
+        Message msg = listener.getMessages();
         assertNotNull(msg);
         assertTrue(msg instanceof TextMessage);
         TextMessage txt = (TextMessage) msg;
+        // this one fails on  Travis sporadically
+        // see e.g. https://travis-ci.org/fasseg/larch/builds/28821493#L3346
         assertNotNull(txt.getText());
         assertTrue(txt.getText().startsWith("Created entity"));
     }

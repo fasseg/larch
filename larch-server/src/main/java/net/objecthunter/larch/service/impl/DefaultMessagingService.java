@@ -109,12 +109,12 @@ public class DefaultMessagingService implements MessagingService {
 
     @Override
     public void publishCreateIdentifier(String entityId, String type, String value) {
-        this.publish("Created identifier of type " + type + "with value " + value + "on entity " + entityId);
+        this.publish("Created identifier of type " + type + " with value " + value + " on entity " + entityId);
     }
 
     @Override
     public void publishDeleteIdentifier(String entityId, String type, String value) {
-        this.publish("Created identifier of type " + type + "with value " + value + "on entity " + entityId);
+        this.publish("Deleted identifier of type " + type + " with value " + value + " on entity " + entityId);
 
     }
 
