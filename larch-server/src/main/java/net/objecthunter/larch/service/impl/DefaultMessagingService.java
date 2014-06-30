@@ -50,6 +50,9 @@ public class DefaultMessagingService implements MessagingService {
         if (!enabled) {
             return;
         }
+        if (text == null || text.isEmpty()) {
+           throw new RuntimeException("Text for JMS Message can not be empty");
+        }
         this.template.send(new MessageCreator() {
             @Override
             public Message createMessage(Session session) throws JMSException {
