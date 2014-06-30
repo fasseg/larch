@@ -15,9 +15,7 @@
  */
 package net.objecthunter.larch.integration;
 
-import static net.objecthunter.larch.integration.helpers.Fixtures.createFixtureCollectionEntity;
-import static net.objecthunter.larch.integration.helpers.Fixtures.createFixtureEntity;
-import static net.objecthunter.larch.integration.helpers.Fixtures.createSimpleFixtureEntity;
+import static net.objecthunter.larch.test.util.Fixtures.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;

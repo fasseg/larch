@@ -123,4 +123,32 @@ public class User {
     public void setGroups(List<Group> groups) {
         this.groups = groups;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        User user = (User) o;
+
+        if (email != null ? !email.equals(user.email) : user.email != null) return false;
+        if (firstName != null ? !firstName.equals(user.firstName) : user.firstName != null) return false;
+        if (groups != null ? !groups.equals(user.groups) : user.groups != null) return false;
+        if (lastName != null ? !lastName.equals(user.lastName) : user.lastName != null) return false;
+        if (!name.equals(user.name)) return false;
+        if (pwhash != null ? !pwhash.equals(user.pwhash) : user.pwhash != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
+        result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
+        result = 31 * result + (email != null ? email.hashCode() : 0);
+        result = 31 * result + (pwhash != null ? pwhash.hashCode() : 0);
+        result = 31 * result + (groups != null ? groups.hashCode() : 0);
+        return result;
+    }
 }

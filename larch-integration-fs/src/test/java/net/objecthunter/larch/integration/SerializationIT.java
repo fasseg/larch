@@ -16,8 +16,8 @@
 package net.objecthunter.larch.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.objecthunter.larch.integration.helpers.Fixtures;
 import net.objecthunter.larch.model.Entity;
+import net.objecthunter.larch.test.util.Fixtures;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
