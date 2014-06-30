@@ -53,7 +53,7 @@ public class ElasticSearchAuditService extends AbstractElasticSearchService impl
 
     @PostConstruct
     public void init() {
-        log.debug("initialising ElasticSearchEntityService");
+        log.debug("initialising ElasticSearchAuditService");
         this.checkAndOrCreateIndex(INDEX_AUDIT);
         this.waitForIndex(INDEX_AUDIT);
     }

@@ -61,7 +61,6 @@ public class AbstractElasticSearchService {
     }
 
     private Map getMappings(String indexName) {
-        System.out.println(env.getProperty("elasticsearch.config.path") + indexName + ".json");
         InputStream in =
             this.getClass().getResourceAsStream(
                 env.getProperty("elasticsearch.config.path") + indexName + "_mappings.json");

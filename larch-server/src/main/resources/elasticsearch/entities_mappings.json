@@ -1,0 +1,8 @@
+{
+     "entity" : {
+        "properties" : {
+           "parentId" : {"type" : "string","index" : "not_analyzed"}
+           }
+     }
+   }
+}

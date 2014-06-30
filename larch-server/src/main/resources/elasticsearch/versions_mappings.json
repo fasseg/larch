@@ -1,0 +1,9 @@
+{
+     "version" : {
+        "properties" : {
+           "entityId" : {"type" : "string","index" : "not_analyzed"},
+           "versionNumber" : {"type" : "integer","index" : "not_analyzed"}
+           }
+     }
+   }
+}

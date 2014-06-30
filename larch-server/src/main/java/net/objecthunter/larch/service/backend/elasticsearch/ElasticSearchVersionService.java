@@ -13,12 +13,9 @@ import net.objecthunter.larch.model.Version;
 import net.objecthunter.larch.service.backend.BackendBlobstoreService;
 import net.objecthunter.larch.service.backend.BackendVersionService;
 
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
-import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.sort.SortOrder;
@@ -31,7 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * Service implementation on top of ElasticSearch
  */
-public class ElasticSearchVersionService implements BackendVersionService {
+public class ElasticSearchVersionService extends AbstractElasticSearchService implements BackendVersionService {
     public static final String INDEX_VERSIONS = "versions";
 
     public static final String TYPE_VERSIONS = "version";
@@ -42,25 +39,13 @@ public class ElasticSearchVersionService implements BackendVersionService {
     private BackendBlobstoreService backendBlobstoreService;
 
     @Autowired
-    private Client client;
-
-    @Autowired
     private ObjectMapper mapper;
 
     @PostConstruct
     public void init() throws IOException {
-        final IndicesExistsResponse existsResp =
-            client.admin().indices().prepareExists(INDEX_VERSIONS).execute().actionGet();
-        if (!existsResp.isExists()) {
-            log.info("Creating non existant versions index");
-            final CreateIndexResponse indexResp =
-                client.admin().indices().prepareCreate(INDEX_VERSIONS).execute().actionGet();
-        }
-
-    }
-
-    private void refreshIndex(String... indices) {
-        client.admin().indices().refresh(new RefreshRequest(indices)).actionGet();
+        log.debug("initialising ElasticSearchVersionService");
+        this.checkAndOrCreateIndex(INDEX_VERSIONS);
+        this.waitForIndex(INDEX_VERSIONS);
     }
 
     @Override
@@ -85,8 +70,8 @@ public class ElasticSearchVersionService implements BackendVersionService {
                 .prepareSearch(INDEX_VERSIONS)
                 .setQuery(
                     QueryBuilders
-                        .boolQuery().must(QueryBuilders.matchQuery("entityId", id))
-                        .must(QueryBuilders.matchQuery("versionNumber", versionNumber))).setFrom(0).setSize(1)
+                    .boolQuery().must(QueryBuilders.matchQuery("entityId", id))
+                    .must(QueryBuilders.matchQuery("versionNumber", versionNumber))).setFrom(0).setSize(1)
                 .execute().actionGet();
         if (resp.getHits().getTotalHits() == 0) {
             throw new FileNotFoundException("Entity " + id + " does not exists with version " + versionNumber);
@@ -100,8 +85,12 @@ public class ElasticSearchVersionService implements BackendVersionService {
         final SearchResponse resp =
             client
                 .prepareSearch(INDEX_VERSIONS)
-                .setQuery(QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("entityId", id))).setSize(1000)
+                // .setQuery(QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("entityId", id))).setSize(1000)
+                .setQuery(
+                    QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
+                        FilterBuilders.termFilter("entityId", id))).setSize(1000)
                 .addSort("versionNumber", SortOrder.DESC).execute().actionGet();
+        System.out.println("MIH: found " + resp.getHits().getHits().length + " hits");
         final List<Entity> entities = new ArrayList<Entity>();
         for (final SearchHit hit : resp.getHits()) {
             final Version v = this.mapper.readValue(hit.getSourceAsString(), Version.class);
@@ -111,6 +100,7 @@ public class ElasticSearchVersionService implements BackendVersionService {
         }
         Entities entit = new Entities();
         entit.setEntities(entities);
+        System.out.println("MIH: found " + entities.size() + " entities");
         return entit;
     }
 

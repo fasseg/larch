@@ -43,6 +43,7 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.slf4j.Logger;
@@ -121,8 +122,11 @@ public class ElasticSearchEntityService extends AbstractElasticSearchService imp
         do {
             search =
                 client
-                    .prepareSearch(INDEX_ENTITIES).setTypes(INDEX_ENTITY_TYPE)
-                    .setQuery(QueryBuilders.matchQuery("parentId", id)).setFrom(offset).setSize(max).execute()
+                    .prepareSearch(INDEX_ENTITIES)
+                    .setTypes(INDEX_ENTITY_TYPE)
+                    .setQuery(
+                        QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
+                            FilterBuilders.termFilter("parentId", id))).setFrom(offset).setSize(max).execute()
                     .actionGet();
             if (search.getHits().getHits().length > 0) {
                 for (SearchHit hit : search.getHits().getHits()) {
