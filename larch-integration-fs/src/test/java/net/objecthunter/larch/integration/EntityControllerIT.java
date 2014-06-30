@@ -167,7 +167,7 @@ public class EntityControllerIT extends AbstractLarchIT {
                 .returnResponse();
         assertEquals(201, resp.getStatusLine().getStatusCode());
         assertTrue(listener.isMessageReceived());
-        Message msg = listener.getMessages();
+        Message msg = listener.getMessage();
         assertNotNull(msg);
         assertTrue(msg instanceof TextMessage);
         TextMessage txt = (TextMessage) msg;

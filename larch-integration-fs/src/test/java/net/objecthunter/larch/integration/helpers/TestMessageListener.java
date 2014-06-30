@@ -24,7 +24,7 @@ public class TestMessageListener implements MessageListener {
         return messages.size() > 0;
     }
 
-    public Message getLastMessages() {
+    public Message getMessage() {
         return messages.poll();
     }
 }
