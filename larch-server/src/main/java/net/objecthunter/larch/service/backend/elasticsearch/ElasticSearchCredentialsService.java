@@ -1,22 +1,27 @@
 /* 
-* Copyright 2014 Frank Asseg
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License. 
-*/
+ * Copyright 2014 Frank Asseg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
 package net.objecthunter.larch.service.backend.elasticsearch;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
 
 import net.objecthunter.larch.model.security.Group;
 import net.objecthunter.larch.model.security.User;
@@ -42,24 +47,24 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.AuthorityUtils;
 
-import javax.annotation.PostConstruct;
-
-import java.io.IOException;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Implementation of a spring-security {@link org.springframework.security.authentication.AuthenticationManager}
- * which uses ElasticSearch indices as a persistence layer
+ * Implementation of a spring-security {@link org.springframework.security.authentication.AuthenticationManager} which
+ * uses ElasticSearch indices as a persistence layer
  */
-public class ElasticSearchCredentialsService extends AbstractElasticSearchService implements AuthenticationManager, BackendCredentialsService {
+public class ElasticSearchCredentialsService extends AbstractElasticSearchService
+    implements AuthenticationManager, BackendCredentialsService {
     public static final String INDEX_USERS = "users";
+
     public static final String INDEX_GROUPS = "groups";
+
     public static final String INDEX_USERS_TYPE = "user";
+
     public static final String INDEX_GROUPS_TYPE = "group";
+
     public static final String INDEX_USERS_REQUEST = "user_requests";
+
     public static final String INDEX_USERS_REQUEST_TYPE = "user_request";
 
     @Autowired
@@ -78,48 +83,37 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
     }
 
     private void checkAndOrCreateDefaultUsers() throws IOException {
-        long count = client.prepareCount(INDEX_USERS)
-                .execute()
-                .actionGet()
-                .getCount();
+        long count = client.prepareCount(INDEX_USERS).execute().actionGet().getCount();
         if (count == 0) {
             // create default user
-            final Group g = mapper.readValue(client.prepareGet(INDEX_GROUPS, INDEX_GROUPS_TYPE, "ROLE_ADMIN")
-                    .execute()
-                    .actionGet()
-                    .getSourceAsBytes()
-                    , Group.class);
+            final Group g =
+                mapper.readValue(
+                    client
+                        .prepareGet(INDEX_GROUPS, INDEX_GROUPS_TYPE, "ROLE_ADMIN").execute().actionGet()
+                        .getSourceAsBytes(), Group.class);
             final User admin = new User();
             admin.setPwhash(DigestUtils.sha256Hex("admin"));
             admin.setName("admin");
             admin.setFirstName("Generic");
             admin.setLastName("Superuser");
             admin.setGroups(Arrays.asList(g));
-            client.prepareIndex(INDEX_USERS, "user", admin.getName())
-                    .setSource(mapper.writeValueAsBytes(admin))
-                    .execute()
-                    .actionGet();
+            client
+                .prepareIndex(INDEX_USERS, "user", admin.getName()).setSource(mapper.writeValueAsBytes(admin))
+                .execute().actionGet();
         }
     }
 
     private void checkAndOrCreateDefaultGroups() throws IOException {
-        long count = client.prepareCount(INDEX_GROUPS)
-                .execute()
-                .actionGet()
-                .getCount();
+        long count = client.prepareCount(INDEX_GROUPS).execute().actionGet().getCount();
         if (count == 0) {
             // create default groups
-            final Group[] groups = new Group[]{
-                    new Group(),
-                    new Group()
-            };
+            final Group[] groups = new Group[] { new Group(), new Group() };
             groups[0].setName("ROLE_ADMIN");
             groups[1].setName("ROLE_USER");
             for (final Group g : groups) {
-                client.prepareIndex(INDEX_GROUPS, INDEX_GROUPS_TYPE, g.getName())
-                        .setSource(mapper.writeValueAsBytes(g))
-                        .execute()
-                        .actionGet();
+                client
+                    .prepareIndex(INDEX_GROUPS, INDEX_GROUPS_TYPE, g.getName()).setSource(mapper.writeValueAsBytes(g))
+                    .execute().actionGet();
             }
         }
     }
@@ -128,9 +122,7 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
     public Authentication authenticate(Authentication auth) throws AuthenticationException {
         final String name = (String) auth.getPrincipal();
         final String hash = DigestUtils.sha256Hex((String) auth.getCredentials());
-        final GetResponse get = client.prepareGet(INDEX_USERS, INDEX_USERS_TYPE, name)
-                .execute()
-                .actionGet();
+        final GetResponse get = client.prepareGet(INDEX_USERS, INDEX_USERS_TYPE, name).execute().actionGet();
         if (get.isExists()) {
             try {
                 final User u = mapper.readValue(get.getSourceAsBytes(), User.class);
@@ -139,9 +131,11 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
                     for (int i = 0; i < roles.length; i++) {
                         roles[i] = u.getGroups().get(i).getName();
                     }
-                    return new UsernamePasswordAuthenticationToken(u, auth.getCredentials(), AuthorityUtils.createAuthorityList(roles));
+                    return new UsernamePasswordAuthenticationToken(u, auth.getCredentials(),
+                        AuthorityUtils.createAuthorityList(roles));
                 }
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 throw new BadCredentialsException("Unable to authenticate");
             }
         }
@@ -153,16 +147,15 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
         if (u.getName() == null) {
             throw new IOException("User name can not be null");
         }
-        final GetResponse get = this.client.prepareGet(INDEX_USERS, INDEX_USERS_TYPE, u.getName())
-                .execute()
-                .actionGet();
+        final GetResponse get =
+            this.client.prepareGet(INDEX_USERS, INDEX_USERS_TYPE, u.getName()).execute().actionGet();
         if (get.isExists()) {
             throw new IOException("The user " + u.getName() + " does already exist");
         }
-        final IndexResponse resp = this.client.prepareIndex(INDEX_USERS, INDEX_USERS_TYPE, u.getName())
-                .setSource(mapper.writeValueAsBytes(u))
-                .execute()
-                .actionGet();
+        final IndexResponse resp =
+            this.client
+                .prepareIndex(INDEX_USERS, INDEX_USERS_TYPE, u.getName()).setSource(mapper.writeValueAsBytes(u))
+                .execute().actionGet();
         this.refreshIndex(INDEX_USERS);
         return u;
     }
@@ -188,11 +181,9 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
         if (mailService.isEnabled()) {
             this.mailService.sendUserRequest(request);
         }
-        this.client.prepareIndex(INDEX_USERS_REQUEST, INDEX_USERS_REQUEST_TYPE)
-                .setSource(this.mapper.writeValueAsBytes(request))
-                .setId(request.getToken())
-                .execute()
-                .actionGet();
+        this.client
+            .prepareIndex(INDEX_USERS_REQUEST, INDEX_USERS_REQUEST_TYPE)
+            .setSource(this.mapper.writeValueAsBytes(request)).setId(request.getToken()).execute().actionGet();
         this.refreshIndex(INDEX_USERS_REQUEST);
         return request;
     }
@@ -202,16 +193,15 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
         if (g.getName() == null) {
             throw new IOException("Group name can not be null");
         }
-        final GetResponse get = this.client.prepareGet(INDEX_GROUPS, INDEX_GROUPS_TYPE, g.getName())
-                .execute()
-                .actionGet();
+        final GetResponse get =
+            this.client.prepareGet(INDEX_GROUPS, INDEX_GROUPS_TYPE, g.getName()).execute().actionGet();
         if (get.isExists()) {
             throw new IOException("The group " + g.getName() + " does already exist");
         }
-        final IndexResponse resp = this.client.prepareIndex(INDEX_GROUPS, INDEX_GROUPS_TYPE, g.getName())
-                .setSource(mapper.writeValueAsBytes(g))
-                .execute()
-                .actionGet();
+        final IndexResponse resp =
+            this.client
+                .prepareIndex(INDEX_GROUPS, INDEX_GROUPS_TYPE, g.getName()).setSource(mapper.writeValueAsBytes(g))
+                .execute().actionGet();
         this.refreshIndex(INDEX_GROUPS);
     }
 
@@ -220,16 +210,15 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
         if (u.getName() == null) {
             throw new IOException("User name can not be null");
         }
-        final GetResponse get = this.client.prepareGet(INDEX_USERS, INDEX_USERS_TYPE, u.getName())
-                .execute()
-                .actionGet();
+        final GetResponse get =
+            this.client.prepareGet(INDEX_USERS, INDEX_USERS_TYPE, u.getName()).execute().actionGet();
         if (!get.isExists()) {
             throw new IOException("The user " + u.getName() + " does not exist");
         }
-        final IndexResponse resp = this.client.prepareIndex(INDEX_USERS, INDEX_USERS_TYPE, u.getName())
-                .setSource(mapper.writeValueAsBytes(u))
-                .execute()
-                .actionGet();
+        final IndexResponse resp =
+            this.client
+                .prepareIndex(INDEX_USERS, INDEX_USERS_TYPE, u.getName()).setSource(mapper.writeValueAsBytes(u))
+                .execute().actionGet();
         this.refreshIndex(INDEX_USERS);
     }
 
@@ -238,16 +227,15 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
         if (g.getName() == null) {
             throw new IOException("Group name can not be null");
         }
-        final GetResponse get = this.client.prepareGet(INDEX_GROUPS, INDEX_GROUPS_TYPE, g.getName())
-                .execute()
-                .actionGet();
+        final GetResponse get =
+            this.client.prepareGet(INDEX_GROUPS, INDEX_GROUPS_TYPE, g.getName()).execute().actionGet();
         if (!get.isExists()) {
             throw new IOException("The group " + g.getName() + " does not exist");
         }
-        final IndexResponse resp = this.client.prepareIndex(INDEX_GROUPS, INDEX_GROUPS_TYPE, g.getName())
-                .setSource(mapper.writeValueAsBytes(g))
-                .execute()
-                .actionGet();
+        final IndexResponse resp =
+            this.client
+                .prepareIndex(INDEX_GROUPS, INDEX_GROUPS_TYPE, g.getName()).setSource(mapper.writeValueAsBytes(g))
+                .execute().actionGet();
     }
 
     @Override
@@ -274,15 +262,12 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
         if (this.isLastAdminUser(name)) {
             throw new IOException("Unable to delete last remaining Administrator");
         }
-        final GetResponse get = this.client.prepareGet(INDEX_USERS, INDEX_USERS_TYPE, name)
-                .execute()
-                .actionGet();
+        final GetResponse get = this.client.prepareGet(INDEX_USERS, INDEX_USERS_TYPE, name).execute().actionGet();
         if (!get.isExists()) {
             throw new IOException("The user " + name + " does not exist");
         }
-        final DeleteResponse resp = this.client.prepareDelete(INDEX_USERS, INDEX_USERS_TYPE, name)
-                .execute()
-                .actionGet();
+        final DeleteResponse resp =
+            this.client.prepareDelete(INDEX_USERS, INDEX_USERS_TYPE, name).execute().actionGet();
         this.refreshIndex(INDEX_USERS);
     }
 
@@ -291,18 +276,14 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
         if (name == null) {
             throw new IOException("Group name can not be null");
         }
-        final GetResponse get = this.client.prepareGet(INDEX_GROUPS, INDEX_GROUPS_TYPE, name)
-                .execute()
-                .actionGet();
+        final GetResponse get = this.client.prepareGet(INDEX_GROUPS, INDEX_GROUPS_TYPE, name).execute().actionGet();
         if (!get.isExists()) {
             throw new IOException("The group " + name + " does not exist");
         }
-        final DeleteResponse resp = this.client.prepareDelete(INDEX_GROUPS, INDEX_GROUPS_TYPE, name)
-                .execute()
-                .actionGet();
+        final DeleteResponse resp =
+            this.client.prepareDelete(INDEX_GROUPS, INDEX_GROUPS_TYPE, name).execute().actionGet();
         this.refreshIndex(INDEX_GROUPS);
     }
-
 
     @Override
     public void removeUserFromGroup(String username, String groupname) throws IOException {
@@ -319,18 +300,18 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
         if (!this.retrieveUser(name).getGroups().contains(this.retrieveGroup("ROLE_ADMIN"))) {
             return false;
         }
-        final CountResponse resp = this.client.prepareCount(INDEX_USERS)
-                .setQuery(QueryBuilders.matchQuery("groups.name", "ROLE_ADMIN"))
-                .execute()
-                .actionGet();
+        final CountResponse resp =
+            this.client
+                .prepareCount(INDEX_USERS)
+                .setQuery(
+                    QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
+                        FilterBuilders.termFilter("groups.name", "ROLE_ADMIN"))).execute().actionGet();
         return resp.getCount() < 2; // at least one other admin must exist
     }
 
     @Override
     public User retrieveUser(String name) throws IOException {
-        final GetResponse get = this.client.prepareGet(INDEX_USERS, INDEX_USERS_TYPE, name)
-                .execute()
-                .actionGet();
+        final GetResponse get = this.client.prepareGet(INDEX_USERS, INDEX_USERS_TYPE, name).execute().actionGet();
         if (!get.isExists()) {
             throw new IOException("User '" + name + "' is not valid");
         }
@@ -339,9 +320,7 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
 
     @Override
     public Group retrieveGroup(String name) throws IOException {
-        final GetResponse get = this.client.prepareGet(INDEX_GROUPS, INDEX_GROUPS_TYPE, name)
-                .execute()
-                .actionGet();
+        final GetResponse get = this.client.prepareGet(INDEX_GROUPS, INDEX_GROUPS_TYPE, name).execute().actionGet();
         if (!get.isExists()) {
             throw new IOException("Group '" + name + "' is not valid");
         }
@@ -350,10 +329,8 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
 
     @Override
     public List<User> retrieveUsers() throws IOException {
-        final SearchResponse resp = this.client.prepareSearch(INDEX_USERS)
-                .setQuery(QueryBuilders.matchAllQuery())
-                .execute()
-                .actionGet();
+        final SearchResponse resp =
+            this.client.prepareSearch(INDEX_USERS).setQuery(QueryBuilders.matchAllQuery()).execute().actionGet();
         final List<User> users = new ArrayList<>(resp.getHits().getHits().length);
         for (SearchHit hit : resp.getHits()) {
             users.add(mapper.readValue(hit.getSourceAsString(), User.class));
@@ -363,10 +340,8 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
 
     @Override
     public List<Group> retrieveGroups() throws IOException {
-        final SearchResponse resp = this.client.prepareSearch(INDEX_GROUPS)
-                .setQuery(QueryBuilders.matchAllQuery())
-                .execute()
-                .actionGet();
+        final SearchResponse resp =
+            this.client.prepareSearch(INDEX_GROUPS).setQuery(QueryBuilders.matchAllQuery()).execute().actionGet();
         final List<Group> groups = new ArrayList<>(resp.getHits().getHits().length);
         for (SearchHit hit : resp.getHits()) {
             groups.add(mapper.readValue(hit.getSourceAsString(), Group.class));
@@ -376,9 +351,8 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
 
     @Override
     public UserRequest retrieveUserRequest(String token) throws IOException {
-        final GetResponse resp = this.client.prepareGet(INDEX_USERS_REQUEST, INDEX_USERS_REQUEST_TYPE, token)
-                .execute()
-                .actionGet();
+        final GetResponse resp =
+            this.client.prepareGet(INDEX_USERS_REQUEST, INDEX_USERS_REQUEST_TYPE, token).execute().actionGet();
         return mapper.readValue(resp.getSourceAsBytes(), UserRequest.class);
     }
 
@@ -406,26 +380,22 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
 
     @Override
     public void deleteUserRequest(String token) {
-        final DeleteResponse resp = this.client.prepareDelete(INDEX_USERS_REQUEST, INDEX_USERS_REQUEST_TYPE, token)
-                .execute()
-                .actionGet();
+        final DeleteResponse resp =
+            this.client.prepareDelete(INDEX_USERS_REQUEST, INDEX_USERS_REQUEST_TYPE, token).execute().actionGet();
         refreshIndex(INDEX_USERS_REQUEST);
     }
 
     @Override
     public boolean isExistingUser(String name) {
-        return this.client.prepareGet(INDEX_USERS, INDEX_USERS_TYPE, name)
-                .execute()
-                .actionGet()
-                .isExists();
+        return this.client.prepareGet(INDEX_USERS, INDEX_USERS_TYPE, name).execute().actionGet().isExists();
     }
 
     @Override
     public List<Group> retrieveGroups(List<String> groupNames) throws IOException {
-        final SearchResponse resp = this.client.prepareSearch(INDEX_GROUPS)
-                .setQuery(QueryBuilders.idsQuery()
-                        .ids(groupNames.toArray(new String[groupNames.size()])))
-                .execute()
+        final SearchResponse resp =
+            this.client
+                .prepareSearch(INDEX_GROUPS)
+                .setQuery(QueryBuilders.idsQuery().ids(groupNames.toArray(new String[groupNames.size()]))).execute()
                 .actionGet();
         final List<Group> groups = new ArrayList<>(resp.getHits().getHits().length);
         for (SearchHit hit : resp.getHits()) {

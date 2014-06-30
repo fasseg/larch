@@ -1,29 +1,30 @@
 /* 
-* Copyright 2014 Frank Asseg
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License. 
-*/
+ * Copyright 2014 Frank Asseg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
 package net.objecthunter.larch.integration.helpers;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import net.objecthunter.larch.model.Binary;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.Metadata;
 import net.objecthunter.larch.model.source.UrlSource;
-import org.apache.commons.lang3.RandomStringUtils;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import org.apache.commons.lang3.RandomStringUtils;
 
 public abstract class Fixtures {
     public static Entity createFixtureEntityWithRandomId() throws Exception {
@@ -49,7 +50,7 @@ public abstract class Fixtures {
         bin2.setName("image-2");
         Map<String, Metadata> bin2Md = new HashMap<>();
         md = createRandomDCMetadata();
-        bin2Md.put(md.getName(),md);
+        bin2Md.put(md.getName(), md);
         bin2.setMetadata(bin2Md);
         Map<String, Binary> binaries = new HashMap<>();
         binaries.put(bin1.getName(), bin1);
@@ -71,17 +72,16 @@ public abstract class Fixtures {
         md.setType("DC");
         md.setName("Dublin-Core-" + RandomStringUtils.randomAlphabetic(16));
         StringBuilder dcBuilder = new StringBuilder();
-        dcBuilder.append("<metadata xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:dc=\"http://purl" +
-                ".org/dc/elements/1.1/\">")
-                .append("\n\t<dc:title>Test Object</dc:title>")
-                .append("\n\t<dc:creator>fasseg</dc:creator>")
-                .append("\n\t<dc:subject>Testing Groven</dc:subject>")
-                .append("\n\t<dc:description>Test Object to implement integration Tests</dc:description>")
-                .append("\n<metadata>");
+        dcBuilder
+            .append(
+                "<metadata xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:dc=\"http://purl"
+                    + ".org/dc/elements/1.1/\">").append("\n\t<dc:title>Test Object</dc:title>")
+            .append("\n\t<dc:creator>fasseg</dc:creator>").append("\n\t<dc:subject>Testing Groven</dc:subject>")
+            .append("\n\t<dc:description>Test Object to implement integration Tests</dc:description>")
+            .append("\n<metadata>");
         md.setData(dcBuilder.toString());
         return md;
     }
-
 
     public static Entity createSimpleFixtureEntity() throws Exception {
         Binary bin1 = new Binary();
@@ -99,13 +99,21 @@ public abstract class Fixtures {
         return e;
     }
 
+    public static Entity createFixtureEntityWithoutBinary() throws Exception {
+        Entity e = new Entity();
+        e.setLabel("My Label");
+        e.setTags(Arrays.asList("test", "integration-test"));
+        e.setType("Image");
+        return e;
+    }
+
     public static Entity createFixtureCollectionEntity() throws Exception {
         Entity e = createSimpleFixtureEntity();
         e.setType("Collection");
         return e;
     }
 
-    public static Binary createRandomImageBinary() throws Exception{
+    public static Binary createRandomImageBinary() throws Exception {
         Binary bin = new Binary();
         bin.setMimetype("image/png");
         bin.setFilename("image_1.png");
