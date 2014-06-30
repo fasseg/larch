@@ -83,10 +83,12 @@ public class IdentifierControllerIT extends AbstractLarchIT {
         final String entityId = EntityUtils.toString(resp.getEntity());
 
         // create new identifier
+        this.hideLog();
         resp =
             this.execute(
                 Request.Post(identifierUrl.replaceFirst("\\{id\\}", entityId)).bodyString("type=&value=123",
                     ContentType.APPLICATION_FORM_URLENCODED)).returnResponse();
+        this.showLog();
         checkResponseError(resp, 500, new IOException(), "wrong or empty type or value given");
 
         // retrieve entity
@@ -109,10 +111,12 @@ public class IdentifierControllerIT extends AbstractLarchIT {
         final String entityId = EntityUtils.toString(resp.getEntity());
 
         // create new identifier
+        this.hideLog();
         resp =
             this.execute(
                 Request.Post(identifierUrl.replaceFirst("\\{id\\}", entityId)).bodyString("type=DOI&value=",
                     ContentType.APPLICATION_FORM_URLENCODED)).returnResponse();
+        this.showLog();
         checkResponseError(resp, 500, new IOException(), "wrong or empty type or value given");
 
         // retrieve entity
@@ -135,10 +139,12 @@ public class IdentifierControllerIT extends AbstractLarchIT {
         final String entityId = EntityUtils.toString(resp.getEntity());
 
         // create new identifier
+        this.hideLog();
         resp =
             this.execute(
                 Request.Post(identifierUrl.replaceFirst("\\{id\\}", entityId)).bodyString("type=DDOI&value=123",
                     ContentType.APPLICATION_FORM_URLENCODED)).returnResponse();
+        this.showLog();
         checkResponseError(resp, 500, new IllegalArgumentException(),
             "No enum constant net.objecthunter.larch.model.AlternativeIdentifier.IdentifierType.DDOI");
 
@@ -221,9 +227,11 @@ public class IdentifierControllerIT extends AbstractLarchIT {
         assertEquals("123", fetched.getAlternativeIdentifiers().get(0).getValue());
 
         // delete alternative identifier
+        this.hideLog();
         resp =
             this.execute(Request.Delete(identifierUrl.replaceFirst("\\{id\\}", entityId) + "/DDOI/123"))
                 .returnResponse();
+        this.showLog();
         checkResponseError(resp, 500, new IllegalArgumentException(),
             "No enum constant net.objecthunter.larch.model.AlternativeIdentifier.IdentifierType.DDOI");
 
@@ -266,9 +274,11 @@ public class IdentifierControllerIT extends AbstractLarchIT {
         assertEquals("123", fetched.getAlternativeIdentifiers().get(0).getValue());
 
         // delete alternative identifier
+        this.hideLog();
         resp =
             this.execute(Request.Delete(identifierUrl.replaceFirst("\\{id\\}", entityId) + "/DOI/1234"))
                 .returnResponse();
+        this.showLog();
         checkResponseError(resp, 500, new IOException(), "Identifier of type DOI with value 1234 not found");
 
         // retrieve entity

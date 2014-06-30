@@ -18,15 +18,18 @@ package net.objecthunter.larch.integration;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.io.PrintStream;
 
 import net.objecthunter.larch.LarchServerConfiguration;
 import net.objecthunter.larch.integration.helpers.JsonException;
 
+import net.objecthunter.larch.integration.helpers.NullOutputStream;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Executor;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
+import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.IntegrationTest;
@@ -46,6 +49,15 @@ public abstract class AbstractLarchIT {
     @Autowired
     private ObjectMapper mapper;
 
+    final PrintStream sysOut = System.out;
+
+    final PrintStream sysErr = System.err;
+
+    @Before
+    public void resetSystOutErr() {
+        this.showLog();
+    }
+
     private HttpHost localhost = new HttpHost("localhost", 8080, "http");
 
     private Executor executor = Executor.newInstance().auth(localhost, "admin", "admin").authPreemptive(localhost);
@@ -61,5 +73,15 @@ public abstract class AbstractLarchIT {
         assertEquals(statusCode, exc.getStatus());
         assertEquals(exception.getClass().getName(), exc.getException());
         assertEquals(message, exc.getMessage());
+    }
+
+    protected void hideLog()  {
+        System.setOut(new PrintStream(NullOutputStream.getInstance()));
+        System.setErr(new PrintStream(NullOutputStream.getInstance()));
+    }
+
+    protected void showLog() {
+        System.setOut(sysOut);
+        System.setErr(sysErr);
     }
 }
