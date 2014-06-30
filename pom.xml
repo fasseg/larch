@@ -102,6 +102,12 @@
             </dependency>
             <dependency>
                 <groupId>net.objecthunter.larch</groupId>
+                <artifactId>larch-server</artifactId>
+                <type>test-jar</type>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.objecthunter.larch</groupId>
                 <artifactId>larch-benchtool</artifactId>
                 <version>${project.version}</version>
             </dependency>

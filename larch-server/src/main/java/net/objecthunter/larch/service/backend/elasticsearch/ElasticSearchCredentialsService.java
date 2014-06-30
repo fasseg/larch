@@ -144,8 +144,11 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
 
     @Override
     public User createUser(User u) throws IOException {
-        if (u.getName() == null) {
+        if (u.getName() == null || u.getName().isEmpty()) {
             throw new IOException("User name can not be null");
+        }
+        if(u.getEmail() == null || u.getEmail().isEmpty()) {
+            throw new IOException("Email can not be empty");
         }
         final GetResponse get =
             this.client.prepareGet(INDEX_USERS, INDEX_USERS_TYPE, u.getName()).execute().actionGet();
@@ -207,8 +210,11 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
 
     @Override
     public void updateUser(User u) throws IOException {
-        if (u.getName() == null) {
+        if (u.getName() == null || u.getName().isEmpty())  {
             throw new IOException("User name can not be null");
+        }
+        if (u.getEmail() == null || u.getEmail().isEmpty()) {
+            throw new IOException("Email can not be empty");
         }
         final GetResponse get =
             this.client.prepareGet(INDEX_USERS, INDEX_USERS_TYPE, u.getName()).execute().actionGet();

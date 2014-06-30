@@ -80,13 +80,13 @@ public class ElasticSearchCredentialsServiceTest {
         expect(mockResponse.getSourceAsBytes()).andReturn(mapper.writeValueAsBytes(u));
 
         replay(mockClient, mockFuture, mockGetRequestBuilder, mockResponse);
-        Authentication auth = this.credentialsService.authenticate(new UsernamePasswordAuthenticationToken("test",
+        Authentication auth = this.credentialsService.authenticate(new UsernamePasswordAuthenticationToken(u.getName(),
                 "test"));
         verify(mockClient, mockFuture, mockGetRequestBuilder, mockResponse);
 
         assertNotNull(auth);
         assertTrue(auth.isAuthenticated());
-        assertEquals("test", ((User) auth.getPrincipal()).getName());
+        assertEquals(u.getName(), ((User) auth.getPrincipal()).getName());
     }
 
     @SuppressWarnings("unchecked")
@@ -279,7 +279,7 @@ public class ElasticSearchCredentialsServiceTest {
         replay(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse,
                 mockFuture,
                 mockIndexRequestBuilder);
-        this.credentialsService.addUserToGroup("test", g.getName());
+        this.credentialsService.addUserToGroup(u.getName(), g.getName());
         verify(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
     }
 
@@ -416,7 +416,7 @@ public class ElasticSearchCredentialsServiceTest {
         expect(mockFuture.actionGet()).andReturn(null);
 
         replay(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
-        this.credentialsService.removeUserFromGroup("test", g.getName());
+        this.credentialsService.removeUserFromGroup(u.getName(), g.getName());
         verify(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
     }
 
@@ -437,7 +437,7 @@ public class ElasticSearchCredentialsServiceTest {
         expect(mockGetResponse.getSourceAsBytes()).andReturn(mapper.writeValueAsBytes(u));
 
         replay(mockClient, mockGetRequestBuilder, mockGetResponse, mockFuture);
-        this.credentialsService.retrieveUser("test");
+        this.credentialsService.retrieveUser(u.getName());
         verify(mockClient, mockGetRequestBuilder, mockGetResponse, mockFuture);
     }
 

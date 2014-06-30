@@ -16,7 +16,6 @@
 package net.objecthunter.larch.integration;
 
 import net.objecthunter.larch.client.LarchClient;
-import net.objecthunter.larch.integration.helpers.Fixtures;
 import net.objecthunter.larch.model.Binary;
 import net.objecthunter.larch.model.Describe;
 import net.objecthunter.larch.model.Entity;
@@ -32,6 +31,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URI;
+
+import net.objecthunter.larch.test.util.Fixtures;
 
 import static org.junit.Assert.*;
 

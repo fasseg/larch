@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static net.objecthunter.larch.integration.helpers.Fixtures.*;
+import static net.objecthunter.larch.test.util.Fixtures.*;
 import static org.junit.Assert.*;
 
 public class DefaultEntityServiceIT extends AbstractLarchIT {
