@@ -19,15 +19,25 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
 
 import net.objecthunter.larch.model.Entity;
+import net.objecthunter.larch.model.SearchResult;
 import net.objecthunter.larch.service.backend.BackendPublishService;
+import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchEntityService.EntitiesSearchField;
 
+import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.action.ActionFuture;
+import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
+import org.elasticsearch.action.admin.indices.refresh.RefreshResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
@@ -43,6 +53,8 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
     public static final String INDEX_PUBLISHED = "publish";
 
     public static final String TYPE_PUBLISHED = "publishedentity";
+
+    private int maxRecords = 50;
 
     @Autowired
     private Client client;
@@ -89,6 +101,117 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
             result.add(this.mapper.readValue(hit.getSourceAsString(), Entity.class));
         }
         return result;
+    }
+
+    @Override
+    public SearchResult scanIndex(int offset, int numRecords) {
+        final long time = System.currentTimeMillis();
+        numRecords = numRecords > maxRecords ? maxRecords : numRecords;
+        final SearchResponse resp =
+            this.client
+                .prepareSearch(INDEX_PUBLISHED).setQuery(QueryBuilders.matchAllQuery())
+                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(offset).setSize(numRecords)
+                .addFields("id", "label", "type", "tags").execute().actionGet();
+
+        final SearchResult result = new SearchResult();
+        result.setOffset(offset);
+        result.setNumRecords(numRecords);
+        result.setHits(resp.getHits().getHits().length);
+        result.setTotalHits(resp.getHits().getTotalHits());
+        result.setOffset(offset);
+        result.setNextOffset(offset + numRecords);
+        result.setPrevOffset(Math.max(offset - numRecords, 0));
+        result.setMaxRecords(maxRecords);
+
+        final List<Entity> entites = new ArrayList<>(numRecords);
+        for (final SearchHit hit : resp.getHits()) {
+            // TODO: check if JSON docuemnt is prefetched or laziliy initialised
+            String label = hit.field("label") != null ? hit.field("label").getValue() : "";
+            String type = hit.field("type") != null ? hit.field("type").getValue() : "";
+            final Entity e = new Entity();
+            e.setId(hit.field("id").getValue());
+            e.setLabel(label);
+            e.setType(type);
+            List<String> tags = new ArrayList<>();
+            if (hit.field("tags") != null) {
+                for (Object o : hit.field("tags").values()) {
+                    tags.add((String) o);
+                }
+            }
+            e.setTags(tags);
+            entites.add(e);
+        }
+
+        result.setData(entites);
+        result.setDuration(System.currentTimeMillis() - time);
+        return result;
+    }
+
+    @Override
+    public SearchResult searchEntities(Map<EntitiesSearchField, String[]> searchFields) {
+        BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
+        for (Entry<EntitiesSearchField, String[]> searchField : searchFields.entrySet()) {
+            if (searchField.getValue() != null && searchField.getValue().length > 0) {
+                BoolQueryBuilder childQueryBuilder = QueryBuilders.boolQuery();
+                for (int i = 0; i < searchField.getValue().length; i++) {
+                    if (StringUtils.isNotBlank(searchField.getValue()[i])) {
+                        childQueryBuilder.should(QueryBuilders.wildcardQuery(searchField.getKey().getFieldName(),
+                            searchField.getValue()[i].toLowerCase()));
+                    }
+                }
+                queryBuilder.must(childQueryBuilder);
+            }
+        }
+
+        int numRecords = 20;
+        final long time = System.currentTimeMillis();
+        final ActionFuture<RefreshResponse> refresh =
+            this.client.admin().indices().refresh(new RefreshRequest(INDEX_PUBLISHED));
+        refresh.actionGet();
+
+        final SearchResponse resp =
+            this.client
+                .prepareSearch(INDEX_PUBLISHED).addFields("id", "label", "type", "tags").setQuery(queryBuilder)
+                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).execute().actionGet();
+        log.debug("ES returned {} results for '{}'", resp.getHits().getHits().length, new String(queryBuilder
+            .buildAsBytes().toBytes()));
+        final SearchResult result = new SearchResult();
+
+        final List<Entity> entities = new ArrayList<>();
+        for (final SearchHit hit : resp.getHits()) {
+            String label = hit.field("label") != null ? hit.field("label").getValue() : "";
+            String type = hit.field("type") != null ? hit.field("type").getValue() : "";
+            final Entity e = new Entity();
+            e.setId(hit.field("id").getValue());
+            e.setType(type);
+            e.setLabel(label);
+
+            final List<String> tags = new ArrayList<>();
+            if (hit.field("tags") != null) {
+                for (Object o : hit.field("tags").values()) {
+                    tags.add((String) o);
+                }
+            }
+            e.setTags(tags);
+            entities.add(e);
+        }
+        result.setData(entities);
+        result.setTotalHits(resp.getHits().getTotalHits());
+        result.setMaxRecords(maxRecords);
+        result.setHits(resp.getHits().getHits().length);
+        result.setNumRecords(numRecords);
+        result.setOffset(0);
+        result.setTerm(new String(queryBuilder.buildAsBytes().toBytes()));
+        result.setPrevOffset(0);
+        result.setNextOffset(0);
+        result.setTotalHits(resp.getHits().getTotalHits());
+        result.setDuration(System.currentTimeMillis() - time);
+        return result;
+    }
+
+    @Override
+    public SearchResult scanIndex(int offset) {
+        return scanIndex(offset, maxRecords);
     }
 
 }

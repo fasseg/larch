@@ -40,6 +40,7 @@ import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -139,7 +140,9 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
                 throw new BadCredentialsException("Unable to authenticate");
             }
         }
-        throw new BadCredentialsException("Unable to authenticate");
+        return new AnonymousAuthenticationToken("anonymousUser", "anonymousPrincipal",
+            AuthorityUtils.createAuthorityList(new String[] { "ROLE_ANONYMOUS_USER" }));
+        // throw new BadCredentialsException("Unable to authenticate");
     }
 
     @Override
