@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
+
 package net.objecthunter.larch.service.impl;
 
 import java.io.IOException;
@@ -26,10 +27,11 @@ import net.objecthunter.larch.service.backend.BackendSchemaService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Default implementation of a {@link net.objecthunter.larch.service.ExportService} which is able to export JSON data to
- * the File system
+ * Default implementation of a {@link net.objecthunter.larch.service.ExportService} which is able to export JSON data
+ * to the File system
  */
 public class DefaultSchemaService implements SchemaService {
+
     @Autowired
     private BackendSchemaService schemaService;
 

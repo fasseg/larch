@@ -1,3 +1,4 @@
+
 package net.objecthunter.larch.service.elasticsearch;
 
 import static org.easymock.EasyMock.anyObject;
@@ -62,8 +63,8 @@ public class ElasticSearchVersionServiceTest {
 
         /* index */
         expect(
-            mockClient.prepareIndex(ElasticSearchVersionService.INDEX_VERSIONS,
-                ElasticSearchVersionService.TYPE_VERSIONS)).andReturn(mockIndexRequestBuilder);
+                mockClient.prepareIndex(ElasticSearchVersionService.INDEX_VERSIONS,
+                        ElasticSearchVersionService.TYPE_VERSIONS)).andReturn(mockIndexRequestBuilder);
         expect(mockIndexRequestBuilder.setSource((byte[]) anyObject())).andReturn(mockIndexRequestBuilder);
         expect(mockIndexRequestBuilder.execute()).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(null);
@@ -75,10 +76,10 @@ public class ElasticSearchVersionServiceTest {
         expect(mockFuture.actionGet()).andReturn(null);
 
         replay(mockIndexRequestBuilder, mockClient, mockAdminClient, mockIndicesAdminClient, mockBlobstoreService,
-            mockFuture);
+                mockFuture);
         this.versionService.addOldVersion(Fixtures.createEntity());
         verify(mockIndexRequestBuilder, mockClient, mockAdminClient, mockIndicesAdminClient, mockBlobstoreService,
-            mockFuture);
+                mockFuture);
     }
 
     @SuppressWarnings("unchecked")
@@ -95,7 +96,7 @@ public class ElasticSearchVersionServiceTest {
         v.setPath("bar");
 
         expect(mockClient.prepareSearch(ElasticSearchVersionService.INDEX_VERSIONS))
-            .andReturn(mockSearchRequestBuilder);
+                .andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setQuery(anyObject(QueryBuilder.class))).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setFrom(0)).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setSize(1)).andReturn(mockSearchRequestBuilder);
@@ -106,12 +107,12 @@ public class ElasticSearchVersionServiceTest {
         expect(mockSearchHits.getAt(0)).andReturn(mockHit);
         expect(mockHit.getSourceAsString()).andReturn(mapper.writeValueAsString(v));
         expect(mockBlobstoreService.retrieveOldVersionBlob(v.getPath())).andReturn(
-            new ByteArrayInputStream("{}".getBytes()));
+                new ByteArrayInputStream("{}".getBytes()));
 
         replay(mockClient, mockSearchHits, mockSearchRequestBuilder, mockSearchResponse, mockAdminClient,
-            mockIndicesAdminClient, mockBlobstoreService, mockHit, mockFuture);
+                mockIndicesAdminClient, mockBlobstoreService, mockHit, mockFuture);
         this.versionService.getOldVersion("foo", 1);
         verify(mockClient, mockSearchHits, mockSearchRequestBuilder, mockSearchResponse, mockAdminClient,
-            mockIndicesAdminClient, mockBlobstoreService, mockHit, mockFuture);
+                mockIndicesAdminClient, mockBlobstoreService, mockHit, mockFuture);
     }
 }

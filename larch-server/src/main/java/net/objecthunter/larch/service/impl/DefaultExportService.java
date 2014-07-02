@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
+
 package net.objecthunter.larch.service.impl;
 
 import static net.objecthunter.larch.util.FileSystemUtil.checkAndCreate;
@@ -33,10 +34,11 @@ import org.springframework.core.env.Environment;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Default implementation of a {@link net.objecthunter.larch.service.ExportService} which is able to export JSON data to
- * the File system
+ * Default implementation of a {@link net.objecthunter.larch.service.ExportService} which is able to export JSON data
+ * to the File system
  */
 public class DefaultExportService implements ExportService {
+
     private File directory;
 
     @Autowired

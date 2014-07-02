@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
+
 package net.objecthunter.larch.service;
 
 import java.io.IOException;
@@ -27,17 +28,17 @@ import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchEntityS
  * Service definition for CRUD operations on {@link net.objecthunter.larch.model.Entity} objects
  */
 public interface PublishService {
+
     Entity retrieve(String id) throws IOException;
 
     Entities retrievePublishedEntities(String entityId) throws IOException;
 
     /**
      * Retrieve a {@link net.objecthunter.larch.model.SearchResult} containing all
-     * {@link net.objecthunter.larch.model .Entity}s from the publish-index from a given offset with the default number
-     * of {@link net.objecthunter.larch.model.Entity}s returned
-     *
-     * @param offset
-     *            the offset from which to return {@link net.objecthunter.larch.model.Entity}s from
+     * {@link net.objecthunter.larch.model .Entity}s from the publish-index from a given offset with the default
+     * number of {@link net.objecthunter.larch.model.Entity}s returned
+     * 
+     * @param offset the offset from which to return {@link net.objecthunter.larch.model.Entity}s from
      * @return a list of {@link net.objecthunter.larch.model.Entity}s available in the published repository
      */
     SearchResult scanIndex(int offset);
@@ -46,20 +47,17 @@ public interface PublishService {
      * Retrieve a {@link net.objecthunter.larch.model.SearchResult} containing all
      * {@link net.objecthunter.larch.model .Entity}s from the publish index from a given offset with a given maximum
      * number of {@link net.objecthunter.larch.model.Entity}s returned
-     *
-     * @param offset
-     *            the offset from which to return {@link net.objecthunter.larch.model.Entity}s from
-     * @param numRecords
-     *            the number of {@link net.objecthunter.larch.model.Entity}s to return
+     * 
+     * @param offset the offset from which to return {@link net.objecthunter.larch.model.Entity}s from
+     * @param numRecords the number of {@link net.objecthunter.larch.model.Entity}s to return
      * @return a list of {@link net.objecthunter.larch.model.Entity}s available in the publish repository
      */
     SearchResult scanIndex(int offset, int numRecords);
 
     /**
      * Search {@link net.objecthunter.larch.model.Entity}s in the publish repository.
-     *
-     * @param searchFields
-     *            Map with key: EntitiesSearchField and value searchStrings as array.
+     * 
+     * @param searchFields Map with key: EntitiesSearchField and value searchStrings as array.
      * @return A {@link net.objecthunter.larch.model.SearchResult} containig the search hits
      */
     SearchResult searchEntities(Map<EntitiesSearchField, String[]> searchFields);

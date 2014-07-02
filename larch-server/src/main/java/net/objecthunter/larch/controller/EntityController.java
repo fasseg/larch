@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
+
 package net.objecthunter.larch.controller;
 
 import java.io.IOException;
@@ -60,19 +61,17 @@ public class EntityController extends AbstractLarchController {
     private ObjectMapper mapper;
 
     /**
-     * Controller method for patching an {@link net.objecthunter.larch.model.Entity} stored in the repository. The patch
-     * method allows only a set of given fields to be updated and therefore allowing for more efficient resource usage
-     *
-     * @param id
-     *            The id of the {@link net.objecthunter.larch.model.Entity} to patch
-     * @param src
-     *            The JSON representation of the subset of fields which should get updated on the Entity
+     * Controller method for patching an {@link net.objecthunter.larch.model.Entity} stored in the repository. The
+     * patch method allows only a set of given fields to be updated and therefore allowing for more efficient resource
+     * usage
+     * 
+     * @param id The id of the {@link net.objecthunter.larch.model.Entity} to patch
+     * @param src The JSON representation of the subset of fields which should get updated on the Entity
      * @throws IOException
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     @ResponseStatus(HttpStatus.OK)
-    public void patch(@PathVariable("id")
-    final String id, final InputStream src) throws IOException {
+    public void patch(@PathVariable("id") final String id, final InputStream src) throws IOException {
         final JsonNode node = mapper.readTree(src);
         this.entityService.patch(id, node);
         this.entityService.createAuditRecord(AuditRecords.updateEntityRecord(id));
@@ -82,34 +81,30 @@ public class EntityController extends AbstractLarchController {
     /**
      * Controller method for retrieval of a JSON representation of the current version of an
      * {@link net.objecthunter .larch.model.Entity}
-     *
-     * @param id
-     *            the {@link net.objecthunter.larch.model.Entity}'s id
+     * 
+     * @param id the {@link net.objecthunter.larch.model.Entity}'s id
      * @return An Entity object which gets transformed into a JSON response by Spring MVC
      * @throws IOException
      */
     @RequestMapping("/{id}")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public Entity retrieve(@PathVariable("id")
-    final String id) throws IOException {
+    public Entity retrieve(@PathVariable("id") final String id) throws IOException {
         return entityService.retrieve(id);
     }
 
     /**
      * Controller method for retrieval of a HTML view of the current version of an
      * {@link net.objecthunter.larch.model.Entity}
-     *
-     * @param id
-     *            The is of the {@link net.objecthunter.larch.model.Entity} to retrieve
+     * 
+     * @param id The is of the {@link net.objecthunter.larch.model.Entity} to retrieve
      * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} for rendering the HTML view
      * @throws IOException
      */
     @RequestMapping(value = "/{id}", produces = "text/html")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public ModelAndView retrieveHtml(@PathVariable("id")
-    final String id) throws IOException {
+    public ModelAndView retrieveHtml(@PathVariable("id") final String id) throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("entity", entityService.retrieve(id));
         model.addAttribute("metadataTypes", this.schemaService.getSchemaTypes());
@@ -120,40 +115,34 @@ public class EntityController extends AbstractLarchController {
     /**
      * Controller method for retrieval of a JSON representation of a given version of an
      * {@link net.objecthunter.larch.model.Entity}
-     *
-     * @param id
-     *            the {@link net.objecthunter.larch.model.Entity}'s id
-     * @param version
-     *            the version number of the Entity version to retrieve
+     * 
+     * @param id the {@link net.objecthunter.larch.model.Entity}'s id
+     * @param version the version number of the Entity version to retrieve
      * @return An Entity object which gets transformed into a JSON response by Spring MVC
      * @throws IOException
      */
     @RequestMapping("/{id}/version/{version}")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public Entity retrieve(@PathVariable("id")
-    final String id, @PathVariable("version")
-    final int version) throws IOException {
+    public Entity retrieve(@PathVariable("id") final String id, @PathVariable("version") final int version)
+            throws IOException {
         return entityService.retrieve(id, version);
     }
 
     /**
      * Controller method for retrieval of a HTML view of a given version of an
      * {@link net.objecthunter.larch.model.Entity}
-     *
-     * @param id
-     *            the {@link net.objecthunter.larch.model.Entity}'s id
-     * @param version
-     *            the version number of the Entity version to retrieve
+     * 
+     * @param id the {@link net.objecthunter.larch.model.Entity}'s id
+     * @param version the version number of the Entity version to retrieve
      * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} for rendering the HTML view
      * @throws IOException
      */
     @RequestMapping(value = "/{id}/version/{version}", produces = "text/html")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public ModelAndView retrieveHtml(@PathVariable("id")
-    final String id, @PathVariable("version")
-    final int version) throws IOException {
+    public ModelAndView retrieveHtml(@PathVariable("id") final String id, @PathVariable("version") final int version)
+            throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("entity", entityService.retrieve(id, version));
         return new ModelAndView("entity", model);
@@ -162,35 +151,32 @@ public class EntityController extends AbstractLarchController {
     /**
      * Controller method for retrieval of a JSON representation of all versions of an
      * {@link net.objecthunter.larch.model.Entity}
-     *
-     * @param id
-     *            the {@link net.objecthunter.larch.model.Entity}'s id
+     * 
+     * @param id the {@link net.objecthunter.larch.model.Entity}'s id
      * @return An Entities object which gets transformed into a JSON response by Spring MVC
      * @throws IOException
      */
     @RequestMapping("/{id}/versions")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public Entities retrieveVersions(@PathVariable("id")
-    final String id) throws IOException {
+    public Entities retrieveVersions(@PathVariable("id") final String id) throws IOException {
         Entities entities = entityService.getOldVersions(id);
         entities.getEntities().add(0, entityService.retrieve(id));
         return entities;
     }
 
     /**
-     * Controller method for retrieval of a HTML view of all versions of an {@link net.objecthunter.larch.model.Entity}
-     *
-     * @param id
-     *            the {@link net.objecthunter.larch.model.Entity}'s id
+     * Controller method for retrieval of a HTML view of all versions of an
+     * {@link net.objecthunter.larch.model.Entity}
+     * 
+     * @param id the {@link net.objecthunter.larch.model.Entity}'s id
      * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} for rendering the HTML view
      * @throws IOException
      */
     @RequestMapping(value = "/{id}/versions", produces = "text/html")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public ModelAndView retrieveVersionsHtml(@PathVariable("id")
-    final String id) throws IOException {
+    public ModelAndView retrieveVersionsHtml(@PathVariable("id") final String id) throws IOException {
         final ModelMap model = new ModelMap();
         Entities entities = entityService.getOldVersions(id);
         entities.getEntities().add(0, entityService.retrieve(id));
@@ -201,9 +187,8 @@ public class EntityController extends AbstractLarchController {
     /**
      * Controller method for creation of a new {@link net.objecthunter.larch.model.Entity} using a HTTP POST with the
      * JSON representation of the entity as the request body
-     *
-     * @param src
-     *            The Stream injected by Spring MVC containing the JSON representation of the Entity to create.
+     * 
+     * @param src The Stream injected by Spring MVC containing the JSON representation of the Entity to create.
      * @return The id of the created entity.
      * @throws IOException
      */
@@ -218,19 +203,16 @@ public class EntityController extends AbstractLarchController {
     }
 
     /**
-     * Controller method for updating an {@link net.objecthunter.larch.model.Entity} using a HTTP PUT with a JSON entity
-     * representation as request body
-     *
-     * @param id
-     *            The is of the Entity to update
-     * @param src
-     *            The Stream injected by Spring MVC containing the JSON representation of the updated Entity
+     * Controller method for updating an {@link net.objecthunter.larch.model.Entity} using a HTTP PUT with a JSON
+     * entity representation as request body
+     * 
+     * @param id The is of the Entity to update
+     * @param src The Stream injected by Spring MVC containing the JSON representation of the updated Entity
      * @throws IOException
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable("id")
-    final String id, final InputStream src) throws IOException {
+    public void update(@PathVariable("id") final String id, final InputStream src) throws IOException {
         final Entity e = mapper.readValue(src, Entity.class);
         if (e.getId() == null) {
             e.setId(id);
@@ -246,8 +228,7 @@ public class EntityController extends AbstractLarchController {
     @RequestMapping(value = "/{id}/publish", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public String publish(@PathVariable("id")
-    final String id) throws IOException {
+    public String publish(@PathVariable("id") final String id) throws IOException {
         String publishId = this.entityService.publish(id);
         this.entityService.createAuditRecord(AuditRecords.publishEntityRecord(id));
         this.messagingService.publishPublishEntity(id);
@@ -256,8 +237,7 @@ public class EntityController extends AbstractLarchController {
 
     @RequestMapping(value = "/{id}/publish", method = RequestMethod.POST, produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
-    public ModelAndView publishHtml(@PathVariable("id")
-    final String id) throws IOException {
+    public ModelAndView publishHtml(@PathVariable("id") final String id) throws IOException {
         this.publish(id);
         return this.retrieveHtml(id);
     }

@@ -1,50 +1,20 @@
 /* 
-* Copyright 2014 Frank Asseg
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License. 
-*/
+ * Copyright 2014 Frank Asseg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 package net.objecthunter.larch.service.backend.elasticsearch;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import net.objecthunter.larch.helpers.MetadataTypes;
-import net.objecthunter.larch.model.*;
-import net.objecthunter.larch.service.backend.BackendSchemaService;
-
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
-import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
-import org.elasticsearch.action.count.CountResponse;
-import org.elasticsearch.action.delete.DeleteResponse;
-import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.xml.sax.SAXException;
-
-import javax.annotation.PostConstruct;
-import javax.xml.XMLConstants;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
@@ -55,9 +25,43 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+import javax.xml.XMLConstants;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
+
+import net.objecthunter.larch.helpers.MetadataTypes;
+import net.objecthunter.larch.model.Binary;
+import net.objecthunter.larch.model.Entity;
+import net.objecthunter.larch.model.Metadata;
+import net.objecthunter.larch.model.MetadataType;
+import net.objecthunter.larch.model.MetadataValidationResult;
+import net.objecthunter.larch.service.backend.BackendSchemaService;
+
+import org.elasticsearch.action.count.CountResponse;
+import org.elasticsearch.action.delete.DeleteResponse;
+import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.xml.sax.SAXException;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class ElasticSearchSchemaService extends AbstractElasticSearchService implements BackendSchemaService {
+
     public static final String INDEX_MD_SCHEMATA = "mdschema";
+
     public static final String INDEX_MD_SCHEMATA_TYPE = "mdschema-type";
+
     private static final Logger log = LoggerFactory.getLogger(ElasticSearchSchemaService.class);
 
     @Autowired
@@ -72,7 +76,7 @@ public class ElasticSearchSchemaService extends AbstractElasticSearchService imp
         this.checkAndOrCreateDefaultMdTypes();
     }
 
-    private void checkAndOrCreateDefaultMdTypes() throws IOException{
+    private void checkAndOrCreateDefaultMdTypes() throws IOException {
         for (MetadataType type : MetadataTypes.getDefaultMetadataTypes()) {
             final IndexResponse resp = this.client.prepareIndex(INDEX_MD_SCHEMATA, INDEX_MD_SCHEMATA_TYPE,
                     type.getName())
@@ -81,6 +85,7 @@ public class ElasticSearchSchemaService extends AbstractElasticSearchService imp
                     .actionGet();
         }
     }
+
     public String getSchemUrlForType(String type) throws IOException {
         final GetResponse get = this.client.prepareGet(INDEX_MD_SCHEMATA, INDEX_MD_SCHEMATA_TYPE, type)
                 .execute()
@@ -117,10 +122,11 @@ public class ElasticSearchSchemaService extends AbstractElasticSearchService imp
             throw new IOException("Metadata type " + newType.getName() + " already exists");
         }
         /* add the new type to the index */
-        final IndexResponse resp = this.client.prepareIndex(INDEX_MD_SCHEMATA, INDEX_MD_SCHEMATA_TYPE, newType.getName())
-                .setSource(mapper.writeValueAsBytes(newType))
-                .execute()
-                .actionGet();
+        final IndexResponse resp =
+                this.client.prepareIndex(INDEX_MD_SCHEMATA, INDEX_MD_SCHEMATA_TYPE, newType.getName())
+                        .setSource(mapper.writeValueAsBytes(newType))
+                        .execute()
+                        .actionGet();
         this.refreshIndex(INDEX_MD_SCHEMATA);
         return resp.getId();
     }
@@ -147,9 +153,9 @@ public class ElasticSearchSchemaService extends AbstractElasticSearchService imp
     public MetadataValidationResult validate(String id, String metadataName) throws IOException {
         /* fetch the entity first */
         final GetResponse resp = this.client.prepareGet(ElasticSearchEntityService
-                        .INDEX_ENTITIES,
+                .INDEX_ENTITIES,
                 ElasticSearchEntityService.INDEX_ENTITY_TYPE, id
-        )
+                )
                 .execute()
                 .actionGet();
         if (!resp.isExists()) {
@@ -169,9 +175,9 @@ public class ElasticSearchSchemaService extends AbstractElasticSearchService imp
     public MetadataValidationResult validate(String id, String binaryName, String metadataName) throws IOException {
         /* fetch the entity first */
         final GetResponse resp = this.client.prepareGet(ElasticSearchEntityService
-                        .INDEX_ENTITIES,
+                .INDEX_ENTITIES,
                 ElasticSearchEntityService.INDEX_ENTITY_TYPE, id
-        )
+                )
                 .execute()
                 .actionGet();
         if (!resp.isExists()) {
@@ -184,7 +190,8 @@ public class ElasticSearchSchemaService extends AbstractElasticSearchService imp
         }
         final Binary bin = e.getBinaries().get(binaryName);
         if (bin.getMetadata() == null || !bin.getMetadata().containsKey(metadataName)) {
-            throw new IOException("The binary " + binaryName + " of the entity '" + id + "' has no meta data record " +
+            throw new IOException("The binary " + binaryName + " of the entity '" + id +
+                    "' has no meta data record " +
                     "named '" + metadataName);
         }
         final Metadata md = bin.getMetadata().get(metadataName);

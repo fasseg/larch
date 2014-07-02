@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
+
 package net.objecthunter.larch.model;
 
 /**
  * DTO class for wrapping audit information
- *
  */
 public class AuditRecord {
+
     public static final String EVENT_CREATE_ENTITY = "Create entity";
 
     public static final String EVENT_UPDATE_ENTITY = "Update entity";
@@ -62,7 +63,7 @@ public class AuditRecord {
 
     /**
      * Get the id of the AuditRecord
-     *
+     * 
      * @return the id
      */
     public String getId() {
@@ -72,8 +73,7 @@ public class AuditRecord {
     /**
      * Set the id of the AuditRecord
      * 
-     * @param id
-     *            the id to set
+     * @param id the id to set
      */
     public void setId(String id) {
         this.id = id;
@@ -91,8 +91,7 @@ public class AuditRecord {
     /**
      * Ste the entity if of the AuditRecord
      * 
-     * @param entityId
-     *            the entity id to set
+     * @param entityId the entity id to set
      */
     public void setEntityId(String entityId) {
         this.entityId = entityId;
@@ -110,8 +109,7 @@ public class AuditRecord {
     /**
      * Set the agent's name
      * 
-     * @param agentName
-     *            the name to set
+     * @param agentName the name to set
      */
     public void setAgentName(String agentName) {
         this.agentName = agentName;
@@ -129,8 +127,7 @@ public class AuditRecord {
     /**
      * Set the Action of the AuditRecord
      * 
-     * @param action
-     *            the action to set
+     * @param action the action to set
      */
     public void setAction(String action) {
         this.action = action;
@@ -148,8 +145,7 @@ public class AuditRecord {
     /**
      * Set the timespatmp of the AuditRecord
      * 
-     * @param timestamp
-     *            the timestamp to set
+     * @param timestamp the timestamp to set
      */
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;

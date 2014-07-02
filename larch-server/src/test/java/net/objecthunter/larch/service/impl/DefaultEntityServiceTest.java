@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
+
 package net.objecthunter.larch.service.impl;
 
 import static org.easymock.EasyMock.anyObject;
@@ -40,6 +41,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DefaultEntityServiceTest {
+
     private DefaultEntityService entityService;
 
     private BackendEntityService mockEntitiesService;
@@ -152,7 +154,7 @@ public class DefaultEntityServiceTest {
 
         replay(mockEntitiesService, mockExportService, mockBlobstoreService);
         this.entityService.createBinary(e.getId(), b.getName(), "application/octet-stream", new ByteArrayInputStream(
-            new byte[3]));
+                new byte[3]));
         verify(mockEntitiesService, mockExportService, mockBlobstoreService);
     }
 

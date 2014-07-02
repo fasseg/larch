@@ -19,12 +19,25 @@
         <a th:each="record : ${result.data}" th:href="@{~/entity/} + ${record.id}">
             <div class="panel clickable">
                 <p class="panel_title" th:text="${record.id}"></p>
-                <p class="property">Label</p><p class="value" th:text="${record.label}"></p>
+
+                <p class="property">Label</p>
+
+                <p class="value" th:text="${record.label}"></p>
+
                 <p class="property">Type</p>
+
                 <p class="value" th:if="${#strings.isEmpty(record.type)}" th:text="'No Type'"></p>
-                <p class="value" th:unless="${#strings.isEmpty(record.type)}" th:text="${record.type}"></p>
-                <p class="property">Parent</p><p class="value" th:text="${record.parentId} ? ${record.parentId} : 'None'"></p>
-                <p class="property">State</p><p th:text="${record.state}" class="value"></p>
+
+                <p class="value" th:unless="${#strings.isEmpty(record.type)}"
+                   th:text="${record.type}"></p>
+
+                <p class="property">Parent</p>
+
+                <p class="value" th:text="${record.parentId} ? ${record.parentId} : 'None'"></p>
+
+                <p class="property">State</p>
+
+                <p th:text="${record.state}" class="value"></p>
             </div>
         </a>
     </div>

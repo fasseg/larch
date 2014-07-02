@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
+
 package net.objecthunter.larch.service.backend.elasticsearch;
 
 import java.io.FileNotFoundException;
@@ -50,6 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ElasticSearchPublishService extends AbstractElasticSearchService implements BackendPublishService {
+
     private static final Logger log = LoggerFactory.getLogger(ElasticSearchPublishService.class);
 
     public static final String INDEX_PUBLISHED = "publish";
@@ -74,8 +76,8 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
         String publishId = new StringBuilder(e.getId()).append(":").append(e.getVersion()).toString();
         e.setPublishId(publishId);
         this.client
-            .prepareIndex(INDEX_PUBLISHED, TYPE_PUBLISHED, publishId).setSource(this.mapper.writeValueAsBytes(e))
-            .execute().actionGet();
+                .prepareIndex(INDEX_PUBLISHED, TYPE_PUBLISHED, publishId).setSource(this.mapper.writeValueAsBytes(e))
+                .execute().actionGet();
         this.refreshIndex(INDEX_PUBLISHED);
         return publishId;
     }
@@ -83,10 +85,10 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
     @Override
     public Entity retrievePublishedEntity(String publishId) throws IOException {
         final GetResponse resp =
-            this.client.prepareGet(INDEX_PUBLISHED, TYPE_PUBLISHED, publishId).execute().actionGet();
+                this.client.prepareGet(INDEX_PUBLISHED, TYPE_PUBLISHED, publishId).execute().actionGet();
         if (!resp.isExists()) {
             throw new FileNotFoundException("The entity with the publishId " + publishId
-                + " can not be found in the publish index");
+                    + " can not be found in the publish index");
         }
         return this.mapper.readValue(resp.getSourceAsBytes(), Entity.class);
     }
@@ -94,13 +96,14 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
     @Override
     public Entities retrievePublishedEntities(String entityId) throws IOException {
         final SearchResponse search =
-            this.client
-                .prepareSearch(INDEX_PUBLISHED)
-                .setTypes(TYPE_PUBLISHED)
-                .setQuery(
-                    QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
-                        FilterBuilders.termFilter("id", entityId))).addSort("publishId", SortOrder.ASC).execute()
-                .actionGet();
+                this.client
+                        .prepareSearch(INDEX_PUBLISHED)
+                        .setTypes(TYPE_PUBLISHED)
+                        .setQuery(
+                            QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
+                                                        FilterBuilders.termFilter("id", entityId))).addSort("publishId",
+                                SortOrder.ASC).execute()
+                        .actionGet();
         if (search.getHits().getTotalHits() == 0) {
             throw new FileNotFoundException("There are no published versions of the entity " + entityId);
         }
@@ -118,10 +121,10 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
         final long time = System.currentTimeMillis();
         numRecords = numRecords > maxRecords ? maxRecords : numRecords;
         final SearchResponse resp =
-            this.client
-                .prepareSearch(INDEX_PUBLISHED).setQuery(QueryBuilders.matchAllQuery())
-                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(offset).setSize(numRecords)
-                .addFields("id", "publishId", "version", "label", "type", "tags").execute().actionGet();
+                this.client
+                        .prepareSearch(INDEX_PUBLISHED).setQuery(QueryBuilders.matchAllQuery())
+                        .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(offset).setSize(numRecords)
+                        .addFields("id", "publishId", "version", "label", "type", "tags").execute().actionGet();
 
         final SearchResult result = new SearchResult();
         result.setOffset(offset);
@@ -169,7 +172,7 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
                 for (int i = 0; i < searchField.getValue().length; i++) {
                     if (StringUtils.isNotBlank(searchField.getValue()[i])) {
                         childQueryBuilder.should(QueryBuilders.wildcardQuery(searchField.getKey().getFieldName(),
-                            searchField.getValue()[i].toLowerCase()));
+                                searchField.getValue()[i].toLowerCase()));
                     }
                 }
                 queryBuilder.must(childQueryBuilder);
@@ -179,15 +182,16 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
         int numRecords = 20;
         final long time = System.currentTimeMillis();
         final ActionFuture<RefreshResponse> refresh =
-            this.client.admin().indices().refresh(new RefreshRequest(INDEX_PUBLISHED));
+                this.client.admin().indices().refresh(new RefreshRequest(INDEX_PUBLISHED));
         refresh.actionGet();
 
         final SearchResponse resp =
-            this.client
-                .prepareSearch(INDEX_PUBLISHED).addFields("id", "publishId", "version", "label", "type", "tags")
-                .setQuery(queryBuilder).setSearchType(SearchType.DFS_QUERY_THEN_FETCH).execute().actionGet();
+                this.client
+                        .prepareSearch(INDEX_PUBLISHED).addFields("id", "publishId", "version", "label", "type",
+                                "tags")
+                        .setQuery(queryBuilder).setSearchType(SearchType.DFS_QUERY_THEN_FETCH).execute().actionGet();
         log.debug("ES returned {} results for '{}'", resp.getHits().getHits().length, new String(queryBuilder
-            .buildAsBytes().toBytes()));
+                .buildAsBytes().toBytes()));
         final SearchResult result = new SearchResult();
 
         final List<Entity> entities = new ArrayList<>();

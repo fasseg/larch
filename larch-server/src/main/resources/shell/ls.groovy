@@ -2,7 +2,6 @@ package shell
 
 import net.objecthunter.larch.model.Entity
 import net.objecthunter.larch.model.SearchResult
-import net.objecthunter.larch.service.IndexService
 import net.objecthunter.larch.service.SearchService
 import net.objecthunter.larch.util.ServiceProvider
 import org.crsh.cli.Command
@@ -11,7 +10,7 @@ import org.crsh.command.InvocationContext
 import org.crsh.text.Color
 import org.crsh.text.RenderPrintWriter
 
-/* 
+/*
 * Copyright 2014 Frank Asseg
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,7 +31,7 @@ class ls {
     @Usage("List entities")
     @Command
     def main(InvocationContext ctx) {
-        final SearchService searchService= ServiceProvider.getService(ctx, SearchService.class);
+        final SearchService searchService = ServiceProvider.getService(ctx, SearchService.class);
         final SearchResult result = searchService.scanIndex(0);
         final RenderPrintWriter sink = ctx.getWriter();
         sink.print("Number of entites\t\t");
@@ -49,7 +48,7 @@ class ls {
         sink.format(" %32s |\n", "Label");
         sink.print("+----------------------------------+");
         sink.println("----------------------------------+");
-        for (Entity e: result.getData()) {
+        for (Entity e : result.getData()) {
             sink.format("| %32s |", e.getId());
             sink.format(" %32s |\n", e.getLabel());
         }

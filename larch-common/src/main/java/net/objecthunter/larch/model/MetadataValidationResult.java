@@ -1,18 +1,19 @@
 /* 
-* Copyright 2014 Frank Asseg
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License. 
-*/
+ * Copyright 2014 Frank Asseg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 package net.objecthunter.larch.model;
 
 /**
@@ -21,12 +22,14 @@ package net.objecthunter.larch.model;
 public class MetadataValidationResult {
 
     private String timestamp;
+
     private boolean success;
+
     private String details;
 
     /**
      * Get the details of of validation result
-     *
+     * 
      * @return the details
      */
     public String getDetails() {
@@ -35,7 +38,7 @@ public class MetadataValidationResult {
 
     /**
      * Set the details of a validation result
-     *
+     * 
      * @param details the details to set
      */
     public void setDetails(String details) {
@@ -44,7 +47,7 @@ public class MetadataValidationResult {
 
     /**
      * Check if a validation was successful
-     *
+     * 
      * @return true is successful false otherwise
      */
     public boolean isSuccess() {
@@ -53,7 +56,7 @@ public class MetadataValidationResult {
 
     /**
      * Set the success of the validation result
-     *
+     * 
      * @param success the boolean to set
      */
     public void setSuccess(boolean success) {
@@ -62,7 +65,7 @@ public class MetadataValidationResult {
 
     /**
      * Get the timestamp of the validation result
-     *
+     * 
      * @return the timestamp
      */
     public String getTimestamp() {
@@ -71,7 +74,7 @@ public class MetadataValidationResult {
 
     /**
      * Set the timestamp of a validation result
-     *
+     * 
      * @param timestamp the timestamp
      */
     public void setTimestamp(String timestamp) {

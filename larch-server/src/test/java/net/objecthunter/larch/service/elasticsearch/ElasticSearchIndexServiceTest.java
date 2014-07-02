@@ -1,21 +1,31 @@
 /* 
-* Copyright 2014 Frank Asseg
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License. 
-*/
+ * Copyright 2014 Frank Asseg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 package net.objecthunter.larch.service.elasticsearch;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.easymock.EasyMock.anyInt;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertTrue;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.state.IndexState;
@@ -24,7 +34,11 @@ import net.objecthunter.larch.test.util.Fixtures;
 
 import org.elasticsearch.action.ListenableActionFuture;
 import org.elasticsearch.action.admin.indices.stats.IndicesStatsResponse;
-import org.elasticsearch.action.admin.indices.status.*;
+import org.elasticsearch.action.admin.indices.status.DocsStatus;
+import org.elasticsearch.action.admin.indices.status.IndexShardStatus;
+import org.elasticsearch.action.admin.indices.status.IndexStatus;
+import org.elasticsearch.action.admin.indices.status.IndicesStatusRequest;
+import org.elasticsearch.action.admin.indices.status.IndicesStatusResponse;
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequestBuilder;
@@ -46,17 +60,18 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.assertTrue;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ElasticSearchIndexServiceTest {
+
     private ElasticSearchEntityService indexService;
+
     private Client mockClient;
+
     private AdminClient mockAdminClient;
+
     private IndicesAdminClient mockIndicesAdminClient;
+
     private ObjectMapper mapper = new ObjectMapper();
 
     @Before
@@ -99,10 +114,12 @@ public class ElasticSearchIndexServiceTest {
         expect(mockIndicesAdminClient.refresh(anyObject())).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(null);
 
-        replay(mockIndicesAdminClient, mockAdminClient, mockClient, mockGetRequestBuilder, mockFuture, mockGetResponse,
+        replay(mockIndicesAdminClient, mockAdminClient, mockClient, mockGetRequestBuilder, mockFuture,
+                mockGetResponse,
                 mockIndexRequestBuilder);
         this.indexService.create(e);
-        verify(mockIndicesAdminClient, mockAdminClient, mockClient, mockGetRequestBuilder, mockFuture, mockGetResponse,
+        verify(mockIndicesAdminClient, mockAdminClient, mockClient, mockGetRequestBuilder, mockFuture,
+                mockGetResponse,
                 mockIndexRequestBuilder);
     }
 
@@ -129,10 +146,12 @@ public class ElasticSearchIndexServiceTest {
         expect(mockIndicesAdminClient.refresh(anyObject())).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(null);
 
-        replay(mockIndicesAdminClient, mockAdminClient, mockClient, mockGetRequestBuilder, mockFuture, mockGetResponse,
+        replay(mockIndicesAdminClient, mockAdminClient, mockClient, mockGetRequestBuilder, mockFuture,
+                mockGetResponse,
                 mockIndexRequestBuilder);
         this.indexService.update(e);
-        verify(mockIndicesAdminClient, mockAdminClient, mockClient, mockGetRequestBuilder, mockFuture, mockGetResponse,
+        verify(mockIndicesAdminClient, mockAdminClient, mockClient, mockGetRequestBuilder, mockFuture,
+                mockGetResponse,
                 mockIndexRequestBuilder);
 
     }
@@ -157,8 +176,10 @@ public class ElasticSearchIndexServiceTest {
         expect(mockGetResponse.getSourceAsBytes()).andReturn(mapper.writeValueAsBytes(e));
 
         /* retrieve children */
-        expect(mockClient.prepareSearch(ElasticSearchEntityService.INDEX_ENTITIES)).andReturn(mockSearchRequestBuilder);
-        expect(mockSearchRequestBuilder.setTypes(ElasticSearchEntityService.INDEX_ENTITY_TYPE)).andReturn(mockSearchRequestBuilder);
+        expect(mockClient.prepareSearch(ElasticSearchEntityService.INDEX_ENTITIES)).andReturn(
+                mockSearchRequestBuilder);
+        expect(mockSearchRequestBuilder.setTypes(ElasticSearchEntityService.INDEX_ENTITY_TYPE)).andReturn(
+                mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setQuery(anyObject(QueryBuilder.class))).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setFrom(0)).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setSize(anyInt())).andReturn(mockSearchRequestBuilder);
@@ -214,12 +235,10 @@ public class ElasticSearchIndexServiceTest {
         MergeStats mockMergeStats = createMock(MergeStats.class);
         RefreshStats mockRefreshStats = createMock(RefreshStats.class);
 
-
         Map<String, IndexStatus> indexStates = new HashMap<>();
         indexStates.put(ElasticSearchEntityService.INDEX_ENTITIES, mockIndexStatus);
         Map<Integer, IndexShardStatus> shardStates = new HashMap<>();
         shardStates.put(0, mockShardStatus);
-
 
         expect(mockClient.admin()).andReturn(mockAdminClient);
         expect(mockAdminClient.indices()).andReturn(mockIndicesAdminClient);
@@ -240,7 +259,6 @@ public class ElasticSearchIndexServiceTest {
         expect(mockMergeStats.getTotalSizeInBytes()).andReturn(0l);
         expect(mockIndexStatus.getRefreshStats()).andReturn(mockRefreshStats);
         expect(mockRefreshStats.getTotalTimeInMillis()).andReturn(0l);
-
 
         replay(mockClient, mockAdminClient, mockIndicesAdminClient, mockStats, mockFuture, mockIndexStatus,
                 mockStatusResponse, mockByteSize, mockDocStatus, mockFlushStats, mockMergeStats, mockRefreshStats);

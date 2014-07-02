@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package net.objecthunter.larch.model;
 
 import java.util.ArrayList;
@@ -33,8 +34,7 @@ public class Entities {
     }
 
     /**
-     * @param entities
-     *            the entities to set
+     * @param entities the entities to set
      */
     public void setEntities(List<Entity> entities) {
         if (entities == null) {

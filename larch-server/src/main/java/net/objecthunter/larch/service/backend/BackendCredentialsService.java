@@ -1,35 +1,36 @@
 /* 
-* Copyright 2014 Frank Asseg
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License. 
-*/
-package net.objecthunter.larch.service.backend;
+ * Copyright 2014 Frank Asseg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
 
-import com.fasterxml.jackson.core.JsonParseException;
-import net.objecthunter.larch.model.security.Group;
-import net.objecthunter.larch.model.security.User;
-import net.objecthunter.larch.model.security.UserRequest;
+package net.objecthunter.larch.service.backend;
 
 import java.io.IOException;
 import java.util.List;
+
+import net.objecthunter.larch.model.security.Group;
+import net.objecthunter.larch.model.security.User;
+import net.objecthunter.larch.model.security.UserRequest;
 
 /**
  * Service definition for the AuthZ/AuthN service
  */
 public interface BackendCredentialsService {
+
     /**
      * Create a new User in the repository
-     *
+     * 
      * @param u The user to create
      * @throws IOException
      */
@@ -37,6 +38,7 @@ public interface BackendCredentialsService {
 
     /**
      * Create a new request to add a user. the user's email address should be employed to send a confirmation link to
+     * 
      * @param u the user for which a new confirmation request should be created
      * @throws IOException
      */
@@ -44,7 +46,7 @@ public interface BackendCredentialsService {
 
     /**
      * Create a new Group in the repository
-     *
+     * 
      * @param g the group to create
      * @throws IOException
      */
@@ -52,7 +54,7 @@ public interface BackendCredentialsService {
 
     /**
      * Update a {@link net.objecthunter.larch.model.security.User} in the Repository
-     *
+     * 
      * @param u the user to update
      * @throws IOException
      */
@@ -60,7 +62,7 @@ public interface BackendCredentialsService {
 
     /**
      * Update a {@link net.objecthunter.larch.model.security.Group} in the repository
-     *
+     * 
      * @param g The group to update
      * @throws IOException
      */
@@ -68,8 +70,8 @@ public interface BackendCredentialsService {
 
     /**
      * Add an existing user to an exisitng group in the repository
-     *
-     * @param username  The name of the user
+     * 
+     * @param username The name of the user
      * @param groupname the namoe of the group
      * @throws IOException
      */
@@ -77,7 +79,7 @@ public interface BackendCredentialsService {
 
     /**
      * Delete a User from the repository
-     *
+     * 
      * @param name The name of the user to delete
      * @throws IOException
      */
@@ -85,7 +87,7 @@ public interface BackendCredentialsService {
 
     /**
      * Delete a {@link net.objecthunter.larch.model.security.Group} from the repository
-     *
+     * 
      * @param name The name of the {@link net.objecthunter.larch.model.security.Group} to delete
      * @throws IOException
      */
@@ -93,8 +95,8 @@ public interface BackendCredentialsService {
 
     /**
      * Remove an existing user from group, he is currently a member of
-     *
-     * @param username  the name of the user to remove from the group
+     * 
+     * @param username the name of the user to remove from the group
      * @param groupname the name of the group to remove the user from
      * @throws IOException
      */
@@ -102,7 +104,7 @@ public interface BackendCredentialsService {
 
     /**
      * Retrieve a {@link net.objecthunter.larch.model.security.User} object from the repository
-     *
+     * 
      * @param name the name of the user to retrieve
      * @return The {@link net.objecthunter.larch.model.security.User} object of the corresponding user
      * @throws IOException
@@ -111,7 +113,7 @@ public interface BackendCredentialsService {
 
     /**
      * Retrieve a Group from the repository
-     *
+     * 
      * @param name the name of the{@link net.objecthunter.larch.model.security.Group} to retrieve
      * @return The {@link net.objecthunter.larch.model.security.Group} object with the corresponding name
      * @throws IOException
@@ -120,7 +122,7 @@ public interface BackendCredentialsService {
 
     /**
      * Retrieve a list of {@link net.objecthunter.larch.model.security.User}s existing in the repository
-     *
+     * 
      * @return a list of {@link net.objecthunter.larch.model.security.User} objects
      * @throws IOException
      */
@@ -128,7 +130,7 @@ public interface BackendCredentialsService {
 
     /**
      * retrieve a list of {@link net.objecthunter.larch.model.security.Group}s existing in the repository
-     *
+     * 
      * @return The list of {@link net.objecthunter.larch.model.security.Group} that are available
      * @throws IOException
      */
@@ -136,14 +138,16 @@ public interface BackendCredentialsService {
 
     /**
      * Retrieve an existing {@link net.objecthunter.larch.model.security.UserRequest}
+     * 
      * @param token the token of the user request
      * @return the existing {@link net.objecthunter.larch.model.security.UserRequest}
      */
     UserRequest retrieveUserRequest(String token) throws IOException;
 
     /**
-     * Create a new {@link net.objecthunter.larch.model.security.User} from an existing {@link net.objecthunter.larch
-     * .model.security.UserRequest} with a given token value
+     * Create a new {@link net.objecthunter.larch.model.security.User} from an existing
+     * {@link net.objecthunter.larch .model.security.UserRequest} with a given token value
+     * 
      * @param token the token value
      * @param password the password to use
      * @param passwordRepeat the password repetition to check
@@ -152,12 +156,14 @@ public interface BackendCredentialsService {
 
     /**
      * Delete a {@link net.objecthunter.larch.model.security.UserRequest} record
+     * 
      * @param token the token value of the {@link net.objecthunter.larch.model.security.UserRequest}
      */
     void deleteUserRequest(String token);
 
     /**
      * Check if a user name is already existing in the index
+     * 
      * @param name the name to check
      * @return true if the user does exist, otherwise false
      */
@@ -165,6 +171,7 @@ public interface BackendCredentialsService {
 
     /**
      * Retrieve a list of groups from the repo
+     * 
      * @param groupNames the names of the groups to retrieve
      * @return a List containing the corresponding {@link net.objecthunter.larch.model.security.Group} instances
      */

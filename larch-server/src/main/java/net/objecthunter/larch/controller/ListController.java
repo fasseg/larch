@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
+
 package net.objecthunter.larch.controller;
 
 import net.objecthunter.larch.model.SearchResult;
@@ -33,6 +34,7 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 @RequestMapping("/list")
 public class ListController extends AbstractLarchController {
+
     @Autowired
     private EntityService entityService;
 

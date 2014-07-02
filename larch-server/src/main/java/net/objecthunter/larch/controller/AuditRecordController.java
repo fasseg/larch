@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
+
 package net.objecthunter.larch.controller;
 
 import java.io.IOException;
@@ -42,41 +43,35 @@ public class AuditRecordController extends AbstractLarchController {
     /**
      * Controller method for HTTP GET requests of audit records from the repository, describing the provenance of an
      * {@link net.objecthunter.larch.model.Entity}
-     *
-     * @param entityId
-     *            The entity's id for which the {@link net.objecthunter.larch.model.AuditRecord}s should be returned
-     * @param offset
-     *            The offset for {@link net.objecthunter.larch.helpers.AuditRecords} returned from the repository
-     * @param count
-     *            The max number of {@link net.objecthunter.larch.helpers.AuditRecords} returned from the repository
+     * 
+     * @param entityId The entity's id for which the {@link net.objecthunter.larch.model.AuditRecord}s should be
+     *        returned
+     * @param offset The offset for {@link net.objecthunter.larch.helpers.AuditRecords} returned from the repository
+     * @param count The max number of {@link net.objecthunter.larch.helpers.AuditRecords} returned from the repository
      * @return A {@link java.util.List} of {@link net.objecthunter.larch.model.AuditRecord} objects.
      * @throws IOException
      */
     @RequestMapping(value = "/entity/{entity-id}/audit", method = RequestMethod.GET)
-    public List<AuditRecord> retrieve(@PathVariable("entity-id")
-    final String entityId, @RequestParam(value = "offset", defaultValue = "0")
-    final int offset, @RequestParam(value = "count", defaultValue = "25")
-    final int count) throws IOException {
+    public List<AuditRecord> retrieve(@PathVariable("entity-id") final String entityId, @RequestParam(
+            value = "offset", defaultValue = "0") final int offset, @RequestParam(value = "count",
+            defaultValue = "25") final int count) throws IOException {
         return entityService.retrieveAuditRecords(entityId, offset, count);
     }
 
     /**
      * Controller method for HTTP GET requests that procudes an HTML view.
-     *
-     * @param entityId
-     *            The entity's id for which the {@link net.objecthunter.larch.model.AuditRecord}s should be returned
-     * @param offset
-     *            The offset for {@link net.objecthunter.larch.helpers.AuditRecords} returned from the repository
-     * @param count
-     *            The max number of {@link net.objecthunter.larch.helpers.AuditRecords} returned from the repository
+     * 
+     * @param entityId The entity's id for which the {@link net.objecthunter.larch.model.AuditRecord}s should be
+     *        returned
+     * @param offset The offset for {@link net.objecthunter.larch.helpers.AuditRecords} returned from the repository
+     * @param count The max number of {@link net.objecthunter.larch.helpers.AuditRecords} returned from the repository
      * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} object used to render the HTML view
      * @throws IOException
      */
     @RequestMapping(value = "/entity/{entity-id}/audit", method = RequestMethod.GET, produces = "text/html")
-    public ModelAndView retrieveHtml(@PathVariable("entity-id")
-    final String entityId, @RequestParam(value = "offset", defaultValue = "0")
-    final int offset, @RequestParam(value = "count", defaultValue = "25")
-    final int count) throws IOException {
+    public ModelAndView retrieveHtml(@PathVariable("entity-id") final String entityId, @RequestParam(
+            value = "offset", defaultValue = "0") final int offset, @RequestParam(value = "count",
+            defaultValue = "25") final int count) throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("auditRecords", this.retrieve(entityId, offset, count));
         return new ModelAndView("audit", model);

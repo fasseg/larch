@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
+
 package net.objecthunter.larch.helpers;
 
 import java.time.ZoneOffset;
@@ -27,11 +28,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
  * A Factory class for creating different kinds of {@link net.objecthunter.larch.model.AuditRecord} objects
  */
 public abstract class AuditRecords {
+
     /**
      * Create an almost empty {@link net.objecthunter.larch.model.AuditRecord}
-     *
-     * @param entityId
-     *            the id of the Entity this {@link net.objecthunter.larch.model.AuditRecord} will be associated with
+     * 
+     * @param entityId the id of the Entity this {@link net.objecthunter.larch.model.AuditRecord} will be associated
+     *        with
      * @return An almost empty {@link net.objecthunter.larch.model.AuditRecord} ready to be further filled
      */
     public static AuditRecord skeletonRecord(String entityId) {
@@ -45,9 +47,8 @@ public abstract class AuditRecords {
 
     /**
      * Create an {@link net.objecthunter.larch.model.AuditRecord} for a "Create Entity" event
-     *
-     * @param entityId
-     *            the id of the entity created
+     * 
+     * @param entityId the id of the entity created
      * @return the AuditRecord
      */
     public static AuditRecord createEntityRecord(String entityId) {
@@ -58,9 +59,8 @@ public abstract class AuditRecords {
 
     /**
      * Create an {@link net.objecthunter.larch.model.AuditRecord} event for an "Update Entity" event
-     *
-     * @param entityId
-     *            the id of the updated entity
+     * 
+     * @param entityId the id of the updated entity
      * @return
      */
     public static AuditRecord updateEntityRecord(String entityId) {
@@ -71,9 +71,8 @@ public abstract class AuditRecords {
 
     /**
      * Create a {@link net.objecthunter.larch.model.AuditRecord} for a "Delete Entity" event
-     *
-     * @param entityId
-     *            the id of the Entity deleted
+     * 
+     * @param entityId the id of the Entity deleted
      * @return
      */
     public static AuditRecord deleteEntityRecord(String entityId) {
@@ -84,9 +83,8 @@ public abstract class AuditRecords {
 
     /**
      * Create an {@link net.objecthunter.larch.model.AuditRecord} for a "Create Binary" event
-     *
-     * @param entityId
-     *            the id of the entity the binary got created on
+     * 
+     * @param entityId the id of the entity the binary got created on
      * @return
      */
     public static AuditRecord createBinaryRecord(String entityId) {
@@ -97,9 +95,8 @@ public abstract class AuditRecords {
 
     /**
      * create an {@link net.objecthunter.larch.model.AuditRecord} for an "Update Binary" event
-     *
-     * @param entityId
-     *            The id of the entity on which the {@link net.objecthunter.larch.model.Binary} got updated
+     * 
+     * @param entityId The id of the entity on which the {@link net.objecthunter.larch.model.Binary} got updated
      * @return
      */
     public static AuditRecord updateBinaryRecord(String entityId) {
@@ -110,9 +107,8 @@ public abstract class AuditRecords {
 
     /**
      * Create an {@link net.objecthunter.larch.model.AuditRecord} for an "Delete Binary" event
-     *
-     * @param entityId
-     *            the id the entity which's Binary got deleted
+     * 
+     * @param entityId the id the entity which's Binary got deleted
      * @return
      */
     public static AuditRecord deleteBinaryRecord(String entityId) {
@@ -123,9 +119,8 @@ public abstract class AuditRecords {
 
     /**
      * Create an {@link net.objecthunter.larch.model.AuditRecord} for a "Create Relation" event
-     *
-     * @param entityId
-     *            the id of the entity the relation is created on
+     * 
+     * @param entityId the id of the entity the relation is created on
      * @return
      */
     public static AuditRecord createRelationRecord(String entityId) {
@@ -136,9 +131,8 @@ public abstract class AuditRecords {
 
     /**
      * Create an {@link net.objecthunter.larch.model.AuditRecord} for a "Update Relation" event
-     *
-     * @param entityId
-     *            the is of the {@link net.objecthunter.larch.model.Entity} on which a relation got updated
+     * 
+     * @param entityId the is of the {@link net.objecthunter.larch.model.Entity} on which a relation got updated
      * @return
      */
     public static AuditRecord updateRelationRecord(String entityId) {
@@ -149,9 +143,8 @@ public abstract class AuditRecords {
 
     /**
      * Create an {@link net.objecthunter.larch.model.AuditRecord} for a "Delete Relation" event
-     *
-     * @param entityId
-     *            the id of the {@link net.objecthunter.larch.model.Entity} on which a relation got deleted
+     * 
+     * @param entityId the id of the {@link net.objecthunter.larch.model.Entity} on which a relation got deleted
      * @return
      */
     public static AuditRecord deleteRelationRecord(String entityId) {
@@ -162,10 +155,9 @@ public abstract class AuditRecords {
 
     /**
      * Create an {@link net.objecthunter.larch.model.AuditRecord} for a "Create Metadata" event
-     *
-     * @param entityId
-     *            the id of the {@link net.objecthunter.larch.model.Entity} on which the
-     *            {@link net.objecthunter .larch.model.Metadata} gets created
+     * 
+     * @param entityId the id of the {@link net.objecthunter.larch.model.Entity} on which the
+     *        {@link net.objecthunter .larch.model.Metadata} gets created
      * @return
      */
     public static AuditRecord createMetadataRecord(String entityId) {
@@ -176,10 +168,9 @@ public abstract class AuditRecords {
 
     /**
      * Create an {@link net.objecthunter.larch.model.AuditRecord} for a "Update Metadata" event
-     *
-     * @param entityId
-     *            the id of the {@link net.objecthunter.larch.model.Entity} on which the
-     *            {@link net.objecthunter .larch.model.Metadata} gets updated
+     * 
+     * @param entityId the id of the {@link net.objecthunter.larch.model.Entity} on which the
+     *        {@link net.objecthunter .larch.model.Metadata} gets updated
      * @return
      */
     public static AuditRecord updateMetadataRecord(String entityId) {
@@ -190,9 +181,8 @@ public abstract class AuditRecords {
 
     /**
      * Create an {@link net.objecthunter.larch.model.AuditRecord} for a "Delete Identifier" event
-     *
-     * @param entityId
-     *            the id of the {@link net.objecthunter.larch.model.Entity} on which the identifier got deleted
+     * 
+     * @param entityId the id of the {@link net.objecthunter.larch.model.Entity} on which the identifier got deleted
      * @return
      */
     public static AuditRecord deleteIdentifier(String entityId) {
@@ -203,10 +193,9 @@ public abstract class AuditRecords {
 
     /**
      * Create an {@link net.objecthunter.larch.model.AuditRecord} for a "Create Metadata" event
-     *
-     * @param entityId
-     *            the id of the {@link net.objecthunter.larch.model.Entity} on which the
-     *            {@link net.objecthunter .larch.model.Metadata} gets created
+     * 
+     * @param entityId the id of the {@link net.objecthunter.larch.model.Entity} on which the
+     *        {@link net.objecthunter .larch.model.Metadata} gets created
      * @return
      */
     public static AuditRecord createIdentifier(String entityId) {
@@ -217,10 +206,9 @@ public abstract class AuditRecords {
 
     /**
      * Create an {@link net.objecthunter.larch.model.AuditRecord} for a "Delete Metadata" event
-     *
-     * @param entityId
-     *            the id of the {@link net.objecthunter.larch.model.Entity} on which the
-     *            {@link net.objecthunter .larch.model.Metadata} got deleted
+     * 
+     * @param entityId the id of the {@link net.objecthunter.larch.model.Entity} on which the
+     *        {@link net.objecthunter .larch.model.Metadata} got deleted
      * @return
      */
     public static AuditRecord deleteMetadataRecord(String entityId) {

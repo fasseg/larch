@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package net.objecthunter.larch.integration;
 
-import static net.objecthunter.larch.test.util.Fixtures.*;
+import static net.objecthunter.larch.test.util.Fixtures.createSimpleFixtureEntity;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -35,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class IdentifierControllerIT extends AbstractLarchIT {
+
     private static final Logger log = LoggerFactory.getLogger(IdentifierControllerIT.class);
 
     private static final String entityUrl = "http://localhost:8080/entity";
@@ -48,17 +50,18 @@ public class IdentifierControllerIT extends AbstractLarchIT {
     public void testCreateIdentifier() throws Exception {
         // create entity
         HttpResponse resp =
-            this.execute(
-                Request.Post(entityUrl).bodyString(mapper.writeValueAsString(createSimpleFixtureEntity()),
-                    ContentType.APPLICATION_JSON)).returnResponse();
+                this.execute(
+                        Request.Post(entityUrl).bodyString(mapper.writeValueAsString(createSimpleFixtureEntity()),
+                                ContentType.APPLICATION_JSON)).returnResponse();
         assertEquals(201, resp.getStatusLine().getStatusCode());
         final String entityId = EntityUtils.toString(resp.getEntity());
 
         // create new identifier
         resp =
-            this.execute(
-                Request.Post(identifierUrl.replaceFirst("\\{id\\}", entityId)).bodyString("type=DOI&value=123",
-                    ContentType.APPLICATION_FORM_URLENCODED)).returnResponse();
+                this.execute(
+                        Request.Post(identifierUrl.replaceFirst("\\{id\\}", entityId)).bodyString(
+                                "type=DOI&value=123",
+                                ContentType.APPLICATION_FORM_URLENCODED)).returnResponse();
         assertEquals(201, resp.getStatusLine().getStatusCode());
 
         // retrieve entity
@@ -76,18 +79,18 @@ public class IdentifierControllerIT extends AbstractLarchIT {
     public void testDecliningCreateIdentifierEmptyType() throws Exception {
         // create entity
         HttpResponse resp =
-            this.execute(
-                Request.Post(entityUrl).bodyString(mapper.writeValueAsString(createSimpleFixtureEntity()),
-                    ContentType.APPLICATION_JSON)).returnResponse();
+                this.execute(
+                        Request.Post(entityUrl).bodyString(mapper.writeValueAsString(createSimpleFixtureEntity()),
+                                ContentType.APPLICATION_JSON)).returnResponse();
         assertEquals(201, resp.getStatusLine().getStatusCode());
         final String entityId = EntityUtils.toString(resp.getEntity());
 
         // create new identifier
         this.hideLog();
         resp =
-            this.execute(
-                Request.Post(identifierUrl.replaceFirst("\\{id\\}", entityId)).bodyString("type=&value=123",
-                    ContentType.APPLICATION_FORM_URLENCODED)).returnResponse();
+                this.execute(
+                        Request.Post(identifierUrl.replaceFirst("\\{id\\}", entityId)).bodyString("type=&value=123",
+                                ContentType.APPLICATION_FORM_URLENCODED)).returnResponse();
         this.showLog();
         checkResponseError(resp, 500, IOException.class, "wrong or empty type or value given");
 
@@ -104,18 +107,18 @@ public class IdentifierControllerIT extends AbstractLarchIT {
     public void testDecliningCreateIdentifierEmptyValue() throws Exception {
         // create entity
         HttpResponse resp =
-            this.execute(
-                Request.Post(entityUrl).bodyString(mapper.writeValueAsString(createSimpleFixtureEntity()),
-                    ContentType.APPLICATION_JSON)).returnResponse();
+                this.execute(
+                        Request.Post(entityUrl).bodyString(mapper.writeValueAsString(createSimpleFixtureEntity()),
+                                ContentType.APPLICATION_JSON)).returnResponse();
         assertEquals(201, resp.getStatusLine().getStatusCode());
         final String entityId = EntityUtils.toString(resp.getEntity());
 
         // create new identifier
         this.hideLog();
         resp =
-            this.execute(
-                Request.Post(identifierUrl.replaceFirst("\\{id\\}", entityId)).bodyString("type=DOI&value=",
-                    ContentType.APPLICATION_FORM_URLENCODED)).returnResponse();
+                this.execute(
+                        Request.Post(identifierUrl.replaceFirst("\\{id\\}", entityId)).bodyString("type=DOI&value=",
+                                ContentType.APPLICATION_FORM_URLENCODED)).returnResponse();
         this.showLog();
         checkResponseError(resp, 500, IOException.class, "wrong or empty type or value given");
 
@@ -132,21 +135,22 @@ public class IdentifierControllerIT extends AbstractLarchIT {
     public void testDecliningCreateIdentifierWrongType() throws Exception {
         // create entity
         HttpResponse resp =
-            this.execute(
-                Request.Post(entityUrl).bodyString(mapper.writeValueAsString(createSimpleFixtureEntity()),
-                    ContentType.APPLICATION_JSON)).returnResponse();
+                this.execute(
+                        Request.Post(entityUrl).bodyString(mapper.writeValueAsString(createSimpleFixtureEntity()),
+                                ContentType.APPLICATION_JSON)).returnResponse();
         assertEquals(201, resp.getStatusLine().getStatusCode());
         final String entityId = EntityUtils.toString(resp.getEntity());
 
         // create new identifier
         this.hideLog();
         resp =
-            this.execute(
-                Request.Post(identifierUrl.replaceFirst("\\{id\\}", entityId)).bodyString("type=DDOI&value=123",
-                    ContentType.APPLICATION_FORM_URLENCODED)).returnResponse();
+                this.execute(
+                        Request.Post(identifierUrl.replaceFirst("\\{id\\}", entityId)).bodyString(
+                                "type=DDOI&value=123",
+                                ContentType.APPLICATION_FORM_URLENCODED)).returnResponse();
         this.showLog();
         checkResponseError(resp, 500, IllegalArgumentException.class,
-            "No enum constant net.objecthunter.larch.model.AlternativeIdentifier.IdentifierType.DDOI");
+                "No enum constant net.objecthunter.larch.model.AlternativeIdentifier.IdentifierType.DDOI");
 
         // retrieve entity
         resp = this.execute(Request.Get(entityUrl + "/" + entityId)).returnResponse();
@@ -161,17 +165,18 @@ public class IdentifierControllerIT extends AbstractLarchIT {
     public void testDeleteIdentifier() throws Exception {
         // create entity
         HttpResponse resp =
-            this.execute(
-                Request.Post(entityUrl).bodyString(mapper.writeValueAsString(createSimpleFixtureEntity()),
-                    ContentType.APPLICATION_JSON)).returnResponse();
+                this.execute(
+                        Request.Post(entityUrl).bodyString(mapper.writeValueAsString(createSimpleFixtureEntity()),
+                                ContentType.APPLICATION_JSON)).returnResponse();
         assertEquals(201, resp.getStatusLine().getStatusCode());
         final String entityId = EntityUtils.toString(resp.getEntity());
 
         // create new identifier
         resp =
-            this.execute(
-                Request.Post(identifierUrl.replaceFirst("\\{id\\}", entityId)).bodyString("type=DOI&value=123",
-                    ContentType.APPLICATION_FORM_URLENCODED)).returnResponse();
+                this.execute(
+                        Request.Post(identifierUrl.replaceFirst("\\{id\\}", entityId)).bodyString(
+                                "type=DOI&value=123",
+                                ContentType.APPLICATION_FORM_URLENCODED)).returnResponse();
         assertEquals(201, resp.getStatusLine().getStatusCode());
 
         // retrieve entity
@@ -186,8 +191,8 @@ public class IdentifierControllerIT extends AbstractLarchIT {
 
         // delete alternative identifier
         resp =
-            this.execute(Request.Delete(identifierUrl.replaceFirst("\\{id\\}", entityId) + "/DOI/123"))
-                .returnResponse();
+                this.execute(Request.Delete(identifierUrl.replaceFirst("\\{id\\}", entityId) + "/DOI/123"))
+                        .returnResponse();
         assertEquals(200, resp.getStatusLine().getStatusCode());
 
         // retrieve entity
@@ -203,17 +208,18 @@ public class IdentifierControllerIT extends AbstractLarchIT {
     public void testDecliningDeleteIdentifierWrongType() throws Exception {
         // create entity
         HttpResponse resp =
-            this.execute(
-                Request.Post(entityUrl).bodyString(mapper.writeValueAsString(createSimpleFixtureEntity()),
-                    ContentType.APPLICATION_JSON)).returnResponse();
+                this.execute(
+                        Request.Post(entityUrl).bodyString(mapper.writeValueAsString(createSimpleFixtureEntity()),
+                                ContentType.APPLICATION_JSON)).returnResponse();
         assertEquals(201, resp.getStatusLine().getStatusCode());
         final String entityId = EntityUtils.toString(resp.getEntity());
 
         // create new identifier
         resp =
-            this.execute(
-                Request.Post(identifierUrl.replaceFirst("\\{id\\}", entityId)).bodyString("type=DOI&value=123",
-                    ContentType.APPLICATION_FORM_URLENCODED)).returnResponse();
+                this.execute(
+                        Request.Post(identifierUrl.replaceFirst("\\{id\\}", entityId)).bodyString(
+                                "type=DOI&value=123",
+                                ContentType.APPLICATION_FORM_URLENCODED)).returnResponse();
         assertEquals(201, resp.getStatusLine().getStatusCode());
 
         // retrieve entity
@@ -229,11 +235,11 @@ public class IdentifierControllerIT extends AbstractLarchIT {
         // delete alternative identifier
         this.hideLog();
         resp =
-            this.execute(Request.Delete(identifierUrl.replaceFirst("\\{id\\}", entityId) + "/DDOI/123"))
-                .returnResponse();
+                this.execute(Request.Delete(identifierUrl.replaceFirst("\\{id\\}", entityId) + "/DDOI/123"))
+                        .returnResponse();
         this.showLog();
         checkResponseError(resp, 500, IllegalArgumentException.class,
-            "No enum constant net.objecthunter.larch.model.AlternativeIdentifier.IdentifierType.DDOI");
+                "No enum constant net.objecthunter.larch.model.AlternativeIdentifier.IdentifierType.DDOI");
 
         // retrieve entity
         resp = this.execute(Request.Get(entityUrl + "/" + entityId)).returnResponse();
@@ -250,17 +256,18 @@ public class IdentifierControllerIT extends AbstractLarchIT {
     public void testDecliningDeleteIdentifierWrongValue() throws Exception {
         // create entity
         HttpResponse resp =
-            this.execute(
-                Request.Post(entityUrl).bodyString(mapper.writeValueAsString(createSimpleFixtureEntity()),
-                    ContentType.APPLICATION_JSON)).returnResponse();
+                this.execute(
+                        Request.Post(entityUrl).bodyString(mapper.writeValueAsString(createSimpleFixtureEntity()),
+                                ContentType.APPLICATION_JSON)).returnResponse();
         assertEquals(201, resp.getStatusLine().getStatusCode());
         final String entityId = EntityUtils.toString(resp.getEntity());
 
         // create new identifier
         resp =
-            this.execute(
-                Request.Post(identifierUrl.replaceFirst("\\{id\\}", entityId)).bodyString("type=DOI&value=123",
-                    ContentType.APPLICATION_FORM_URLENCODED)).returnResponse();
+                this.execute(
+                        Request.Post(identifierUrl.replaceFirst("\\{id\\}", entityId)).bodyString(
+                                "type=DOI&value=123",
+                                ContentType.APPLICATION_FORM_URLENCODED)).returnResponse();
         assertEquals(201, resp.getStatusLine().getStatusCode());
 
         // retrieve entity
@@ -276,8 +283,8 @@ public class IdentifierControllerIT extends AbstractLarchIT {
         // delete alternative identifier
         this.hideLog();
         resp =
-            this.execute(Request.Delete(identifierUrl.replaceFirst("\\{id\\}", entityId) + "/DOI/1234"))
-                .returnResponse();
+                this.execute(Request.Delete(identifierUrl.replaceFirst("\\{id\\}", entityId) + "/DOI/1234"))
+                        .returnResponse();
         this.showLog();
         checkResponseError(resp, 500, IOException.class, "Identifier of type DOI with value 1234 not found");
 

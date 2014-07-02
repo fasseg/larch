@@ -1,3 +1,4 @@
+
 package net.objecthunter.larch.service.backend.elasticsearch;
 
 import java.io.InputStream;
@@ -40,8 +41,7 @@ public class AbstractElasticSearchService {
                 for (String key : ((Set<String>) mappings.keySet())) {
                     try {
                         requestBuilder.addMapping(key, mapper.writeValueAsString(mappings.get(key)));
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                     }
                 }
                 requestBuilder.execute().actionGet();
@@ -62,14 +62,13 @@ public class AbstractElasticSearchService {
 
     private Map getMappings(String indexName) {
         InputStream in =
-            this.getClass().getResourceAsStream(
-                env.getProperty("elasticsearch.config.path") + indexName + "_mappings.json");
+                this.getClass().getResourceAsStream(
+                        env.getProperty("elasticsearch.config.path") + indexName + "_mappings.json");
         if (in != null) {
             try {
                 String mappings = IOUtils.toString(in);
                 return mapper.readValue(mappings, Map.class);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 return null;
             }
         }

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
+
 package net.objecthunter.larch.service.backend.fs;
 
 import static net.objecthunter.larch.util.FileSystemUtil.checkAndCreate;
@@ -73,8 +74,7 @@ public class FilesystemBlobstoreService implements BackendBlobstoreService {
         do {
             /* create a new random file name */
             data = new File(folder, RandomStringUtils.randomAlphabetic(16));
-        }
-        while (data.exists());
+        } while (data.exists());
         log.debug("creating Blob at {}", data.getAbsolutePath());
         final FileOutputStream sink = new FileOutputStream(data);
         IOUtils.copy(src, sink);
@@ -121,8 +121,7 @@ public class FilesystemBlobstoreService implements BackendBlobstoreService {
         do {
             /* create a new random file name */
             data = new File(folder, RandomStringUtils.randomAlphabetic(16));
-        }
-        while (data.exists());
+        } while (data.exists());
         try (final OutputStream sink = new FileOutputStream(data)) {
             mapper.writeValue(sink, oldVersion);
             return folder.getName() + "/" + data.getName();

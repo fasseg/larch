@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package net.objecthunter.larch.integration;
 
-import static net.objecthunter.larch.test.util.Fixtures.*;
+import static net.objecthunter.larch.test.util.Fixtures.createFixtureEntity;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
 import net.objecthunter.larch.model.Entities;
 import net.objecthunter.larch.model.Entity;
 
@@ -33,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class PublishControllerIT extends AbstractLarchIT {
+
     private static final Logger log = LoggerFactory.getLogger(PublishControllerIT.class);
 
     private static final String hostUrl = "http://localhost:8080/";
@@ -52,9 +55,9 @@ public class PublishControllerIT extends AbstractLarchIT {
     public void testRetrievePublishedEntity() throws Exception {
         // create
         HttpResponse resp =
-            this.execute(
-                Request.Post(entityUrl).bodyString(mapper.writeValueAsString(createFixtureEntity()),
-                    ContentType.APPLICATION_JSON)).returnResponse();
+                this.execute(
+                        Request.Post(entityUrl).bodyString(mapper.writeValueAsString(createFixtureEntity()),
+                                ContentType.APPLICATION_JSON)).returnResponse();
         assertEquals(201, resp.getStatusLine().getStatusCode());
         final String id = EntityUtils.toString(resp.getEntity());
 
@@ -77,9 +80,9 @@ public class PublishControllerIT extends AbstractLarchIT {
     public void testRetrievePublishedEntities() throws Exception {
         // create
         HttpResponse resp =
-            this.execute(
-                Request.Post(entityUrl).bodyString(mapper.writeValueAsString(createFixtureEntity()),
-                    ContentType.APPLICATION_JSON)).returnResponse();
+                this.execute(
+                        Request.Post(entityUrl).bodyString(mapper.writeValueAsString(createFixtureEntity()),
+                                ContentType.APPLICATION_JSON)).returnResponse();
         assertEquals(201, resp.getStatusLine().getStatusCode());
         final String id = EntityUtils.toString(resp.getEntity());
 
@@ -90,9 +93,9 @@ public class PublishControllerIT extends AbstractLarchIT {
 
         // create new identifier
         resp =
-            this.execute(
-                Request.Post(identifierUrl.replaceFirst("\\{id\\}", id)).bodyString("type=DOI&value=123",
-                    ContentType.APPLICATION_FORM_URLENCODED)).returnResponse();
+                this.execute(
+                        Request.Post(identifierUrl.replaceFirst("\\{id\\}", id)).bodyString("type=DOI&value=123",
+                                ContentType.APPLICATION_FORM_URLENCODED)).returnResponse();
         assertEquals(201, resp.getStatusLine().getStatusCode());
 
         // publish

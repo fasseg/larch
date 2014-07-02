@@ -15,8 +15,14 @@
         </div>
         <div th:each="audit : ${auditRecords}" class="panel clickable">
             <p class="panel_title" th:text="${audit.action}"></p>
-            <p class="property">Agent</p><p class="value" th:text="${audit.agentName}"></p>
-            <p class="property">Timestamp</p><p class="value" th:text="${audit.timestamp}"></p>
+
+            <p class="property">Agent</p>
+
+            <p class="value" th:text="${audit.agentName}"></p>
+
+            <p class="property">Timestamp</p>
+
+            <p class="value" th:text="${audit.timestamp}"></p>
         </div>
     </div>
 </div>

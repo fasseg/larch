@@ -1,21 +1,31 @@
 /* 
-* Copyright 2014 Frank Asseg
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License. 
-*/
+ * Copyright 2014 Frank Asseg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 package net.objecthunter.larch.service.elasticsearch;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.Arrays;
+import java.util.List;
 
 import net.objecthunter.larch.model.MetadataType;
 import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchEntityService;
@@ -45,20 +55,19 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.Arrays;
-import java.util.List;
-
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ElasticSearchSchemaServiceTest {
-    private ElasticSearchSchemaService schemaService;
-    private ObjectMapper mapper = new ObjectMapper();
-    private Client mockClient;
-    private AdminClient mockAdminClient;
-    private IndicesAdminClient mockIndicesAdminClient;
 
+    private ElasticSearchSchemaService schemaService;
+
+    private ObjectMapper mapper = new ObjectMapper();
+
+    private Client mockClient;
+
+    private AdminClient mockAdminClient;
+
+    private IndicesAdminClient mockIndicesAdminClient;
 
     @Before
     public void setup() {
@@ -104,8 +113,10 @@ public class ElasticSearchSchemaServiceTest {
         hitArray[0] = mockHit;
         SearchHits mockHits = createMock(SearchHits.class);
 
-        expect(mockClient.prepareSearch(ElasticSearchSchemaService.INDEX_MD_SCHEMATA)).andReturn(mockSearchRequestBuilder);
-        expect(mockSearchRequestBuilder.setSearchType(anyObject(SearchType.class))).andReturn(mockSearchRequestBuilder);
+        expect(mockClient.prepareSearch(ElasticSearchSchemaService.INDEX_MD_SCHEMATA)).andReturn(
+                mockSearchRequestBuilder);
+        expect(mockSearchRequestBuilder.setSearchType(anyObject(SearchType.class))).andReturn(
+                mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setQuery(anyObject(QueryBuilder.class))).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.execute()).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(mockSearchResponse);
@@ -152,7 +163,8 @@ public class ElasticSearchSchemaServiceTest {
         expect(mockIndicesAdminClient.refresh(anyObject())).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(null);
 
-        replay(mockClient, mockAdminClient, mockIndicesAdminClient, mockFuture, mockGetRequestBuilder, mockGetResponse,
+        replay(mockClient, mockAdminClient, mockIndicesAdminClient, mockFuture, mockGetRequestBuilder,
+                mockGetResponse,
                 mockIndexRequestBuilder, mockIndexResponse);
         assertNotNull(this.schemaService.createSchemaType(type));
         verify(mockClient, mockAdminClient, mockIndicesAdminClient, mockFuture, mockGetRequestBuilder,
@@ -188,6 +200,6 @@ public class ElasticSearchSchemaServiceTest {
     @Test
     @Ignore
     public void testValidate() throws Exception {
-        //TODO implement validation test
+        // TODO implement validation test
     }
 }

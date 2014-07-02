@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package net.objecthunter.larch.service.impl;
 
 import javax.annotation.PostConstruct;
@@ -30,6 +31,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 
 public class DefaultMessagingService implements MessagingService {
+
     private static final Logger log = LoggerFactory.getLogger(DefaultMessagingService.class);
 
     @Autowired
@@ -51,9 +53,10 @@ public class DefaultMessagingService implements MessagingService {
             return;
         }
         if (text == null || text.isEmpty()) {
-           throw new RuntimeException("Text for JMS Message can not be empty");
+            throw new RuntimeException("Text for JMS Message can not be empty");
         }
         this.template.send(new MessageCreator() {
+
             @Override
             public Message createMessage(Session session) throws JMSException {
                 return session.createTextMessage(text);

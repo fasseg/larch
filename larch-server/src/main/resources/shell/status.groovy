@@ -28,13 +28,15 @@ import org.crsh.text.RenderPrintWriter
 */
 
 class status {
+
     RenderPrintWriter sink;
 
     @Usage("Repository status information")
     @Command
     def main(InvocationContext ctx) {
-        final RepositoryService repositoryService = (RepositoryService) ServiceProvider.getService(ctx,
-                RepositoryService.class);
+        final RepositoryService repositoryService = (RepositoryService) ServiceProvider.
+                getService(ctx,
+                           RepositoryService.class);
         final Describe desc = repositoryService.describe();
         final LarchState state = repositoryService.status();
         final StringBuilder resp = new StringBuilder();
@@ -86,9 +88,11 @@ class status {
         sink.print("\n");
         sink.println(header, Decoration.bold, Color.green);
     }
+
     def printField(String field) {
         sink.print(field)
     }
+
     def printValue(String value) {
         sink.println(value, Color.yellow);
     }

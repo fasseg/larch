@@ -1,11 +1,15 @@
+
 package net.objecthunter.larch.model;
 
 /**
  * Model class to hold version information
  */
 public class Version {
+
     private String entityId;
+
     private int versionNumber;
+
     private String path;
 
     public Version() {

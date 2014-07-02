@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package net.objecthunter.larch.integration;
 
 import static org.junit.Assert.assertEquals;
@@ -20,10 +21,9 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import net.objecthunter.larch.LarchServerConfiguration;
-
 import net.objecthunter.larch.integration.helpers.NullOutputStream;
+
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Executor;
@@ -38,6 +38,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -46,6 +47,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @WebAppConfiguration
 @ActiveProfiles("fs")
 public abstract class AbstractLarchIT {
+
     @Autowired
     private ObjectMapper mapper;
 
@@ -67,9 +69,9 @@ public abstract class AbstractLarchIT {
     }
 
     protected void checkResponseError(HttpResponse response, int statusCode,
-                                      Class<? extends Exception> expectedException,
-                                      String message)
-        throws IOException {
+            Class<? extends Exception> expectedException,
+            String message)
+            throws IOException {
         JsonNode error = mapper.readTree(response.getEntity().getContent());
         assertEquals(statusCode, response.getStatusLine().getStatusCode());
         assertEquals(statusCode, error.get("status").asInt());
@@ -77,7 +79,7 @@ public abstract class AbstractLarchIT {
         assertEquals(message, error.get("message").asText());
     }
 
-    protected void hideLog()  {
+    protected void hideLog() {
         System.setOut(new PrintStream(NullOutputStream.getInstance()));
         System.setErr(new PrintStream(NullOutputStream.getInstance()));
     }

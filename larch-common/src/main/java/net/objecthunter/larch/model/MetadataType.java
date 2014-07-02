@@ -1,18 +1,19 @@
 /* 
-* Copyright 2014 Frank Asseg
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License. 
-*/
+ * Copyright 2014 Frank Asseg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 package net.objecthunter.larch.model;
 
 /**
@@ -34,7 +35,7 @@ public class MetadataType {
 
     /**
      * Get the name of the metadata type
-     *
+     * 
      * @return the name
      */
     public String getName() {
@@ -43,7 +44,7 @@ public class MetadataType {
 
     /**
      * Set the name of the metadata type
-     *
+     * 
      * @param name the name to set
      */
     public void setName(String name) {
@@ -52,7 +53,7 @@ public class MetadataType {
 
     /**
      * Get the schema URL from the meta data type
-     *
+     * 
      * @return the schema url
      */
     public String getSchemaUrl() {
@@ -61,7 +62,7 @@ public class MetadataType {
 
     /**
      * Set the schema URL for the meta data type
-     *
+     * 
      * @param schemaUrl the url to set
      */
     public void setSchemaUrl(String schemaUrl) {

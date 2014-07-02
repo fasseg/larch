@@ -1,19 +1,24 @@
 /* 
-* Copyright 2014 Frank Asseg
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License. 
-*/
+ * Copyright 2014 Frank Asseg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 package net.objecthunter.larch.controller;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.objecthunter.larch.model.security.Group;
 import net.objecthunter.larch.model.security.User;
@@ -24,18 +29,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Web controller class responsible for larch {@link net.objecthunter.larch.model.Binary} objects
  */
 @Controller
 public class UserController extends AbstractLarchController {
+
     @Autowired
     private BackendCredentialsService backendCredentialsService;
 
@@ -57,8 +64,8 @@ public class UserController extends AbstractLarchController {
     @RequestMapping(value = "/confirm/{token}", method = RequestMethod.POST, consumes = "multipart/form-data")
     @ResponseStatus(HttpStatus.OK)
     public ModelAndView confirmUserRequest(@PathVariable("token") final String token,
-                                           @RequestParam("password") final String password,
-                                           @RequestParam("passwordRepeat") final String passwordRepeat) throws IOException {
+            @RequestParam("password") final String password,
+            @RequestParam("passwordRepeat") final String passwordRepeat) throws IOException {
         final User u = this.backendCredentialsService.createUser(token, password, passwordRepeat);
         final ModelMap model = new ModelMap();
         return success("The user " + u.getName() + " has been created.");
@@ -76,7 +83,7 @@ public class UserController extends AbstractLarchController {
     /**
      * Controller method for retrieving a List of existing {@link net.objecthunter.larch.model.security.User}s in the
      * repository as a JSON representation
-     *
+     * 
      * @return A JSON representation of the user list
      * @throws IOException
      */
@@ -89,22 +96,22 @@ public class UserController extends AbstractLarchController {
 
     /**
      * Controller method for creating a new {@link net.objecthunter.larch.model.security.User}
-     *
-     * @param userName  the name of the user
+     * 
+     * @param userName the name of the user
      * @param firstName the user's first name
-     * @param lastName  the user's last name
-     * @param email     the user's mail address
-     * @param groups    the user's groups
+     * @param lastName the user's last name
+     * @param email the user's mail address
+     * @param groups the user's groups
      * @throws IOException if the user could not be created
      */
     @RequestMapping(value = "/user", method = RequestMethod.POST, consumes = "multipart/form-data")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public String createUser(@RequestParam("name") final String userName,
-                             @RequestParam("first_name") final String firstName,
-                             @RequestParam("last_name") final String lastName,
-                             @RequestParam("email") final String email,
-                             @RequestParam("groups") final List<String> groups) throws IOException {
+            @RequestParam("first_name") final String firstName,
+            @RequestParam("last_name") final String lastName,
+            @RequestParam("email") final String email,
+            @RequestParam("groups") final List<String> groups) throws IOException {
         final User u = new User();
         u.setName(userName);
         u.setFirstName(firstName);
@@ -124,7 +131,7 @@ public class UserController extends AbstractLarchController {
     /**
      * Controller method for retrieving an existing {@link net.objecthunter.larch.model.security.User}s in the
      * repository as a JSON representation
-     *
+     * 
      * @return A JSON representation of the user
      * @throws IOException
      */
@@ -138,7 +145,7 @@ public class UserController extends AbstractLarchController {
     /**
      * Controller method for retrieving an existing {@link net.objecthunter.larch.model.security.User}s in the
      * repository as a JSON representation
-     *
+     * 
      * @param name The user's name
      * @return A JSON representation of the user
      * @throws IOException
@@ -155,7 +162,7 @@ public class UserController extends AbstractLarchController {
 
     /**
      * Controller method for retrieving a HTML view via HTTP GET of all Users and Groups in the repository
-     *
+     * 
      * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} used for redering the HTML view
      * @throws IOException
      */
@@ -172,7 +179,7 @@ public class UserController extends AbstractLarchController {
     /**
      * Controller method to retrieve a list of {@link net.objecthunter.larch.model.security.Group}s that exist in the
      * repository as a JSON representation
-     *
+     * 
      * @return the list of {@link net.objecthunter.larch.model.security.Group}s as a JSON representation
      * @throws IOException
      */
@@ -187,10 +194,10 @@ public class UserController extends AbstractLarchController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public ModelAndView updateUserDetails(@PathVariable("name") final String username,
-                                          @RequestParam("firstName") final String firstName,
-                                          @RequestParam("lastName") final String lastName,
-                                          @RequestParam("email") final String email,
-                                          @RequestParam("groups") final List<String> groupNames) throws IOException {
+            @RequestParam("firstName") final String firstName,
+            @RequestParam("lastName") final String lastName,
+            @RequestParam("email") final String email,
+            @RequestParam("groups") final List<String> groupNames) throws IOException {
         final User u = this.backendCredentialsService.retrieveUser(username);
         u.setLastName(lastName);
         u.setFirstName(firstName);
@@ -199,6 +206,5 @@ public class UserController extends AbstractLarchController {
         this.backendCredentialsService.updateUser(u);
         return success("The user " + username + " has been updated");
     }
-
 
 }

@@ -17,7 +17,8 @@
             <h2>All Entities List</h2>
         </div>
         <div class="container">
-            Returned <span th:text="${result.totalHits}"></span> records in <span th:text="${result.duration}"></span>
+            Returned <span th:text="${result.totalHits}"></span> records in <span
+                th:text="${result.duration}"></span>
             ms.
             <hr width="100%"/>
             <table>
@@ -36,15 +37,21 @@
                     <td th:if="${#strings.isEmpty(record.type)}" th:text="'No Type'"></td>
                     <td th:unless="${#strings.isEmpty(record.type)}" th:text="${record.type}"></td>
                     <td th:text="${record.tags}"></td>
-                    <td><input type="button" id="bDelete" value="Delete" th:onclick="'javascript:deleteEntity(\'' + ${record.id} + '\');'"/></td>
+                    <td><input type="button" id="bDelete" value="Delete"
+                               th:onclick="'javascript:deleteEntity(\'' + ${record.id} + '\');'"/>
+                    </td>
                 </tr>
                 <tfoot>
                 <tr>
-                    <td><a th:if="${result.offset &gt; 0}" th:href="@{~/browse} + '/' + ${result.prevOffset} + '/' + ${result.numRecords}">Prev</a></td>
+                    <td><a th:if="${result.offset &gt; 0}"
+                           th:href="@{~/browse} + '/' + ${result.prevOffset} + '/' + ${result.numRecords}">Prev</a>
+                    </td>
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td><a th:if="${result.totalHits &gt; result.offset + result.numRecords}" th:href="@{~/browse} + '/' + ${result.nextOffset} + '/' + ${result.numRecords}">Next</a></td>
+                    <td><a th:if="${result.totalHits &gt; result.offset + result.numRecords}"
+                           th:href="@{~/browse} + '/' + ${result.nextOffset} + '/' + ${result.numRecords}">Next</a>
+                    </td>
                 </tr>
                 </tfoot>
             </table>

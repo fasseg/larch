@@ -1,21 +1,32 @@
 /* 
-* Copyright 2014 Frank Asseg
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License. 
-*/
+ * Copyright 2014 Frank Asseg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 package net.objecthunter.larch.service.elasticsearch;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.List;
 
 import net.objecthunter.larch.model.security.Group;
 import net.objecthunter.larch.model.security.User;
@@ -41,17 +52,18 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.Arrays;
-import java.util.List;
-
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ElasticSearchCredentialsServiceTest {
+
     private ElasticSearchCredentialsService credentialsService;
+
     private Client mockClient;
+
     private AdminClient mockAdminClient;
+
     private IndicesAdminClient mockIndicesAdminClient;
+
     private ObjectMapper mapper = new ObjectMapper();
 
     @Before
@@ -80,8 +92,9 @@ public class ElasticSearchCredentialsServiceTest {
         expect(mockResponse.getSourceAsBytes()).andReturn(mapper.writeValueAsBytes(u));
 
         replay(mockClient, mockFuture, mockGetRequestBuilder, mockResponse);
-        Authentication auth = this.credentialsService.authenticate(new UsernamePasswordAuthenticationToken(u.getName(),
-                "test"));
+        Authentication auth =
+                this.credentialsService.authenticate(new UsernamePasswordAuthenticationToken(u.getName(),
+                        "test"));
         verify(mockClient, mockFuture, mockGetRequestBuilder, mockResponse);
 
         assertNotNull(auth);
@@ -119,9 +132,11 @@ public class ElasticSearchCredentialsServiceTest {
         expect(mockIndicesAdminClient.refresh(anyObject())).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(null);
 
-        replay(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
+        replay(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse,
+                mockFuture, mockIndexRequestBuilder);
         this.credentialsService.createUser(u);
-        verify(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
+        verify(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse,
+                mockFuture, mockIndexRequestBuilder);
     }
 
     @SuppressWarnings("unchecked")
@@ -154,9 +169,11 @@ public class ElasticSearchCredentialsServiceTest {
         expect(mockIndicesAdminClient.refresh(anyObject())).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(null);
 
-        replay(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
+        replay(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse,
+                mockFuture, mockIndexRequestBuilder);
         this.credentialsService.createGroup(g);
-        verify(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
+        verify(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse,
+                mockFuture, mockIndexRequestBuilder);
     }
 
     @SuppressWarnings("unchecked")
@@ -190,10 +207,11 @@ public class ElasticSearchCredentialsServiceTest {
         expect(mockIndicesAdminClient.refresh(anyObject())).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(null);
 
-
-        replay(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
+        replay(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse,
+                mockFuture, mockIndexRequestBuilder);
         this.credentialsService.updateUser(u);
-        verify(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
+        verify(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse,
+                mockFuture, mockIndexRequestBuilder);
     }
 
     @SuppressWarnings("unchecked")
@@ -219,7 +237,6 @@ public class ElasticSearchCredentialsServiceTest {
         expect(mockIndexRequestBuilder.setSource((byte[]) anyObject())).andReturn(mockIndexRequestBuilder);
         expect(mockIndexRequestBuilder.execute()).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(null);
-
 
         replay(mockClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
         this.credentialsService.updateGroup(g);
@@ -275,12 +292,12 @@ public class ElasticSearchCredentialsServiceTest {
         expect(mockIndicesAdminClient.refresh(anyObject())).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(null);
 
-
         replay(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse,
                 mockFuture,
                 mockIndexRequestBuilder);
         this.credentialsService.addUserToGroup(u.getName(), g.getName());
-        verify(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
+        verify(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse,
+                mockFuture, mockIndexRequestBuilder);
     }
 
     @SuppressWarnings("unchecked")
@@ -310,7 +327,8 @@ public class ElasticSearchCredentialsServiceTest {
         Group adminGroup = new Group();
         adminGroup.setName("ROLE_ADMIN");
         expect(mockClient.prepareGet(ElasticSearchCredentialsService.INDEX_GROUPS,
-                ElasticSearchCredentialsService.INDEX_GROUPS_TYPE, adminGroup.getName())).andReturn(mockGetRequestBuilder);
+                ElasticSearchCredentialsService.INDEX_GROUPS_TYPE, adminGroup.getName())).andReturn(
+                mockGetRequestBuilder);
         expect(mockGetRequestBuilder.execute()).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(mockGetResponse);
         expect(mockGetResponse.isExists()).andReturn(true);
@@ -327,9 +345,11 @@ public class ElasticSearchCredentialsServiceTest {
         expect(mockIndicesAdminClient.refresh(anyObject())).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(null);
 
-        replay(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockDeleteRequestBuilder);
+        replay(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse,
+                mockFuture, mockDeleteRequestBuilder);
         this.credentialsService.deleteUser(u.getName());
-        verify(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockDeleteRequestBuilder);
+        verify(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse,
+                mockFuture, mockDeleteRequestBuilder);
 
     }
 
@@ -361,9 +381,11 @@ public class ElasticSearchCredentialsServiceTest {
         expect(mockIndicesAdminClient.refresh(anyObject())).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(null);
 
-        replay(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockDeleteRequestBuilder);
+        replay(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse,
+                mockFuture, mockDeleteRequestBuilder);
         this.credentialsService.deleteGroup(g.getName());
-        verify(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockDeleteRequestBuilder);
+        verify(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse,
+                mockFuture, mockDeleteRequestBuilder);
     }
 
     @SuppressWarnings("unchecked")
@@ -415,9 +437,11 @@ public class ElasticSearchCredentialsServiceTest {
         expect(mockIndicesAdminClient.refresh(anyObject())).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(null);
 
-        replay(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
+        replay(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse,
+                mockFuture, mockIndexRequestBuilder);
         this.credentialsService.removeUserFromGroup(u.getName(), g.getName());
-        verify(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse, mockFuture, mockIndexRequestBuilder);
+        verify(mockClient, mockAdminClient, mockIndicesAdminClient, mockGetRequestBuilder, mockGetResponse,
+                mockFuture, mockIndexRequestBuilder);
     }
 
     @SuppressWarnings("unchecked")
@@ -475,8 +499,8 @@ public class ElasticSearchCredentialsServiceTest {
         hitArray[0] = mockHit;
         SearchHits mockHits = createMock(SearchHits.class);
 
-
-        expect(mockClient.prepareSearch(ElasticSearchCredentialsService.INDEX_USERS)).andReturn(mockSearchRequestBuilder);
+        expect(mockClient.prepareSearch(ElasticSearchCredentialsService.INDEX_USERS)).andReturn(
+                mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setQuery(anyObject(QueryBuilder.class))).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.execute()).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(mockSearchResponse);
@@ -490,7 +514,7 @@ public class ElasticSearchCredentialsServiceTest {
         verify(mockClient, mockSearchRequestBuilder, mockSearchResponse, mockFuture, mockHits, mockHit);
         assertEquals(1, users.size());
         assertEquals(u.getName(), users.get(0).getName());
-        assertEquals(u.getGroups().get(0).getName(),users.get(0).getGroups().get(0).getName());
+        assertEquals(u.getGroups().get(0).getName(), users.get(0).getGroups().get(0).getName());
     }
 
     @SuppressWarnings("unchecked")
@@ -505,8 +529,8 @@ public class ElasticSearchCredentialsServiceTest {
         hitArray[0] = mockHit;
         SearchHits mockHits = createMock(SearchHits.class);
 
-
-        expect(mockClient.prepareSearch(ElasticSearchCredentialsService.INDEX_GROUPS)).andReturn(mockSearchRequestBuilder);
+        expect(mockClient.prepareSearch(ElasticSearchCredentialsService.INDEX_GROUPS)).andReturn(
+                mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setQuery(anyObject(QueryBuilder.class))).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.execute()).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(mockSearchResponse);

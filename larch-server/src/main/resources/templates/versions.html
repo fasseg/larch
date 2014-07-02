@@ -13,16 +13,29 @@
     <div class="main">
         <div th:include="fragments :: banner" class="title">
         </div>
-        <a th:each="entity : ${entities.entities}" th:href="@{~/entity/} + ${entity.id} + '/version/' + ${entity.version}">
+        <a th:each="entity : ${entities.entities}"
+           th:href="@{~/entity/} + ${entity.id} + '/version/' + ${entity.version}">
             <div class="panel clickable">
-                <p class="panel_title" th:text="'Version: ' + ${entity.version} + ' of id: ' + ${entity.id}"></p>
-                <p class="property">Label</p><p class="value" th:text="${entity.label}"></p>
+                <p class="panel_title"
+                   th:text="'Version: ' + ${entity.version} + ' of id: ' + ${entity.id}"></p>
+
+                <p class="property">Label</p>
+
+                <p class="value" th:text="${entity.label}"></p>
+
                 <p class="property">Type</p>
+
                 <p class="value" th:if="${#strings.isEmpty(entity.type)}" th:text="'No Type'"></p>
-                <p class="value" th:unless="${#strings.isEmpty(entity.type)}" th:text="${entity.type}"></p>
+
+                <p class="value" th:unless="${#strings.isEmpty(entity.type)}"
+                   th:text="${entity.type}"></p>
+
                 <p class="property">State</p>
+
                 <p class="value" th:text="${entity.state}"></p>
+
                 <p class="property">Last modified</p>
+
                 <p class="value" th:text="${entity.utcLastModified}"></p>
             </div>
         </a>

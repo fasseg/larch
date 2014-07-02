@@ -1,19 +1,26 @@
 /* 
-* Copyright 2014 Frank Asseg
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License. 
-*/
+ * Copyright 2014 Frank Asseg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 package net.objecthunter.larch.test.util;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import net.objecthunter.larch.model.Binary;
 import net.objecthunter.larch.model.Entity;
@@ -22,28 +29,26 @@ import net.objecthunter.larch.model.MetadataType;
 import net.objecthunter.larch.model.security.Group;
 import net.objecthunter.larch.model.security.User;
 import net.objecthunter.larch.model.source.UrlSource;
+
 import org.apache.commons.lang3.RandomStringUtils;
 
-import java.util.*;
-
 public abstract class Fixtures {
-
 
     public static User createUser() {
         User u = new User();
         u.setGroups(Arrays.asList(createGroup()));
         u.setName(RandomStringUtils.randomAlphabetic(12));
-        u.setPwhash("9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"); //sha256 hash for pw 'test'
+        u.setPwhash("9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"); // sha256 hash for pw 'test'
         u.setFirstName("foo");
         u.setLastName("bar");
         u.setEmail("foo.bar@exmaple.com");
         return u;
     }
 
-    public static User createUser(String ... groupNames) {
-        User u =createUser();
+    public static User createUser(String... groupNames) {
+        User u = createUser();
         List<Group> groups = new ArrayList<>();
-        for (String name: groupNames) {
+        for (String name : groupNames) {
             Group g = new Group();
             g.setName(name);
             groups.add(g);
@@ -113,6 +118,7 @@ public abstract class Fixtures {
         type.setSchemaUrl("http://example.com");
         return type;
     }
+
     public static Entity createFixtureEntityWithRandomId() throws Exception {
         Entity e = createFixtureEntity();
         e.setId(RandomStringUtils.randomAlphabetic(16));

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
+
 package net.objecthunter.larch.service.elasticsearch;
 
 import static org.easymock.EasyMock.anyObject;
@@ -89,9 +90,9 @@ public class ElasticSearchAuditServiceTest {
 
         expect(mockClient.prepareSearch(ElasticSearchAuditService.INDEX_AUDIT)).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setQuery((MatchQueryBuilder) EasyMock.anyObject())).andReturn(
-            mockSearchRequestBuilder);
+                mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)).andReturn(
-            mockSearchRequestBuilder);
+                mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setFrom(0)).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setSize(0)).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.addSort("timestamp", SortOrder.ASC)).andReturn(mockSearchRequestBuilder);
@@ -122,13 +123,14 @@ public class ElasticSearchAuditServiceTest {
         IndexRequestBuilder mockIndexRequestBuilder = createMock(IndexRequestBuilder.class);
 
         expect(mockClient.prepareGet(eq(ElasticSearchAuditService.INDEX_AUDIT), isNull(), anyString())).andReturn(
-            mockGetRequestBuilder);
+                mockGetRequestBuilder);
         expect(mockGetRequestBuilder.execute()).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(mockResponse);
         expect(mockResponse.isExists()).andReturn(false);
 
-        expect(mockClient.prepareIndex(eq(ElasticSearchAuditService.INDEX_AUDIT), eq("audit"), anyString())).andReturn(
-            mockIndexRequestBuilder);
+        expect(mockClient.prepareIndex(eq(ElasticSearchAuditService.INDEX_AUDIT), eq("audit"), anyString()))
+                .andReturn(
+                    mockIndexRequestBuilder);
         expect(mockIndexRequestBuilder.setSource((byte[]) anyObject())).andReturn(mockIndexRequestBuilder);
         expect(mockIndexRequestBuilder.execute()).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(null);

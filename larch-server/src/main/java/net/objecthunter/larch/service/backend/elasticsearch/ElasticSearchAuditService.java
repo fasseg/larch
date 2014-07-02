@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
+
 package net.objecthunter.larch.service.backend.elasticsearch;
 
 import java.io.IOException;
@@ -40,9 +41,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Implementation of an {@link net.objecthunter.larch.service.backend.BackendAuditService} built on top of ElasticSearch
+ * Implementation of an {@link net.objecthunter.larch.service.backend.BackendAuditService} built on top of
+ * ElasticSearch
  */
 public class ElasticSearchAuditService extends AbstractElasticSearchService implements BackendAuditService {
+
     public static final String INDEX_AUDIT = "audit";
 
     private static final Logger log = Logger.getLogger(ElasticSearchAuditService.class);
@@ -63,13 +66,14 @@ public class ElasticSearchAuditService extends AbstractElasticSearchService impl
     public List<AuditRecord> retrieve(String entityId, int offset, int numRecords) throws IOException {
         numRecords = numRecords > maxRecords ? maxRecords : numRecords;
         final SearchResponse resp =
-            this.client
-                .prepareSearch(INDEX_AUDIT)
-                .setQuery(
-                    QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
-                        FilterBuilders.termFilter("entityId", entityId)))
-                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(offset).setSize(numRecords)
-                .addSort("timestamp", SortOrder.ASC).execute().actionGet();
+                this.client
+                        .prepareSearch(INDEX_AUDIT)
+                        .setQuery(
+                            QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
+                                                        FilterBuilders
+                                                            .termFilter("entityId", entityId)))
+                        .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(offset).setSize(numRecords)
+                        .addSort("timestamp", SortOrder.ASC).execute().actionGet();
 
         final List<AuditRecord> records = new ArrayList<>(numRecords);
         for (final SearchHit hit : resp.getHits()) {
@@ -84,13 +88,13 @@ public class ElasticSearchAuditService extends AbstractElasticSearchService impl
         String id;
         do {
             id = RandomStringUtils.randomAlphabetic(16);
-        }
-        while (this.exists(id));
+        } while (this.exists(id));
         rec.setId(id);
         rec.setTimestamp(ZonedDateTime.now(ZoneOffset.UTC).toString());
         final IndexResponse resp =
-            this.client
-                .prepareIndex(INDEX_AUDIT, "audit", id).setSource(mapper.writeValueAsBytes(rec)).execute().actionGet();
+                this.client
+                        .prepareIndex(INDEX_AUDIT, "audit", id).setSource(mapper.writeValueAsBytes(rec)).execute()
+                        .actionGet();
         return id;
     }
 

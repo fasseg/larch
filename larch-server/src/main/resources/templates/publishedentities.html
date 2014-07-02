@@ -16,25 +16,42 @@
         <div>
             <h2>Published Versions of one Entity</h2>
         </div>
-        <a th:each="entity : ${entities.entities}" th:href="@{~/entity/published/} + ${entity.publishId}">
+        <a th:each="entity : ${entities.entities}"
+           th:href="@{~/entity/published/} + ${entity.publishId}">
             <div class="panel clickable">
-            <p class="panel_title" th:text="${entity.publishId}"></p>
-            <p class="property">Label</p>
-            <p class="value" th:text="${entity.label}"></p>
-            <p class="property">Type</p>
-            <p class="value" th:text="${entity.type} ? ${entity.type} : 'No Type'"></p>
-            <p class="property">Parent</p>
-            <p class="value" th:text="${entity.parentId} ? ${entity.parentId} : 'None'"></p>
-            <p class="property">Tags</p>
-            <p class="value" th:text="${entity.tags}"></p>
-            <p class="property">State</p>
-            <p class="value" th:text="${entity.state}"></p>
-            <p class="property">Version</p>
-            <p class="value" th:text="${entity.version}"></p>
-            <p class="property">Created</p>
-            <p class="value" th:text="${entity.utcCreated}"></p>
-            <p class="property">Last modified</p>
-            <p class="value" th:text="${entity.utcLastModified}"></p>
+                <p class="panel_title" th:text="${entity.publishId}"></p>
+
+                <p class="property">Label</p>
+
+                <p class="value" th:text="${entity.label}"></p>
+
+                <p class="property">Type</p>
+
+                <p class="value" th:text="${entity.type} ? ${entity.type} : 'No Type'"></p>
+
+                <p class="property">Parent</p>
+
+                <p class="value" th:text="${entity.parentId} ? ${entity.parentId} : 'None'"></p>
+
+                <p class="property">Tags</p>
+
+                <p class="value" th:text="${entity.tags}"></p>
+
+                <p class="property">State</p>
+
+                <p class="value" th:text="${entity.state}"></p>
+
+                <p class="property">Version</p>
+
+                <p class="value" th:text="${entity.version}"></p>
+
+                <p class="property">Created</p>
+
+                <p class="value" th:text="${entity.utcCreated}"></p>
+
+                <p class="property">Last modified</p>
+
+                <p class="value" th:text="${entity.utcLastModified}"></p>
             </div>
         </a>
     </div>

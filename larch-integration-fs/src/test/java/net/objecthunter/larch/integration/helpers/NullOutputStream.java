@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package net.objecthunter.larch.integration.helpers;
 
 import java.io.IOException;
@@ -21,7 +22,8 @@ import java.io.OutputStream;
 /**
  * Created by ruckus on 30.06.14.
  */
-public class NullOutputStream extends OutputStream{
+public class NullOutputStream extends OutputStream {
+
     private static NullOutputStream INSTANCE = new NullOutputStream();
 
     private NullOutputStream() {
@@ -31,6 +33,7 @@ public class NullOutputStream extends OutputStream{
     public static NullOutputStream getInstance() {
         return INSTANCE;
     }
+
     @Override
     public void write(int b) throws IOException {
         // do nothing;

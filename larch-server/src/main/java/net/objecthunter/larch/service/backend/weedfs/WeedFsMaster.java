@@ -1,28 +1,21 @@
 /* 
-* Copyright 2014 Frank Asseg
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License. 
-*/
+ * Copyright 2014 Frank Asseg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 package net.objecthunter.larch.service.backend.weedfs;
 
-import net.objecthunter.larch.helpers.InputStreamLoggerTask;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystemNotFoundException;
@@ -31,20 +24,34 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+import net.objecthunter.larch.helpers.InputStreamLoggerTask;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+
 /**
  * Helper class for starting and monitoring a WeedFs Master node process
  */
-public class WeedFsMaster{
+public class WeedFsMaster {
+
     private static final Logger log = LoggerFactory.getLogger(WeedFsMaster.class);
 
     @Autowired
     Environment env;
+
     private Process masterProcess;
+
     private InputStreamLoggerTask loggerTask;
 
     @PostConstruct
     public void init() {
-        if (env.getProperty("weedfs.master.enabled") != null && !Boolean.parseBoolean(env.getProperty("weedfs.master.enabled"))) {
+        if (env.getProperty("weedfs.master.enabled") != null &&
+                !Boolean.parseBoolean(env.getProperty("weedfs.master.enabled"))) {
             // no weedfs master node is needed
             return;
         }
@@ -53,7 +60,8 @@ public class WeedFsMaster{
         if (!dir.exists()) {
             log.info("creating WeedFS master directory at " + dir.getAbsolutePath());
             if (!dir.mkdir()) {
-                throw new IllegalArgumentException("Unable to create master directory. Please check the configuration");
+                throw new IllegalArgumentException(
+                        "Unable to create master directory. Please check the configuration");
             }
         }
         if (!dir.canRead() || !dir.canWrite()) {
@@ -65,10 +73,12 @@ public class WeedFsMaster{
         }
         final File binary = new File(env.getProperty("weedfs.binary"));
         if (!binary.exists()) {
-            throw new IllegalArgumentException(new FileSystemNotFoundException("The weedfs binary can not be found at " + binary.getAbsolutePath()));
+            throw new IllegalArgumentException(new FileSystemNotFoundException(
+                    "The weedfs binary can not be found at " + binary.getAbsolutePath()));
         }
         if (!binary.canExecute()) {
-            throw new IllegalArgumentException("The weedfs binary at " + binary.getAbsolutePath() + " can not be executed");
+            throw new IllegalArgumentException("The weedfs binary at " + binary.getAbsolutePath() +
+                    " can not be executed");
         }
         try {
 
@@ -78,14 +88,14 @@ public class WeedFsMaster{
                     "-mdir=" + env.getProperty("weedfs.master.dir"),
                     "-port=" + env.getProperty("weedfs.master.port"),
                     "-ip=" + env.getProperty("weedfs.master.public")
-            );
+                    );
             log.info("Starting weedfs master with command '" + String.join(" ", command) + "'");
             masterProcess = new ProcessBuilder(command)
                     .redirectErrorStream(true)
                     .redirectInput(ProcessBuilder.Redirect.PIPE)
                     .start();
 
-            final Executor executor= Executors.newSingleThreadExecutor();
+            final Executor executor = Executors.newSingleThreadExecutor();
             if (!masterProcess.isAlive()) {
                 throw new IOException("WeedFS Master could not be started! Exitcode " + masterProcess.exitValue());
             } else {

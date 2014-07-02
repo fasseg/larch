@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
+
 package net.objecthunter.larch.controller;
 
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 @RequestMapping("/search")
 public class SearchController extends AbstractLarchController {
+
     @Autowired
     private EntityService entityService;
 
@@ -49,11 +51,10 @@ public class SearchController extends AbstractLarchController {
     private PublishService publishService;
 
     /**
-     * Controller method for searching {@link net.objecthunter.larch.model.Entity}s in the repository using an HTTP POST
-     * which returns a JSON representation of the {@link net.objecthunter.larch.model.SearchResult}
-     *
-     * @param query
-     *            The search query
+     * Controller method for searching {@link net.objecthunter.larch.model.Entity}s in the repository using an HTTP
+     * POST which returns a JSON representation of the {@link net.objecthunter.larch.model.SearchResult}
+     * 
+     * @param query The search query
      * @return A {@link net.objecthunter.larch.model.SearchResult} containing the found
      *         {@link net.objecthunter.larch .model.Entity}s as s JSON representation
      */
@@ -65,9 +66,8 @@ public class SearchController extends AbstractLarchController {
     /**
      * Controller method for searching {@link net.objecthunter.larch.model.Entity}s in the publish repository using an
      * HTTP POST which returns a JSON representation of the {@link net.objecthunter.larch.model.SearchResult}
-     *
-     * @param query
-     *            The search query
+     * 
+     * @param query The search query
      * @return A {@link net.objecthunter.larch.model.SearchResult} containing the found
      *         {@link net.objecthunter.larch .model.Entity}s as s JSON representation
      */
@@ -78,7 +78,7 @@ public class SearchController extends AbstractLarchController {
 
     /**
      * Controller method for displaying a HTML search page
-     *
+     * 
      * @return a Spring MVC {@link org.springframework.web.servlet.ModelAndView} used to render the HTML view
      */
     @RequestMapping(method = RequestMethod.GET, produces = "text/html")
@@ -88,11 +88,10 @@ public class SearchController extends AbstractLarchController {
     }
 
     /**
-     * Controller method for searching {@link net.objecthunter.larch.model.Entity}s in the repository using an HTTP POST
-     * which returns a HTML view of the {@link net.objecthunter.larch.model.SearchResult}
-     *
-     * @param query
-     *            The search query
+     * Controller method for searching {@link net.objecthunter.larch.model.Entity}s in the repository using an HTTP
+     * POST which returns a HTML view of the {@link net.objecthunter.larch.model.SearchResult}
+     * 
+     * @param query The search query
      * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} used to render the HTML view
      */
     @RequestMapping(method = RequestMethod.POST, produces = { "text/html" })
@@ -103,11 +102,10 @@ public class SearchController extends AbstractLarchController {
     }
 
     /**
-     * Controller method for searching {@link net.objecthunter.larch.model.Entity}s in the repository using an HTTP POST
-     * which returns a HTML view of the {@link net.objecthunter.larch.model.SearchResult}
-     *
-     * @param query
-     *            The search query
+     * Controller method for searching {@link net.objecthunter.larch.model.Entity}s in the repository using an HTTP
+     * POST which returns a HTML view of the {@link net.objecthunter.larch.model.SearchResult}
+     * 
+     * @param query The search query
      * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} used to render the HTML view
      */
     @RequestMapping(value = "/published", method = RequestMethod.POST, produces = { "text/html" })
@@ -120,8 +118,7 @@ public class SearchController extends AbstractLarchController {
     /**
      * Fill all Parameters that are search-fields into Map.
      * 
-     * @param request
-     *            HttpServletRequest
+     * @param request HttpServletRequest
      * @return Map<EntitiesSearchField, String[]> key: searchField, value: searchStrings (Words)
      */
     private Map<EntitiesSearchField, String[]> fillSearchFields(HttpServletRequest request) {

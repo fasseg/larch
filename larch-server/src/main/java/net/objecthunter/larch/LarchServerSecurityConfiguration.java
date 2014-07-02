@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
+
 package net.objecthunter.larch;
 
 import java.util.regex.Pattern;
@@ -30,18 +31,20 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
  * Spring-security JavaConfig class defining the security context of the larch repository
  */
 public class LarchServerSecurityConfiguration extends WebSecurityConfigurerAdapter {
+
     @Autowired
     private Environment env;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests().requestMatchers(new AntPathRequestMatcher("/", "GET"))
-            .hasAnyRole("USER", "ADMIN", "ANONYMOUS").requestMatchers(new AntPathRequestMatcher("/entity", "POST"))
-            .hasAnyRole("USER", "ADMIN").requestMatchers(new AntPathRequestMatcher("/credentials", "GET"))
-            .hasAnyRole("ADMIN").requestMatchers(new AntPathRequestMatcher("/login", "GET"))
-            .hasAnyRole("USER", "ADMIN")
-            // TODO: add missing matchers for other endpoints
-            .and().httpBasic();
+                .hasAnyRole("USER", "ADMIN", "ANONYMOUS").requestMatchers(
+                        new AntPathRequestMatcher("/entity", "POST"))
+                .hasAnyRole("USER", "ADMIN").requestMatchers(new AntPathRequestMatcher("/credentials", "GET"))
+                .hasAnyRole("ADMIN").requestMatchers(new AntPathRequestMatcher("/login", "GET"))
+                .hasAnyRole("USER", "ADMIN")
+                // TODO: add missing matchers for other endpoints
+                .and().httpBasic();
         http.csrf().requireCsrfProtectionMatcher(new LarchCsrfRequestMatcher());
         if (!Boolean.valueOf(env.getProperty("larch.security.csrf.enabled", "true"))) {
             http.csrf().disable();
@@ -49,6 +52,7 @@ public class LarchServerSecurityConfiguration extends WebSecurityConfigurerAdapt
     }
 
     private static class LarchCsrfRequestMatcher implements RequestMatcher {
+
         private Pattern allowedMethods = Pattern.compile("^(GET|HEAD|TRACE|OPTIONS)$");
 
         @Override
@@ -58,7 +62,7 @@ public class LarchServerSecurityConfiguration extends WebSecurityConfigurerAdapt
             }
             // protect HTML forms from Cross Site forgeries using Sessions
             if (request.getContentType().equalsIgnoreCase("multipart/form-data")
-                || request.getContentType().equalsIgnoreCase("application/x-www-form-urlencoded")) {
+                    || request.getContentType().equalsIgnoreCase("application/x-www-form-urlencoded")) {
                 return true;
             }
             // everything else must authenticate and does not need a CSRF protection

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
+
 package net.objecthunter.larch.service.backend.weedfs;
 
 import java.io.FileNotFoundException;
@@ -42,6 +43,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * distributed file system WeedFS
  */
 public class WeedFSBlobstoreService implements BackendBlobstoreService {
+
     private static final Logger log = LoggerFactory.getLogger(WeedFSBlobstoreService.class);
 
     @Autowired
@@ -55,7 +57,7 @@ public class WeedFSBlobstoreService implements BackendBlobstoreService {
     @PostConstruct
     public void init() {
         this.weedfsUrl =
-            "http://" + env.getProperty("weedfs.master.host") + ":" + env.getProperty("weedfs.master.port");
+                "http://" + env.getProperty("weedfs.master.host") + ":" + env.getProperty("weedfs.master.port");
     }
 
     @Override
@@ -67,12 +69,13 @@ public class WeedFSBlobstoreService implements BackendBlobstoreService {
         // secondly post the file contents to the assigned volumeserver using the fid
         final String volumeUrl = "http://" + json.get("url").textValue() + "/";
         final HttpResponse resp =
-            Request
-                .Post(volumeUrl + fid).body(MultipartEntityBuilder.create().addBinaryBody("data", src).build())
-                .execute().returnResponse();
+                Request
+                        .Post(volumeUrl + fid).body(
+                                MultipartEntityBuilder.create().addBinaryBody("data", src).build())
+                        .execute().returnResponse();
         if (resp.getStatusLine().getStatusCode() != 201) {
             throw new IOException("WeedFS returned HTTP " + resp.getStatusLine().getStatusCode() + "\n"
-                + EntityUtils.toString(resp.getEntity()));
+                    + EntityUtils.toString(resp.getEntity()));
         }
         log.debug("WeedFS wrote {} bytes", mapper.readTree(resp.getEntity().getContent()).get("size").asInt());
         return fid;
@@ -94,7 +97,7 @@ public class WeedFSBlobstoreService implements BackendBlobstoreService {
         }
         if (resp.getStatusLine().getStatusCode() != 200) {
             throw new IOException("WeedFS returned HTTP " + resp.getStatusLine().getStatusCode() + "\n"
-                + EntityUtils.toString(resp.getEntity()));
+                    + EntityUtils.toString(resp.getEntity()));
         }
         return resp.getEntity().getContent();
     }
@@ -105,16 +108,17 @@ public class WeedFSBlobstoreService implements BackendBlobstoreService {
         final HttpResponse resp = Request.Delete(lookupVolumeUrl(fid)).execute().returnResponse();
         if (resp.getStatusLine().getStatusCode() != 202) {
             throw new IOException("WeedFS returned HTTP " + resp.getStatusLine().getStatusCode() + "\n"
-                + EntityUtils.toString(resp.getEntity()));
+                    + EntityUtils.toString(resp.getEntity()));
         }
     }
 
     @Override
     public void update(String fid, InputStream src) throws IOException {
         final HttpResponse resp =
-            Request
-                .Post(lookupVolumeUrl(fid)).body(MultipartEntityBuilder.create().addBinaryBody("path", src).build())
-                .execute().returnResponse();
+                Request
+                        .Post(lookupVolumeUrl(fid)).body(
+                                MultipartEntityBuilder.create().addBinaryBody("path", src).build())
+                        .execute().returnResponse();
         if (resp.getStatusLine().getStatusCode() != 201) {
             throw new IOException("WeedFS returned:\n" + EntityUtils.toString(resp.getEntity()));
         }
@@ -126,7 +130,7 @@ public class WeedFSBlobstoreService implements BackendBlobstoreService {
         final HttpResponse resp = Request.Get(this.weedfsUrl + "/dir/status").execute().returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
             throw new IOException("WeedFS returned HTTP " + resp.getStatusLine().getStatusCode() + "\n"
-                + EntityUtils.toString(resp.getEntity()));
+                    + EntityUtils.toString(resp.getEntity()));
         }
         final JsonNode node = mapper.readTree(resp.getEntity().getContent());
         final JsonNode topology = node.get("Topology");
@@ -146,14 +150,16 @@ public class WeedFSBlobstoreService implements BackendBlobstoreService {
         // secondly post the file contents to the assigned volumeserver using the fid
         final String volumeUrl = "http://" + json.get("url").textValue() + "/";
         final HttpResponse resp =
-            Request
-                .Post(volumeUrl + fid)
-                .body(
-                    MultipartEntityBuilder.create().addBinaryBody("data", mapper.writeValueAsBytes(oldVersion)).build())
-                .execute().returnResponse();
+                Request
+                        .Post(volumeUrl + fid)
+                        .body(
+                            MultipartEntityBuilder.create().addBinaryBody("data",
+                                                                          mapper.writeValueAsBytes(
+                                                                              oldVersion)).build())
+                        .execute().returnResponse();
         if (resp.getStatusLine().getStatusCode() != 201) {
             throw new IOException("WeedFS returned HTTP " + resp.getStatusLine().getStatusCode() + "\n"
-                + EntityUtils.toString(resp.getEntity()));
+                    + EntityUtils.toString(resp.getEntity()));
         }
         log.debug("WeedFS wrote {} bytes", mapper.readTree(resp.getEntity().getContent()).get("size").asInt());
         return fid;
@@ -169,10 +175,10 @@ public class WeedFSBlobstoreService implements BackendBlobstoreService {
         final String volumeId = fid.substring(0, fid.indexOf(','));
         final String id = fid.substring(separator + 1);
         final HttpResponse resp =
-            Request.Get(this.weedfsUrl + "/dir/lookup?volumeId=" + volumeId).execute().returnResponse();
+                Request.Get(this.weedfsUrl + "/dir/lookup?volumeId=" + volumeId).execute().returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
             throw new IOException("WeedFS returned HTTP " + resp.getStatusLine().getStatusCode() + "\n"
-                + EntityUtils.toString(resp.getEntity()));
+                    + EntityUtils.toString(resp.getEntity()));
         }
         final JsonNode json = mapper.readTree(resp.getEntity().getContent());
         return "http://" + json.get("locations").get(0).get("url").textValue() + "/" + fid;

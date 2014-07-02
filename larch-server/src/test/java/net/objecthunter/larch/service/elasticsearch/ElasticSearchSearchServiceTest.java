@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
+
 package net.objecthunter.larch.service.elasticsearch;
 
 import static org.easymock.EasyMock.anyObject;
@@ -45,6 +46,7 @@ import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 public class ElasticSearchSearchServiceTest {
+
     private ElasticSearchEntityService entityService;
 
     private Client mockClient;
@@ -74,14 +76,15 @@ public class ElasticSearchSearchServiceTest {
         SearchHitField mockField = createMock(SearchHitField.class);
         SearchHits mockHits = createMock(SearchHits.class);
 
-        expect(mockClient.prepareSearch(ElasticSearchEntityService.INDEX_ENTITIES)).andReturn(mockSearchRequestBuilder);
+        expect(mockClient.prepareSearch(ElasticSearchEntityService.INDEX_ENTITIES)).andReturn(
+                mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setQuery(anyObject(QueryBuilder.class))).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)).andReturn(
-            mockSearchRequestBuilder);
+                mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setFrom(0)).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setSize(10)).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.addFields("id", "label", "type", "tags", "state")).andReturn(
-            mockSearchRequestBuilder);
+                mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.execute()).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(mockSearchResponse);
         expect(mockSearchResponse.getHits()).andReturn(mockHits).times(3);
@@ -123,10 +126,11 @@ public class ElasticSearchSearchServiceTest {
         expect(mockIndicesAdminClient.refresh(anyObject())).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(null);
 
-        expect(mockClient.prepareSearch(ElasticSearchEntityService.INDEX_ENTITIES)).andReturn(mockSearchRequestBuilder);
+        expect(mockClient.prepareSearch(ElasticSearchEntityService.INDEX_ENTITIES)).andReturn(
+                mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setQuery(anyObject(QueryBuilder.class))).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)).andReturn(
-            mockSearchRequestBuilder);
+                mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.addFields("id", "label", "type", "tags")).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.execute()).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(mockSearchResponse);
@@ -144,12 +148,12 @@ public class ElasticSearchSearchServiceTest {
         expect(mockHits.getTotalHits()).andReturn(1l).times(2);
 
         replay(mockClient, mockAdminClient, mockIndicesAdminClient, mockSearchRequestBuilder, mockFuture,
-            mockSearchResponse, mockHits, mockHit, mockField);
+                mockSearchResponse, mockHits, mockHit, mockField);
         Map<EntitiesSearchField, String[]> searchFields = new HashMap<EntitiesSearchField, String[]>();
         searchFields.put(EntitiesSearchField.ALL, new String[] { "*" });
         SearchResult result = entityService.searchEntities(searchFields);
         verify(mockClient, mockAdminClient, mockIndicesAdminClient, mockSearchRequestBuilder, mockFuture,
-            mockSearchResponse, mockHits, mockHit, mockField);
+                mockSearchResponse, mockHits, mockHit, mockField);
     }
 
     @SuppressWarnings("unchecked")
@@ -164,14 +168,15 @@ public class ElasticSearchSearchServiceTest {
         SearchHitField mockField = createMock(SearchHitField.class);
         SearchHits mockHits = createMock(SearchHits.class);
 
-        expect(mockClient.prepareSearch(ElasticSearchEntityService.INDEX_ENTITIES)).andReturn(mockSearchRequestBuilder);
+        expect(mockClient.prepareSearch(ElasticSearchEntityService.INDEX_ENTITIES)).andReturn(
+                mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setQuery(anyObject(QueryBuilder.class))).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)).andReturn(
-            mockSearchRequestBuilder);
+                mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setFrom(0)).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setSize(50)).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.addFields("id", "label", "type", "tags", "state")).andReturn(
-            mockSearchRequestBuilder);
+                mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.execute()).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(mockSearchResponse);
         expect(mockSearchResponse.getHits()).andReturn(mockHits).times(3);

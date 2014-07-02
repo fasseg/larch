@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
+
 package net.objecthunter.larch.service.impl;
 
 import java.io.FileNotFoundException;
@@ -115,7 +116,7 @@ public class DefaultEntityService implements EntityService {
         else {
             if (this.backendEntityService.exists(e.getId())) {
                 throw new IOException("Entity with id " + e.getId()
-                    + " could not be created because it already exists in the index");
+                        + " could not be created because it already exists in the index");
             }
         }
         if (e.getMetadata() != null) {
@@ -156,12 +157,11 @@ public class DefaultEntityService implements EntityService {
         final MessageDigest digest;
         try {
             digest = MessageDigest.getInstance("MD5");
-        }
-        catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e) {
             throw new IOException(e);
         }
         try (final SizeCalculatingDigestInputStream src =
-            new SizeCalculatingDigestInputStream(b.getSource().getInputStream(), digest)) {
+                new SizeCalculatingDigestInputStream(b.getSource().getInputStream(), digest)) {
             final ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
             final String path = this.backendBlobstoreService.create(src);
             final String checksum = new BigInteger(1, digest.digest()).toString(16);
@@ -169,8 +169,9 @@ public class DefaultEntityService implements EntityService {
             b.setSize(src.getCalculatedSize());
             b.setChecksumType(digest.getAlgorithm());
             b.setPath(path);
-            b.setSource(new UrlSource(URI.create("http://localhost:8080/entity/" + entityId + "/binary/" + b.getName()
-                + "/content"), true));
+            b.setSource(new UrlSource(URI.create("http://localhost:8080/entity/" + entityId + "/binary/" +
+                    b.getName()
+                    + "/content"), true));
             final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
             b.setUtcCreated(now);
             b.setUtcLastModified(now);
@@ -187,8 +188,7 @@ public class DefaultEntityService implements EntityService {
         String generated;
         do {
             generated = RandomStringUtils.randomAlphabetic(16);
-        }
-        while (backendEntityService.exists(generated));
+        } while (backendEntityService.exists(generated));
         return generated;
     }
 
@@ -267,14 +267,13 @@ public class DefaultEntityService implements EntityService {
 
     @Override
     public void createBinary(String entityId, String name, String contentType, InputStream inputStream)
-        throws IOException {
+            throws IOException {
         final Entity e = backendEntityService.retrieve(entityId);
         this.backendVersionService.addOldVersion(e);
         final MessageDigest digest;
         try {
             digest = MessageDigest.getInstance("MD5");
-        }
-        catch (NoSuchAlgorithmException e1) {
+        } catch (NoSuchAlgorithmException e1) {
             throw new IOException(e1);
         }
         try (final SizeCalculatingDigestInputStream src = new SizeCalculatingDigestInputStream(inputStream, digest)) {
@@ -289,7 +288,7 @@ public class DefaultEntityService implements EntityService {
             b.setChecksumType("MD5");
             b.setSize(src.getCalculatedSize());
             b.setSource(new UrlSource(URI.create("http://localhost:8080/entity/" + entityId + "/binary/" + name
-                + "/content"), true));
+                    + "/content"), true));
             b.setPath(path);
             b.setUtcCreated(now);
             b.setUtcLastModified(now);
@@ -317,25 +316,25 @@ public class DefaultEntityService implements EntityService {
                 throw new IOException("The patch data is invalid");
             }
             switch (field.getKey()) {
-                case "label":
-                    e.setLabel(field.getValue().asText());
-                    break;
-                case "type":
-                    e.setType(field.getValue().asText());
-                    break;
-                case "parentId":
-                    final String parentId = field.getValue().asText();
-                    if (parentId.equals(id)) {
-                        throw new IOException("Can not add a parent relation to itself");
-                    }
-                    e.setParentId(parentId);
-                    break;
-                case "state":
-                    final String state = field.getValue().asText();
-                    e.setState(state);
-                    break;
-                default:
-                    throw new IOException("Unable to update field " + field.getKey());
+            case "label":
+                e.setLabel(field.getValue().asText());
+                break;
+            case "type":
+                e.setType(field.getValue().asText());
+                break;
+            case "parentId":
+                final String parentId = field.getValue().asText();
+                if (parentId.equals(id)) {
+                    throw new IOException("Can not add a parent relation to itself");
+                }
+                e.setParentId(parentId);
+                break;
+            case "state":
+                final String state = field.getValue().asText();
+                e.setState(state);
+                break;
+            default:
+                throw new IOException("Unable to update field " + field.getKey());
             }
         }
         if (e.getLabel() == null || e.getLabel().isEmpty()) {
@@ -351,7 +350,7 @@ public class DefaultEntityService implements EntityService {
             final String objId = object.substring(1 + LarchConstants.NAMESPACE_LARCH.length(), object.length() - 1);
             if (!this.backendEntityService.exists(objId)) {
                 throw new FileNotFoundException("The entity " + object
-                    + " referenced in the object of the relation does not exist in the repository");
+                        + " referenced in the object of the relation does not exist in the repository");
             }
         }
         final Entity oldVersion = this.backendEntityService.retrieve(id);
@@ -404,7 +403,7 @@ public class DefaultEntityService implements EntityService {
         final Binary bin = e.getBinaries().get(binaryName);
         if (bin.getMetadata() == null || !bin.getMetadata().containsKey(mdName)) {
             throw new FileNotFoundException("Meta data " + mdName + " does not exist on binary " + binaryName
-                + " of entity " + entityId);
+                    + " of entity " + entityId);
         }
         bin.getMetadata().remove(mdName);
         this.update(e);
@@ -416,7 +415,7 @@ public class DefaultEntityService implements EntityService {
             throw new FileNotFoundException("The entity-id " + entityId + " does not exist in the repository");
         }
         if (StringUtils.isBlank(type) || StringUtils.isBlank(value)
-            || AlternativeIdentifier.IdentifierType.valueOf(type) == null) {
+                || AlternativeIdentifier.IdentifierType.valueOf(type) == null) {
             throw new IOException("wrong or empty type or value given");
         }
         final Entity oldVersion = this.backendEntityService.retrieve(entityId);
@@ -436,7 +435,7 @@ public class DefaultEntityService implements EntityService {
             throw new FileNotFoundException("The entity-id " + entityId + " does not exist in the repository");
         }
         if (StringUtils.isBlank(type) || StringUtils.isBlank(value)
-            || AlternativeIdentifier.IdentifierType.valueOf(type) == null) {
+                || AlternativeIdentifier.IdentifierType.valueOf(type) == null) {
             throw new IOException("wrong or empty type or value given");
         }
         final Entity oldVersion = this.backendEntityService.retrieve(entityId);

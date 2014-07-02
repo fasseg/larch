@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
+
 package net.objecthunter.larch.integration;
 
 import static org.junit.Assert.assertTrue;
+
 import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchNode;
 
 import org.junit.Test;

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
+
 package net.objecthunter.larch.service;
 
 import java.io.IOException;
@@ -25,11 +26,11 @@ import net.objecthunter.larch.model.MetadataValidationResult;
  * Service definition for the schema service which allows to handle schemas
  */
 public interface SchemaService {
+
     /**
      * Get the XML schema's url for a given {@link net.objecthunter.larch.model.MetadataType} name
-     *
-     * @param type
-     *            The name of the {@link net.objecthunter.larch.model.MetadataType}
+     * 
+     * @param type The name of the {@link net.objecthunter.larch.model.MetadataType}
      * @return A String contianing the schema's url
      * @throws IOException
      */
@@ -37,7 +38,7 @@ public interface SchemaService {
 
     /**
      * Retrieve the known Schema types from the repository
-     *
+     * 
      * @return a list of {@link net.objecthunter.larch.model.MetadataType}s
      * @throws IOException
      */
@@ -45,9 +46,8 @@ public interface SchemaService {
 
     /**
      * Create a new {@link net.objecthunter.larch.model.MetadataType} in the repository
-     *
-     * @param type
-     *            the {@link net.objecthunter.larch.model.MetadataType} to store
+     * 
+     * @param type the {@link net.objecthunter.larch.model.MetadataType} to store
      * @return the id of the stored {@link net.objecthunter.larch.model.MetadataType}
      * @throws IOException
      */
@@ -57,9 +57,8 @@ public interface SchemaService {
      * Delete a {@link net.objecthunter.larch.model.MetadataType} from the repository. <b>Implementaitions of this
      * method have to make sure that the {@link net.objecthunter.larch.model.MetadataType} is not used anymore by any
      * {@link net.objecthunter.larch.model.Entity} or {@link net.objecthunter.larch.model.Binary}</b>
-     *
-     * @param name
-     *            the name of the {@link net.objecthunter.larch.model.MetadataType} to delete
+     * 
+     * @param name the name of the {@link net.objecthunter.larch.model.MetadataType} to delete
      * @throws IOException
      */
     void deleteMetadataType(String name) throws IOException;
@@ -67,11 +66,9 @@ public interface SchemaService {
     /**
      * Retrieve the validation result for a given {@link net.objecthunter.larch.model.Metadata} of an
      * {@link net.objecthunter.larch.model.Entity}
-     *
-     * @param id
-     *            The id of the {@link net.objecthunter.larch.model.Entity}
-     * @param metadataName
-     *            The name of the {@link net.objecthunter.larch.model.Metadata}
+     * 
+     * @param id The id of the {@link net.objecthunter.larch.model.Entity}
+     * @param metadataName The name of the {@link net.objecthunter.larch.model.Metadata}
      * @return a {@link net.objecthunter.larch.model.MetadataValidationResult} containing the result of the validation
      * @throws IOException
      */

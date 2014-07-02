@@ -13,7 +13,7 @@
 
     <appender name="ES-STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>::fs-it [    es] %-5level - %msg%n</pattern>
+            <pattern>::fs-it [ es] %-5level - %msg%n</pattern>
         </encoder>
     </appender>
 

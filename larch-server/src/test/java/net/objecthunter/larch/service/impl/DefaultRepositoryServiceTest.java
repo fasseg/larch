@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
+
 package net.objecthunter.larch.service.impl;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+
 import net.objecthunter.larch.model.Describe;
 import net.objecthunter.larch.model.state.LarchState;
 import net.objecthunter.larch.service.backend.BackendBlobstoreService;
@@ -126,15 +128,17 @@ public class DefaultRepositoryServiceTest {
         expect(mockIndicesStats.getDocs()).andReturn(mockDocStats);
         expect(mockDocStats.getCount()).andReturn(1l);
 
-        replay(mockClient, mockEntitiesService, mockBlobstoreService, mockEnv, mockAdminClient, mockClusterAdminClient,
-            mockFuture, mockClusterStateRequest, mockClusterStateResponse, mockClusterState, mockDiscoveryNodes,
-            mockDiscoveryNode, mockAddress, mockClusterStatsRequest, mockClusterStatsResponse, mockIndicesStats,
-            mockDocStats);
+        replay(mockClient, mockEntitiesService, mockBlobstoreService, mockEnv, mockAdminClient,
+                mockClusterAdminClient,
+                mockFuture, mockClusterStateRequest, mockClusterStateResponse, mockClusterState, mockDiscoveryNodes,
+                mockDiscoveryNode, mockAddress, mockClusterStatsRequest, mockClusterStatsResponse, mockIndicesStats,
+                mockDocStats);
         Describe desc = this.repositoryService.describe();
-        verify(mockClient, mockEntitiesService, mockBlobstoreService, mockEnv, mockAdminClient, mockClusterAdminClient,
-            mockFuture, mockClusterStateRequest, mockClusterStateResponse, mockClusterState, mockDiscoveryNodes,
-            mockDiscoveryNode, mockAddress, mockClusterStatsRequest, mockClusterStatsResponse, mockIndicesStats,
-            mockDocStats);
+        verify(mockClient, mockEntitiesService, mockBlobstoreService, mockEnv, mockAdminClient,
+                mockClusterAdminClient,
+                mockFuture, mockClusterStateRequest, mockClusterStateResponse, mockClusterState, mockDiscoveryNodes,
+                mockDiscoveryNode, mockAddress, mockClusterStatsRequest, mockClusterStatsResponse, mockIndicesStats,
+                mockDocStats);
 
     }
 }

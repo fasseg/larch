@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
+
 package net.objecthunter.larch.controller;
 
 import java.io.IOException;
@@ -53,34 +54,30 @@ public class PublishController extends AbstractLarchController {
     /**
      * Controller method for retrieval of a JSON representation of the current published version of an
      * {@link net.objecthunter .larch.model.Entity}
-     *
-     * @param id
-     *            the {@link net.objecthunter.larch.model.Entity}'s id
+     * 
+     * @param id the {@link net.objecthunter.larch.model.Entity}'s id
      * @return An Entity object which gets transformed into a JSON response by Spring MVC
      * @throws IOException
      */
     @RequestMapping("/published/{id}")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public Entity retrieve(@PathVariable("id")
-    final String id) throws IOException {
+    public Entity retrieve(@PathVariable("id") final String id) throws IOException {
         return publishedEntityService.retrieve(id);
     }
 
     /**
      * Controller method for retrieval of a HTML view of the current published version of an
      * {@link net.objecthunter.larch.model.Entity}
-     *
-     * @param id
-     *            The is of the {@link net.objecthunter.larch.model.Entity} to retrieve
+     * 
+     * @param id The is of the {@link net.objecthunter.larch.model.Entity} to retrieve
      * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} for rendering the HTML view
      * @throws IOException
      */
     @RequestMapping(value = "/published/{id}", produces = "text/html")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public ModelAndView retrieveHtml(@PathVariable("id")
-    final String id) throws IOException {
+    public ModelAndView retrieveHtml(@PathVariable("id") final String id) throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("entity", publishedEntityService.retrieve(id));
         return new ModelAndView("publishedentity", model);
@@ -89,34 +86,30 @@ public class PublishController extends AbstractLarchController {
     /**
      * Controller method for retrieval of a JSON representation of the current published version of an
      * {@link net.objecthunter .larch.model.Entity}
-     *
-     * @param id
-     *            the {@link net.objecthunter.larch.model.Entity}'s id
+     * 
+     * @param id the {@link net.objecthunter.larch.model.Entity}'s id
      * @return An Entity object which gets transformed into a JSON response by Spring MVC
      * @throws IOException
      */
     @RequestMapping("/{entityId}/published")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public Entities retrieveForEntityId(@PathVariable("entityId")
-    final String entityId) throws IOException {
+    public Entities retrieveForEntityId(@PathVariable("entityId") final String entityId) throws IOException {
         return publishedEntityService.retrievePublishedEntities(entityId);
     }
 
     /**
      * Controller method for retrieval of a HTML view of the current published version of an
      * {@link net.objecthunter.larch.model.Entity}
-     *
-     * @param id
-     *            The is of the {@link net.objecthunter.larch.model.Entity} to retrieve
+     * 
+     * @param id The is of the {@link net.objecthunter.larch.model.Entity} to retrieve
      * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} for rendering the HTML view
      * @throws IOException
      */
     @RequestMapping(value = "/{entityId}/published", produces = "text/html")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public ModelAndView retrieveHtmlForEntityId(@PathVariable("entityId")
-    final String entityId) throws IOException {
+    public ModelAndView retrieveHtmlForEntityId(@PathVariable("entityId") final String entityId) throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("entities", publishedEntityService.retrievePublishedEntities(entityId));
         return new ModelAndView("publishedentities", model);

@@ -1,26 +1,31 @@
 /*
-* Copyright 2014 Frank Asseg
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2014 Frank Asseg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package net.objecthunter.larch.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+
 import net.objecthunter.larch.model.Binary;
 import net.objecthunter.larch.model.Describe;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.Metadata;
 import net.objecthunter.larch.model.state.LarchState;
+
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Executor;
@@ -31,9 +36,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Client implementation for the Larch server
@@ -41,7 +44,9 @@ import java.net.URI;
 public class LarchClient {
 
     private static final Logger log = LoggerFactory.getLogger(LarchClient.class);
+
     private final URI larchUri;
+
     private ObjectMapper mapper = new ObjectMapper();
 
     private Executor executor;
@@ -55,8 +60,9 @@ public class LarchClient {
     }
 
     /**
-     * Retrieve a {@link net.objecthunter.larch.model.state.LarchState} response from the repository containing detailed state information
-     *
+     * Retrieve a {@link net.objecthunter.larch.model.state.LarchState} response from the repository containing
+     * detailed state information
+     * 
      * @return a LarchState POJO
      * @throws IOException
      */
@@ -71,8 +77,9 @@ public class LarchClient {
     }
 
     /**
-     * Retrieve a {@link net.objecthunter.larch.model.Describe} response from the repository containing general state information
-     *
+     * Retrieve a {@link net.objecthunter.larch.model.Describe} response from the repository containing general state
+     * information
+     * 
      * @return a Describe POJO
      * @throws IOException
      */
@@ -88,16 +95,17 @@ public class LarchClient {
 
     /**
      * Retrieve a {@link net.objecthunter.larch.model.Metadata} of an Entity from the repository
-     *
-     * @param entityId     the entity's id
+     * 
+     * @param entityId the entity's id
      * @param metadataName the meta data set's name
      * @return the Metadata as a POJO
      * @throws IOException if an error occurred while fetching the meta data
      */
     public Metadata retrieveMetadata(String entityId, String metadataName) throws IOException {
-        final HttpResponse resp = this.execute(Request.Get(larchUri + "/entity/" + entityId + "/metadata/" + metadataName)
-                .useExpectContinue())
-                .returnResponse();
+        final HttpResponse resp =
+                this.execute(Request.Get(larchUri + "/entity/" + entityId + "/metadata/" + metadataName)
+                        .useExpectContinue())
+                        .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
             log.error("Unable to fetch meta data\n{}", EntityUtils.toString(resp.getEntity()));
             throw new IOException("Unable to fetch meta data " + metadataName + " from entity " + entityId);
@@ -107,16 +115,21 @@ public class LarchClient {
 
     /**
      * Retrieve a {@link net.objecthunter.larch.model.Metadata} of a Binary from the repository
-     *
-     * @param entityId     the entity's id
+     * 
+     * @param entityId the entity's id
      * @param metadataName the meta data set's name
      * @return the Metadata as a POJO
      * @throws IOException if an error occurred while fetching the meta data
      */
-    public Metadata retrieveBinaryMetadata(String entityId, String binaryName, String metadataName) throws IOException {
-        final HttpResponse resp = this.execute(Request.Get(larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/metadata/" + metadataName)
-                .useExpectContinue())
-                .returnResponse();
+    public Metadata retrieveBinaryMetadata(String entityId, String binaryName, String metadataName)
+            throws IOException {
+        final HttpResponse resp =
+                this.execute(
+                        Request.Get(
+                                larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/metadata/" +
+                                        metadataName)
+                                .useExpectContinue())
+                        .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
             log.error("Unable to fetch meta data\n{}", EntityUtils.toString(resp.getEntity()));
             throw new IOException("Unable to fetch meta data " + metadataName + " from binary " + binaryName +
@@ -127,9 +140,9 @@ public class LarchClient {
 
     /**
      * Add {@link net.objecthunter.larch.model.Metadata} to an existing entity
-     *
+     * 
      * @param entityId the entity's id
-     * @param md       the Metadata object
+     * @param md the Metadata object
      * @throws IOException
      */
     public void postMetadata(String entityId, Metadata md) throws IOException {
@@ -145,33 +158,36 @@ public class LarchClient {
 
     /**
      * Add {@link net.objecthunter.larch.model.Metadata} to an existing binary
-     *
+     * 
      * @param entityId the entity's id
-     * @param md       the Metadata object
+     * @param md the Metadata object
      * @throws IOException
      */
     public void postBinaryMetadata(String entityId, String binaryName, Metadata md) throws IOException {
-        final HttpResponse resp = this.execute(Request.Post(larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/metadata")
-                .useExpectContinue()
-                .bodyString(mapper.writeValueAsString(md), ContentType.APPLICATION_JSON))
-                .returnResponse();
+        final HttpResponse resp =
+                this.execute(Request.Post(larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/metadata")
+                        .useExpectContinue()
+                        .bodyString(mapper.writeValueAsString(md), ContentType.APPLICATION_JSON))
+                        .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 201) {
             log.error("Unable to add meta data to binary\n{}", EntityUtils.toString(resp.getEntity()));
-            throw new IOException("Unable to add meta data " + md.getName() + " to binary " + binaryName + " of entity " + entityId);
+            throw new IOException("Unable to add meta data " + md.getName() + " to binary " + binaryName +
+                    " of entity " + entityId);
         }
     }
 
     /**
      * Delete the {@link net.objecthunter.larch.model.Metadata} of a {@link net.objecthunter.larch.model.Entity}
-     *
-     * @param entityId     the entity's id
+     * 
+     * @param entityId the entity's id
      * @param metadataName the meta data set's name
      * @throws IOException
      */
     public void deleteMetadata(String entityId, String metadataName) throws IOException {
-        final HttpResponse resp = this.execute(Request.Delete(larchUri + "/entity/" + entityId + "/metadata/" + metadataName)
-                .useExpectContinue())
-                .returnResponse();
+        final HttpResponse resp =
+                this.execute(Request.Delete(larchUri + "/entity/" + entityId + "/metadata/" + metadataName)
+                        .useExpectContinue())
+                        .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
             log.error("Unable to remove meta data from entity\n{}", EntityUtils.toString(resp.getEntity()));
             throw new IOException("Unable to remove meta data " + metadataName + "  of entity " + entityId);
@@ -181,35 +197,41 @@ public class LarchClient {
 
     /**
      * Delete the {@link net.objecthunter.larch.model.Metadata} of a {@link net.objecthunter.larch.model.Binary}
-     *
-     * @param entityId     the entity's id
-     * @param binaryName   the binary's name
+     * 
+     * @param entityId the entity's id
+     * @param binaryName the binary's name
      * @param metadataName the meta data set's name
      * @throws IOException
      */
     public void deleteBinaryMetadata(String entityId, String binaryName, String metadataName) throws IOException {
-        final HttpResponse resp = this.execute(Request.Delete(larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/metadata/" + metadataName)
-                .useExpectContinue())
-                .returnResponse();
+        final HttpResponse resp =
+                this.execute(
+                        Request.Delete(
+                                larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/metadata/" +
+                                        metadataName)
+                                .useExpectContinue())
+                        .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
             log.error("Unable to remove meta data from binary\n{}", EntityUtils.toString(resp.getEntity()));
-            throw new IOException("Unable to remove meta data " + metadataName + " from binary " + binaryName + " of entity " + entityId);
+            throw new IOException("Unable to remove meta data " + metadataName + " from binary " + binaryName +
+                    " of entity " + entityId);
         }
 
     }
 
     /**
      * Retrieve {@link net.objecthunter.larch.model.Binary} from the repository
-     *
-     * @param entityId   the entity's id
+     * 
+     * @param entityId the entity's id
      * @param binaryName the binary's name
      * @return the Binary as a POJO
      * @throws IOException if an error occurred while fetching from the repository
      */
     public Binary retrieveBinary(String entityId, String binaryName) throws IOException {
-        final HttpResponse resp = this.execute(Request.Get(larchUri + "/entity/" + entityId + "/binary/" + binaryName)
-                .useExpectContinue())
-                .returnResponse();
+        final HttpResponse resp =
+                this.execute(Request.Get(larchUri + "/entity/" + entityId + "/binary/" + binaryName)
+                        .useExpectContinue())
+                        .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
             log.error("Unable to fetch binary\n{}", EntityUtils.toString(resp.getEntity()));
             throw new IOException("Unable to fetch binary" + binaryName + " from entity " + entityId);
@@ -219,9 +241,9 @@ public class LarchClient {
 
     /**
      * Add a {@link net.objecthunter.larch.model.Binary} to an existing entity
-     *
+     * 
      * @param entityId the entity's id
-     * @param bin      the binary object to add
+     * @param bin the binary object to add
      * @throws IOException
      */
     public void postBinary(String entityId, Binary bin) throws IOException {
@@ -249,15 +271,16 @@ public class LarchClient {
 
     /**
      * Delete a {@link net.objecthunter.larch.model.Binary} in the repository
-     *
-     * @param entityId   the entity's id
+     * 
+     * @param entityId the entity's id
      * @param binaryName the binary's name
      * @throws IOException
      */
     public void deleteBinary(String entityId, String binaryName) throws IOException {
-        final HttpResponse resp = this.execute(Request.Delete(larchUri + "/entity/" + entityId + "/binary/" + binaryName)
-                .useExpectContinue())
-                .returnResponse();
+        final HttpResponse resp =
+                this.execute(Request.Delete(larchUri + "/entity/" + entityId + "/binary/" + binaryName)
+                        .useExpectContinue())
+                        .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
             log.error("Unable to delete binary. Server says:\n", EntityUtils.toString(resp.getEntity()));
             throw new IOException("Unable to delete binary " + binaryName + " of entity " + entityId);
@@ -266,16 +289,17 @@ public class LarchClient {
 
     /**
      * Fetch the actual binary content from the repository
-     *
-     * @param entityId   the Id of the entity
+     * 
+     * @param entityId the Id of the entity
      * @param binaryName the name of the binary to fetch
      * @return an InputStream containing the binary's data
      * @throws IOException
      */
     public InputStream retrieveBinaryContent(String entityId, String binaryName) throws IOException {
-        final HttpResponse resp = this.execute(Request.Get(larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/content")
-                .useExpectContinue())
-                .returnResponse();
+        final HttpResponse resp =
+                this.execute(Request.Get(larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/content")
+                        .useExpectContinue())
+                        .returnResponse();
         if (resp.getStatusLine().getStatusCode() != 200) {
             log.error("Unable to fetch binary data\n{}", EntityUtils.toString(resp.getEntity()));
             throw new IOException("Unable to fetch binary data " + binaryName + " from entity " + entityId);
@@ -285,7 +309,7 @@ public class LarchClient {
 
     /**
      * Update an {@link net.objecthunter.larch.model.Entity} in the larch repository
-     *
+     * 
      * @param e the updated entity object to be written to the repository
      * @throws IOException if an error occurred during update
      */
@@ -305,7 +329,7 @@ public class LarchClient {
 
     /**
      * Delete an entity in the larch repository
-     *
+     * 
      * @param id the id of the entity to delete
      * @throws IOException
      */
@@ -321,7 +345,7 @@ public class LarchClient {
 
     /**
      * Post an {@link net.objecthunter.larch.model.Entity} to the Larch server
-     *
+     * 
      * @param e The entity to ingest
      * @return the entity's id
      * @throws IOException if an error occurred while ingesting
@@ -340,7 +364,7 @@ public class LarchClient {
 
     /**
      * Retrieve an entity using a HTTP GET from the Larch server
-     *
+     * 
      * @param id the Id of the entity
      * @return An entity object
      */
@@ -354,7 +378,7 @@ public class LarchClient {
 
     /**
      * Execute a HTTP request
-     *
+     * 
      * @param req the Request object to use for the execution
      * @return The HttpResponse containing the requested information
      * @throws IOException

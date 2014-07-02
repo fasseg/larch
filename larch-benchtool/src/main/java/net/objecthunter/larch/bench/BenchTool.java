@@ -1,29 +1,36 @@
-package net.objecthunter.larch.bench;/*
-* Copyright 2014 Frank Asseg
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License. 
-*/
 
-import org.apache.commons.cli.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.uncommons.maths.random.XORShiftRNG;
+package net.objecthunter.larch.bench;/*
+ * Copyright 2014 Frank Asseg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.cli.BasicParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.uncommons.maths.random.XORShiftRNG;
 
 public class BenchTool {
 
@@ -34,11 +41,10 @@ public class BenchTool {
     public static final int[] SLICE = new int[1024];
 
     static {
-        for (int i = 0; i< SLICE.length;i++) {
+        for (int i = 0; i < SLICE.length; i++) {
             SLICE[i] = RNG.nextInt();
         }
     }
-
 
     public static void main(String[] args) {
         final Options ops = createOptions();
@@ -87,7 +93,8 @@ public class BenchTool {
 
         log.info("Running {} {} actions with size {} against {} using {} threads", numActions, action,
                 size, larchUri, numThreads);
-        final BenchToolRunner runner = new BenchToolRunner(action, URI.create(larchUri), user, password, numActions, numThreads, size);
+        final BenchToolRunner runner =
+                new BenchToolRunner(action, URI.create(larchUri), user, password, numActions, numThreads, size);
         try {
             final List<BenchToolResult> results = runner.run();
             ResultFormatter.printResults(results, numActions, size, System.out);
@@ -105,7 +112,7 @@ public class BenchTool {
                 .hasArg()
                 .create('l'));
         final StringBuilder desc = new StringBuilder("The action to perform [");
-        for (Action a: Action.values()) {
+        for (Action a : Action.values()) {
             desc.append(a)
                     .append("|");
         }
@@ -162,20 +169,20 @@ public class BenchTool {
         }
         final char postfix = m.group(2).charAt(0);
         switch (postfix) {
-            case 'k':
-            case 'K':
-                return size * 1024l;
-            case 'm':
-            case 'M':
-                return size * 1024l * 1024l;
-            case 'g':
-            case 'G':
-                return size * 1024l * 1024l * 1024l;
-            case 't':
-            case 'T':
-                return size * 1024l * 1024l * 1024l * 1024l;
-            default:
-                return size;
+        case 'k':
+        case 'K':
+            return size * 1024l;
+        case 'm':
+        case 'M':
+            return size * 1024l * 1024l;
+        case 'g':
+        case 'G':
+            return size * 1024l * 1024l * 1024l;
+        case 't':
+        case 'T':
+            return size * 1024l * 1024l * 1024l * 1024l;
+        default:
+            return size;
         }
     }
 
@@ -188,7 +195,9 @@ public class BenchTool {
         System.out.println(" * Ingest 20 files of 1gb using 5 threads\n   --------------------------------------");
         System.out.println("   java -jar larch-benchtool.jar -l http://localhost:8080 -n 20 -a ingest -s 1g -t 5\n");
         System.out.println(" * Retrieve 20 files of 1gb using 5 threads\n   --------------------------------------");
-        System.out.println("   java -jar larch-benchtool.jar -l http://localhost:8080 -n 20 -a retrieve -s 1g -t 5\n");
+        System.out
+                .println(
+                    "   java -jar larch-benchtool.jar -l http://localhost:8080 -n 20 -a retrieve -s 1g -t 5\n");
     }
 
     public static enum Action {

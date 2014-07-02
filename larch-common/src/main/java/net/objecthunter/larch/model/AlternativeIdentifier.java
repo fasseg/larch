@@ -19,9 +19,7 @@ package net.objecthunter.larch.model;
 import java.io.IOException;
 
 /**
- * @author mih
- *
- *         Class holds attributes for alternative identifiers.
+ * @author mih Class holds attributes for alternative identifiers.
  */
 public class AlternativeIdentifier {
 
@@ -49,7 +47,6 @@ public class AlternativeIdentifier {
     }
 
     /**
-     * 
      * @return value
      */
     public String getValue() {
@@ -57,8 +54,7 @@ public class AlternativeIdentifier {
     }
 
     /**
-     * @param type
-     *            the type to set
+     * @param type the type to set
      */
     public void setType(String type) {
         IdentifierType.valueOf(type);
@@ -66,17 +62,14 @@ public class AlternativeIdentifier {
     }
 
     /**
-     * @param value
-     *            the value to set
+     * @param value the value to set
      */
     public void setValue(String value) {
         this.value = value;
     }
 
     /**
-     * 
      * List of supported Identifier-Types.
-     *
      */
     public enum IdentifierType {
         DOI("DOI"), URN("URN");
