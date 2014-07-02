@@ -20,8 +20,8 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import net.objecthunter.larch.LarchServerConfiguration;
-import net.objecthunter.larch.integration.helpers.JsonException;
 
 import net.objecthunter.larch.integration.helpers.NullOutputStream;
 import org.apache.http.HttpHost;
@@ -66,13 +66,15 @@ public abstract class AbstractLarchIT {
         return this.executor.execute(req);
     }
 
-    protected void checkResponseError(HttpResponse response, int statusCode, Exception exception, String message)
+    protected void checkResponseError(HttpResponse response, int statusCode,
+                                      Class<? extends Exception> expectedException,
+                                      String message)
         throws IOException {
-        JsonException exc = mapper.readValue(response.getEntity().getContent(), JsonException.class);
+        JsonNode error = mapper.readTree(response.getEntity().getContent());
         assertEquals(statusCode, response.getStatusLine().getStatusCode());
-        assertEquals(statusCode, exc.getStatus());
-        assertEquals(exception.getClass().getName(), exc.getException());
-        assertEquals(message, exc.getMessage());
+        assertEquals(statusCode, error.get("status").asInt());
+        assertEquals(expectedException.getName(), error.get("exception").asText());
+        assertEquals(message, error.get("message").asText());
     }
 
     protected void hideLog()  {
