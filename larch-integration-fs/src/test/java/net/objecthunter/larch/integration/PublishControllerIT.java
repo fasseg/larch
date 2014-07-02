@@ -18,7 +18,6 @@ package net.objecthunter.larch.integration;
 import static net.objecthunter.larch.integration.helpers.Fixtures.createFixtureEntity;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import net.objecthunter.larch.model.Entities;
 import net.objecthunter.larch.model.Entity;
 
@@ -60,11 +59,14 @@ public class PublishControllerIT extends AbstractLarchIT {
         final String id = EntityUtils.toString(resp.getEntity());
 
         // publish
+        System.out.println(entityUrl + id + "/publish");
         resp = this.execute(Request.Post(entityUrl + id + "/publish")).returnResponse();
         final String publishId = EntityUtils.toString(resp.getEntity());
+        assertEquals(200, resp.getStatusLine().getStatusCode());
 
         // retrieve published
         resp = this.execute(Request.Get(publishedUrl + publishId)).returnResponse();
+        assertEquals(200, resp.getStatusLine().getStatusCode());
         Entity fetched = mapper.readValue(resp.getEntity().getContent(), Entity.class);
         assertEquals("published", fetched.getState());
         assertEquals(1, fetched.getVersion());
@@ -82,7 +84,8 @@ public class PublishControllerIT extends AbstractLarchIT {
         final String id = EntityUtils.toString(resp.getEntity());
 
         // publish
-        resp = this.execute(Request.Post(entityUrl + id + "/publish")).returnResponse();
+        resp = this.execute(Request.Post("http://localhost:8080/entity/" + id + "/publish")).returnResponse();
+        // resp = this.execute(Request.Post(entityUrl + id + "/publish")).returnResponse();
         String publishId = EntityUtils.toString(resp.getEntity());
 
         // create new identifier
@@ -106,7 +109,8 @@ public class PublishControllerIT extends AbstractLarchIT {
         assertEquals(publishId1, e2.getPublishId());
         assertEquals(1, e1.getVersion());
         assertEquals(2, e2.getVersion());
-        assertNull(e1.getAlternativeIdentifiers());
+        assertNotNull(e1.getAlternativeIdentifiers());
+        assertEquals(0, e1.getAlternativeIdentifiers().size());
         assertNotNull(e2.getAlternativeIdentifiers());
         assertEquals(1, e2.getAlternativeIdentifiers().size());
     }
