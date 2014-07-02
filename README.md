@@ -47,3 +47,11 @@ The property `elasticsearch.http.enabled` can be passed on the commandline in th
 ```
 #> java -jar larch-server/target/larch-server-VERSION.jar --elasticsearch.http.enabled=false
 ```
+
+## Developer information
+
+ * Code style is copied from the [Fedora 4 project](https://wiki.duraspace.org/display/FF/Code+Style+Guide)
+ * [Eclipse Formatter XML](https://github.com/fasseg/larch/tree/master/doc/developer/eclipse-larch-formatter.xml)
+ * [IntelliJ Eclipse Formatter plugin](http://plugins.jetbrains.com/plugin/6546?pr=)
+ * A Service interaction diagram can be opened using the [draw.io website](https://www.draw.io/) can be found in the `doc/developer` directory
+ 
