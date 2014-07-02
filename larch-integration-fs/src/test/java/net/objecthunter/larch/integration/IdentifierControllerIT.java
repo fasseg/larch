@@ -257,17 +257,20 @@ public class IdentifierControllerIT extends AbstractLarchIT {
         // create entity
         HttpResponse resp =
                 this.execute(
-                        Request.Post(entityUrl).bodyString(mapper.writeValueAsString(createSimpleFixtureEntity()),
-                                ContentType.APPLICATION_JSON)).returnResponse();
+                        Request.Post(entityUrl)
+                                .bodyString(mapper.writeValueAsString(createSimpleFixtureEntity()),
+                                        ContentType.APPLICATION_JSON))
+                        .returnResponse();
         assertEquals(201, resp.getStatusLine().getStatusCode());
         final String entityId = EntityUtils.toString(resp.getEntity());
 
         // create new identifier
         resp =
                 this.execute(
-                        Request.Post(identifierUrl.replaceFirst("\\{id\\}", entityId)).bodyString(
-                                "type=DOI&value=123",
-                                ContentType.APPLICATION_FORM_URLENCODED)).returnResponse();
+                        Request.Post(identifierUrl.replaceFirst("\\{id\\}", entityId))
+                                .bodyString("type=DOI&value=123",
+                                            ContentType.APPLICATION_FORM_URLENCODED))
+                        .returnResponse();
         assertEquals(201, resp.getStatusLine().getStatusCode());
 
         // retrieve entity

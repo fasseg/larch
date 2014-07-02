@@ -56,8 +56,10 @@ public class PublishControllerIT extends AbstractLarchIT {
         // create
         HttpResponse resp =
                 this.execute(
-                        Request.Post(entityUrl).bodyString(mapper.writeValueAsString(createFixtureEntity()),
-                                ContentType.APPLICATION_JSON)).returnResponse();
+                        Request.Post(entityUrl)
+                                .bodyString(mapper.writeValueAsString(createFixtureEntity()),
+                                            ContentType.APPLICATION_JSON))
+                        .returnResponse();
         assertEquals(201, resp.getStatusLine().getStatusCode());
         final String id = EntityUtils.toString(resp.getEntity());
 
@@ -94,8 +96,10 @@ public class PublishControllerIT extends AbstractLarchIT {
         // create new identifier
         resp =
                 this.execute(
-                        Request.Post(identifierUrl.replaceFirst("\\{id\\}", id)).bodyString("type=DOI&value=123",
-                                ContentType.APPLICATION_FORM_URLENCODED)).returnResponse();
+                        Request.Post(identifierUrl.replaceFirst("\\{id\\}", id))
+                                .bodyString("type=DOI&value=123",
+                                            ContentType.APPLICATION_FORM_URLENCODED))
+                        .returnResponse();
         assertEquals(201, resp.getStatusLine().getStatusCode());
 
         // publish
