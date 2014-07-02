@@ -197,7 +197,7 @@ public class DefaultEntityService implements EntityService {
         final Entity oldVersion = this.backendEntityService.retrieve(e.getId());
         this.backendVersionService.addOldVersion(oldVersion);
         final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
-        e.setVersion(oldVersion.getVersion() + 1);
+        e.setVersionWithStateReset(oldVersion.getVersion() + 1);
         if (e.getMetadata() != null) {
             for (final Metadata md : e.getMetadata().values()) {
                 if (md.getUtcCreated() == null) {
@@ -208,10 +208,6 @@ public class DefaultEntityService implements EntityService {
         }
         e.setUtcCreated(oldVersion.getUtcCreated());
         e.setUtcLastModified(now);
-        if (e.getState() != null && e.getState().equals(Entity.STATE_PUBLISHED)) {
-            /* reset published state so that the new version is not published by default */
-            e.setState(Entity.STATE_INGESTED);
-        }
         if (e.getLabel() == null || e.getLabel().isEmpty()) {
             e.setLabel("Unnamed entity");
         }
@@ -301,7 +297,7 @@ public class DefaultEntityService implements EntityService {
                 e.setBinaries(new HashMap<>(1));
             }
             e.getBinaries().put(name, b);
-            e.setVersion(e.getVersion() + 1);
+            e.setVersionWithStateReset(e.getVersion() + 1);
             e.setUtcLastModified(now);
             this.backendEntityService.update(e);
         }
@@ -363,7 +359,7 @@ public class DefaultEntityService implements EntityService {
         final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
         final Entity newVersion = oldVersion;
         newVersion.setUtcLastModified(now);
-        newVersion.setVersion(oldVersion.getVersion() + 1);
+        newVersion.setVersionWithStateReset(oldVersion.getVersion() + 1);
         if (newVersion.getRelations() == null) {
             newVersion.setRelations(new HashMap<>());
         }
@@ -428,7 +424,7 @@ public class DefaultEntityService implements EntityService {
         final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
         final Entity newVersion = oldVersion;
         newVersion.setUtcLastModified(now);
-        newVersion.setVersion(oldVersion.getVersion() + 1);
+        newVersion.setVersionWithStateReset(oldVersion.getVersion() + 1);
         newVersion.getAlternativeIdentifiers().add(new AlternativeIdentifier(type, value));
 
         this.backendEntityService.update(newVersion);
@@ -448,7 +444,7 @@ public class DefaultEntityService implements EntityService {
         final String now = ZonedDateTime.now(ZoneOffset.UTC).toString();
         final Entity newVersion = oldVersion;
         newVersion.setUtcLastModified(now);
-        newVersion.setVersion(oldVersion.getVersion() + 1);
+        newVersion.setVersionWithStateReset(oldVersion.getVersion() + 1);
         boolean found = false;
         for (AlternativeIdentifier alternativeIdentifier : newVersion.getAlternativeIdentifiers()) {
             if (alternativeIdentifier.getType().equals(type) && alternativeIdentifier.getValue().equals(value)) {
@@ -465,14 +461,14 @@ public class DefaultEntityService implements EntityService {
     }
 
     @Override
-    public void publish(String id) throws IOException {
+    public String publish(String id) throws IOException {
         final Entity e = this.backendEntityService.retrieve(id);
-        if (e.getState().equals(Entity.STATE_PUBLISHED)) {
-            throw new IOException("The entity with the id " + id + " is already published");
-        }
+        // if (e.getState().equals(Entity.STATE_PUBLISHED)) {
+        // throw new IOException("The entity with the id " + id + " is already published");
+        // }
         e.setState(Entity.STATE_PUBLISHED);
         this.backendEntityService.update(e);
-        this.backendPublishService.publish(e);
+        return this.backendPublishService.publish(e);
     }
 
     @Override

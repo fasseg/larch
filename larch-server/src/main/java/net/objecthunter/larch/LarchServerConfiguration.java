@@ -23,6 +23,7 @@ import net.objecthunter.larch.service.EntityService;
 import net.objecthunter.larch.service.ExportService;
 import net.objecthunter.larch.service.MailService;
 import net.objecthunter.larch.service.MessagingService;
+import net.objecthunter.larch.service.PublishService;
 import net.objecthunter.larch.service.RepositoryService;
 import net.objecthunter.larch.service.SchemaService;
 import net.objecthunter.larch.service.backend.BackendAuditService;
@@ -45,6 +46,7 @@ import net.objecthunter.larch.service.impl.DefaultEntityService;
 import net.objecthunter.larch.service.impl.DefaultExportService;
 import net.objecthunter.larch.service.impl.DefaultMailService;
 import net.objecthunter.larch.service.impl.DefaultMessagingService;
+import net.objecthunter.larch.service.impl.DefaultPublishService;
 import net.objecthunter.larch.service.impl.DefaultRepositoryService;
 import net.objecthunter.larch.service.impl.DefaultSchemaService;
 import net.objecthunter.larch.util.FileSystemUtil;
@@ -90,6 +92,16 @@ public class LarchServerConfiguration {
     @Bean
     public EntityService defaultEntityService() {
         return new DefaultEntityService();
+    }
+
+    /**
+     * Get a {@link net.objecthunter.larch.service.impl.DefaultPublishService} Spring bean
+     *
+     * @return the {@link net.objecthunter.larch.service.DefaultPublishService} implementation
+     */
+    @Bean
+    public PublishService defaultPublishService() {
+        return new DefaultPublishService();
     }
 
     /**
@@ -211,8 +223,8 @@ public class LarchServerConfiguration {
     }
 
     /**
-     * Get a {@link net.objecthunter.larch.service.backend.weedfs.WeedFsMaster} object responsible for starting and stopping the
-     * Weed FS master node
+     * Get a {@link net.objecthunter.larch.service.backend.weedfs.WeedFsMaster} object responsible for starting and
+     * stopping the Weed FS master node
      *
      * @return the {@link net.objecthunter.larch.service.backend.weedfs.WeedFsMaster} object
      */
@@ -224,8 +236,8 @@ public class LarchServerConfiguration {
     }
 
     /**
-     * Get a {@link net.objecthunter.larch.service.backend.weedfs.WeedFsVolume} object responsible for starting and stopping a
-     * Weed FS volume node
+     * Get a {@link net.objecthunter.larch.service.backend.weedfs.WeedFsVolume} object responsible for starting and
+     * stopping a Weed FS volume node
      *
      * @return the {@link net.objecthunter.larch.service.backend.weedfs.WeedFsVolume} object
      */

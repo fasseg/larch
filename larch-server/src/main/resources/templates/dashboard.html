@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head th:include="fragments :: header">
 </head>
 <body>
@@ -33,7 +33,7 @@
             <p class="property">Host</p><p class="value" th:text="${describe.larchHost}"></p>
             <p class="property">Cluster name</p><p class="value" th:text="${describe.larchClusterName}"></p>
         </div>
-        <div class="right">
+        <div sec:authorize="!hasRole('ROLE_ANONYMOUS')" class="right">
             <div class="panel">
                 <script>
                 $(document).ready(function() {

@@ -35,6 +35,8 @@ public class Entity {
 
     private String id;
 
+    private String publishId;
+
     private String label;
 
     private String type;
@@ -142,6 +144,21 @@ public class Entity {
      */
     public String getId() {
         return id;
+    }
+
+    /**
+     * @return the publishId
+     */
+    public String getPublishId() {
+        return publishId;
+    }
+
+    /**
+     * @param publishId
+     *            the publishId to set
+     */
+    public void setPublishId(String publishId) {
+        this.publishId = publishId;
     }
 
     /**
@@ -303,6 +320,17 @@ public class Entity {
      */
     public void setVersion(int version) {
         this.version = version;
+    }
+
+    /**
+     * Set the version number of an entity
+     * 
+     * @param version
+     *            the version number to set
+     */
+    public void setVersionWithStateReset(int version) {
+        this.version = version;
+        this.state = STATE_INGESTED;
     }
 
     /**

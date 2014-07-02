@@ -50,6 +50,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class EntityControllerIT extends AbstractLarchIT {
     private static final Logger log = LoggerFactory.getLogger(EntityControllerIT.class);
 
+    private static final String entityUrl = "http://localhost:8080/entity/";
+
     @Autowired
     private ObjectMapper mapper;
 
@@ -57,8 +59,8 @@ public class EntityControllerIT extends AbstractLarchIT {
     public void testCreateAndUpdateEntity() throws Exception {
         HttpResponse resp =
             this.execute(
-                Request.Post("http://localhost:8080/entity").bodyString(
-                    mapper.writeValueAsString(createFixtureEntity()), ContentType.APPLICATION_JSON)).returnResponse();
+                Request.Post(entityUrl).bodyString(mapper.writeValueAsString(createFixtureEntity()),
+                    ContentType.APPLICATION_JSON)).returnResponse();
         assertEquals(201, resp.getStatusLine().getStatusCode());
         final String id = EntityUtils.toString(resp.getEntity());
 
@@ -66,8 +68,8 @@ public class EntityControllerIT extends AbstractLarchIT {
         update.setLabel("My updated Label");
         resp =
             this.execute(
-                Request.Put("http://localhost:8080/entity/" + id).bodyString(mapper.writeValueAsString(update),
-                    ContentType.APPLICATION_JSON)).returnResponse();
+                Request.Put(entityUrl + id).bodyString(mapper.writeValueAsString(update), ContentType.APPLICATION_JSON))
+                .returnResponse();
         assertEquals(200, resp.getStatusLine().getStatusCode());
 
         resp = this.execute(Request.Get("http://localhost:8080/entity/" + id)).returnResponse();
@@ -208,6 +210,47 @@ public class EntityControllerIT extends AbstractLarchIT {
             }
         }
         assertEquals(i, 0);
+    }
+
+    @Test
+    public void testPublish() throws Exception {
+        // create
+        HttpResponse resp =
+            this.execute(
+                Request.Post("http://localhost:8080/entity").bodyString(
+                    mapper.writeValueAsString(createFixtureEntity()), ContentType.APPLICATION_JSON)).returnResponse();
+        assertEquals(201, resp.getStatusLine().getStatusCode());
+        final String id = EntityUtils.toString(resp.getEntity());
+
+        // publish
+        resp = this.execute(Request.Post("http://localhost:8080/entity/" + id + "/publish")).returnResponse();
+
+        // retrieve
+        resp = this.execute(Request.Get("http://localhost:8080/entity/" + id)).returnResponse();
+        Entity fetched = mapper.readValue(resp.getEntity().getContent(), Entity.class);
+        assertEquals("published", fetched.getState());
+        assertEquals(1, fetched.getVersion());
+
+        // update
+        Entity update = createFixtureEntity();
+        update.setLabel("My updated Label1");
+        resp =
+            this.execute(
+                Request.Put("http://localhost:8080/entity/" + id).bodyString(mapper.writeValueAsString(update),
+                    ContentType.APPLICATION_JSON)).returnResponse();
+        assertEquals(200, resp.getStatusLine().getStatusCode());
+
+        // retrieve
+        resp = this.execute(Request.Get("http://localhost:8080/entity/" + id)).returnResponse();
+        fetched = mapper.readValue(resp.getEntity().getContent(), Entity.class);
+        assertEquals("ingested", fetched.getState());
+        assertEquals(2, fetched.getVersion());
+
+        // retrieve published
+        resp = this.execute(Request.Get("http://localhost:8080/entity/published/" + id + ":1")).returnResponse();
+        fetched = mapper.readValue(resp.getEntity().getContent(), Entity.class);
+        assertEquals("published", fetched.getState());
+        assertEquals(1, fetched.getVersion());
     }
 
 }

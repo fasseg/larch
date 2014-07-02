@@ -17,6 +17,7 @@ package net.objecthunter.larch.controller;
 
 import net.objecthunter.larch.model.SearchResult;
 import net.objecthunter.larch.service.EntityService;
+import net.objecthunter.larch.service.PublishService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -34,6 +35,9 @@ import org.springframework.web.servlet.ModelAndView;
 public class ListController extends AbstractLarchController {
     @Autowired
     private EntityService entityService;
+
+    @Autowired
+    private PublishService publishService;
 
     /**
      * Controller method for a retrieving a HTML view using a HTTP GET containing a list of
@@ -59,6 +63,33 @@ public class ListController extends AbstractLarchController {
     @ResponseBody
     public SearchResult list() {
         return entityService.scanIndex(0);
+    }
+
+    /**
+     * Controller method for a retrieving a HTML view using a HTTP GET containing a list of
+     * {@link net.objecthunter .larch.model.Entity}s
+     * 
+     * @return a Spring MVC {@link org.springframework.web.servlet.ModelAndView} for rendering the HTML view
+     */
+    @RequestMapping(value = "/published", method = RequestMethod.GET, produces = { "text/html" })
+    @ResponseBody
+    public ModelAndView listPublishedHtml() {
+        final ModelMap model = new ModelMap();
+        model.addAttribute("result", this.listPublished());
+        return new ModelAndView("publishedlist", model);
+    }
+
+    /**
+     * Controller method to receive a JSON representation using an HTTP GET of a
+     * {@link net.objecthunter.larch.model .SearchResult} object
+     * 
+     * @return A SearchResult containing the Entities
+     */
+    @RequestMapping(value = "/published", method = RequestMethod.GET, produces = { "application/json",
+        "application/xml", "text/xml" })
+    @ResponseBody
+    public SearchResult listPublished() {
+        return publishService.scanIndex(0);
     }
 
 }

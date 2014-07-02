@@ -70,8 +70,8 @@ public class ElasticSearchVersionService extends AbstractElasticSearchService im
                 .prepareSearch(INDEX_VERSIONS)
                 .setQuery(
                     QueryBuilders
-                    .boolQuery().must(QueryBuilders.matchQuery("entityId", id))
-                    .must(QueryBuilders.matchQuery("versionNumber", versionNumber))).setFrom(0).setSize(1)
+                        .boolQuery().must(QueryBuilders.matchQuery("entityId", id))
+                        .must(QueryBuilders.matchQuery("versionNumber", versionNumber))).setFrom(0).setSize(1)
                 .execute().actionGet();
         if (resp.getHits().getTotalHits() == 0) {
             throw new FileNotFoundException("Entity " + id + " does not exists with version " + versionNumber);
@@ -85,12 +85,10 @@ public class ElasticSearchVersionService extends AbstractElasticSearchService im
         final SearchResponse resp =
             client
                 .prepareSearch(INDEX_VERSIONS)
-                // .setQuery(QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("entityId", id))).setSize(1000)
                 .setQuery(
                     QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
                         FilterBuilders.termFilter("entityId", id))).setSize(1000)
                 .addSort("versionNumber", SortOrder.DESC).execute().actionGet();
-        System.out.println("MIH: found " + resp.getHits().getHits().length + " hits");
         final List<Entity> entities = new ArrayList<Entity>();
         for (final SearchHit hit : resp.getHits()) {
             final Version v = this.mapper.readValue(hit.getSourceAsString(), Version.class);
@@ -100,7 +98,6 @@ public class ElasticSearchVersionService extends AbstractElasticSearchService im
         }
         Entities entit = new Entities();
         entit.setEntities(entities);
-        System.out.println("MIH: found " + entities.size() + " entities");
         return entit;
     }
 

@@ -102,7 +102,7 @@ public class ElasticSearchEntityService extends AbstractElasticSearchService imp
                 .prepareIndex(INDEX_ENTITIES, INDEX_ENTITY_TYPE, e.getId()).setSource(mapper.writeValueAsBytes(e))
                 .execute().actionGet();
         /* refresh the index before returning */
-        this.client.admin().indices().refresh(new RefreshRequest(INDEX_ENTITIES)).actionGet();
+        refreshIndex(INDEX_ENTITIES);
     }
 
     @Override
@@ -179,7 +179,7 @@ public class ElasticSearchEntityService extends AbstractElasticSearchService imp
             this.client
                 .prepareSearch(ElasticSearchEntityService.INDEX_ENTITIES).setQuery(QueryBuilders.matchAllQuery())
                 .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(offset).setSize(numRecords)
-                .addFields("id", "label", "type", "tags").execute().actionGet();
+                .addFields("id", "label", "type", "tags", "state").execute().actionGet();
 
         final SearchResult result = new SearchResult();
         result.setOffset(offset);
@@ -196,10 +196,12 @@ public class ElasticSearchEntityService extends AbstractElasticSearchService imp
             // TODO: check if JSON docuemnt is prefetched or laziliy initialised
             String label = hit.field("label") != null ? hit.field("label").getValue() : "";
             String type = hit.field("type") != null ? hit.field("type").getValue() : "";
+            String state = hit.field("state") != null ? hit.field("state").getValue() : "";
             final Entity e = new Entity();
             e.setId(hit.field("id").getValue());
             e.setLabel(label);
             e.setType(type);
+            e.setState(state);
             List<String> tags = new ArrayList<>();
             if (hit.field("tags") != null) {
                 for (Object o : hit.field("tags").values()) {
