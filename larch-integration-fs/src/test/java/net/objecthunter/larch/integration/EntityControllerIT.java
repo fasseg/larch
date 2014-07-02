@@ -210,4 +210,45 @@ public class EntityControllerIT extends AbstractLarchIT {
         assertEquals(i, 0);
     }
 
+    @Test
+    public void testPublish() throws Exception {
+        // create
+        HttpResponse resp =
+            this.execute(
+                Request.Post("http://localhost:8080/entity").bodyString(
+                    mapper.writeValueAsString(createFixtureEntity()), ContentType.APPLICATION_JSON)).returnResponse();
+        assertEquals(201, resp.getStatusLine().getStatusCode());
+        final String id = EntityUtils.toString(resp.getEntity());
+
+        // publish
+        resp = this.execute(Request.Post("http://localhost:8080/entity/" + id + "/publish")).returnResponse();
+
+        // retrieve
+        resp = this.execute(Request.Get("http://localhost:8080/entity/" + id)).returnResponse();
+        Entity fetched = mapper.readValue(resp.getEntity().getContent(), Entity.class);
+        assertEquals("published", fetched.getState());
+        assertEquals(1, fetched.getVersion());
+
+        // update
+        Entity update = createFixtureEntity();
+        update.setLabel("My updated Label1");
+        resp =
+            this.execute(
+                Request.Put("http://localhost:8080/entity/" + id).bodyString(mapper.writeValueAsString(update),
+                    ContentType.APPLICATION_JSON)).returnResponse();
+        assertEquals(200, resp.getStatusLine().getStatusCode());
+
+        // retrieve
+        resp = this.execute(Request.Get("http://localhost:8080/entity/" + id)).returnResponse();
+        fetched = mapper.readValue(resp.getEntity().getContent(), Entity.class);
+        assertEquals("ingested", fetched.getState());
+        assertEquals(2, fetched.getVersion());
+
+        // retrieve published
+        resp = this.execute(Request.Get("http://localhost:8080/entity/published/" + id + ":1")).returnResponse();
+        fetched = mapper.readValue(resp.getEntity().getContent(), Entity.class);
+        assertEquals("published", fetched.getState());
+        assertEquals(1, fetched.getVersion());
+    }
+
 }
