@@ -80,7 +80,8 @@ public class ElasticSearchSearchServiceTest {
             mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setFrom(0)).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setSize(10)).andReturn(mockSearchRequestBuilder);
-        expect(mockSearchRequestBuilder.addFields("id", "label", "type", "tags")).andReturn(mockSearchRequestBuilder);
+        expect(mockSearchRequestBuilder.addFields("id", "label", "type", "tags", "state")).andReturn(
+            mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.execute()).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(mockSearchResponse);
         expect(mockSearchResponse.getHits()).andReturn(mockHits).times(3);
@@ -93,6 +94,8 @@ public class ElasticSearchSearchServiceTest {
         expect(mockField.getValue()).andReturn("test type");
         expect(mockHit.field("id")).andReturn(mockField);
         expect(mockField.getValue()).andReturn("testid");
+        expect(mockHit.field("state")).andReturn(mockField).times(2);
+        expect(mockField.getValue()).andReturn("ingested");
         expect(mockHit.field("tags")).andReturn(mockField).times(2);
         expect(mockField.values()).andReturn(Arrays.asList("testtag1", "testtag2"));
 
@@ -167,7 +170,8 @@ public class ElasticSearchSearchServiceTest {
             mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setFrom(0)).andReturn(mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.setSize(50)).andReturn(mockSearchRequestBuilder);
-        expect(mockSearchRequestBuilder.addFields("id", "label", "type", "tags")).andReturn(mockSearchRequestBuilder);
+        expect(mockSearchRequestBuilder.addFields("id", "label", "type", "tags", "state")).andReturn(
+            mockSearchRequestBuilder);
         expect(mockSearchRequestBuilder.execute()).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(mockSearchResponse);
         expect(mockSearchResponse.getHits()).andReturn(mockHits).times(3);
@@ -180,6 +184,8 @@ public class ElasticSearchSearchServiceTest {
         expect(mockField.getValue()).andReturn("test type");
         expect(mockHit.field("id")).andReturn(mockField);
         expect(mockField.getValue()).andReturn("testid");
+        expect(mockHit.field("state")).andReturn(mockField).times(2);
+        expect(mockField.getValue()).andReturn("ingested");
         expect(mockHit.field("tags")).andReturn(mockField).times(2);
         expect(mockField.values()).andReturn(Arrays.asList("testtag1", "testtag2"));
 
