@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
 
+import net.objecthunter.larch.model.Entities;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.SearchResult;
 import net.objecthunter.larch.service.backend.BackendPublishService;
@@ -68,11 +69,13 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
     }
 
     @Override
-    public void publish(Entity e) throws IOException {
+    public String publish(Entity e) throws IOException {
+        String publishId = new StringBuilder(e.getId()).append(":").append(e.getVersion()).toString();
         this.client
-            .prepareIndex(INDEX_PUBLISHED, TYPE_PUBLISHED).setSource(this.mapper.writeValueAsBytes(e)).execute()
-            .actionGet();
+            .prepareIndex(INDEX_PUBLISHED, TYPE_PUBLISHED, publishId).setSource(this.mapper.writeValueAsBytes(e))
+            .execute().actionGet();
         this.refreshIndex(INDEX_PUBLISHED);
+        return publishId;
     }
 
     @Override
@@ -85,7 +88,7 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
     }
 
     @Override
-    public List<Entity> retrievePublishedEntities(String entityId) throws IOException {
+    public Entities retrievePublishedEntities(String entityId) throws IOException {
         final SearchResponse search =
             this.client
                 .prepareSearch(INDEX_PUBLISHED)
@@ -100,7 +103,9 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
         for (SearchHit hit : search.getHits().getHits()) {
             result.add(this.mapper.readValue(hit.getSourceAsString(), Entity.class));
         }
-        return result;
+        Entities entities = new Entities();
+        entities.setEntities(result);
+        return entities;
     }
 
     @Override
@@ -111,7 +116,7 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
             this.client
                 .prepareSearch(INDEX_PUBLISHED).setQuery(QueryBuilders.matchAllQuery())
                 .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(offset).setSize(numRecords)
-                .addFields("id", "label", "type", "tags").execute().actionGet();
+                .addFields("id", "version", "label", "type", "tags").execute().actionGet();
 
         final SearchResult result = new SearchResult();
         result.setOffset(offset);
@@ -126,10 +131,12 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
         final List<Entity> entites = new ArrayList<>(numRecords);
         for (final SearchHit hit : resp.getHits()) {
             // TODO: check if JSON docuemnt is prefetched or laziliy initialised
+            int version = hit.field("version") != null ? hit.field("version").getValue() : 0;
             String label = hit.field("label") != null ? hit.field("label").getValue() : "";
             String type = hit.field("type") != null ? hit.field("type").getValue() : "";
             final Entity e = new Entity();
             e.setId(hit.field("id").getValue());
+            e.setVersion(version);
             e.setLabel(label);
             e.setType(type);
             List<String> tags = new ArrayList<>();
@@ -171,18 +178,20 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
 
         final SearchResponse resp =
             this.client
-                .prepareSearch(INDEX_PUBLISHED).addFields("id", "label", "type", "tags").setQuery(queryBuilder)
-                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).execute().actionGet();
+                .prepareSearch(INDEX_PUBLISHED).addFields("id", "version", "label", "type", "tags")
+                .setQuery(queryBuilder).setSearchType(SearchType.DFS_QUERY_THEN_FETCH).execute().actionGet();
         log.debug("ES returned {} results for '{}'", resp.getHits().getHits().length, new String(queryBuilder
             .buildAsBytes().toBytes()));
         final SearchResult result = new SearchResult();
 
         final List<Entity> entities = new ArrayList<>();
         for (final SearchHit hit : resp.getHits()) {
+            int version = hit.field("version") != null ? hit.field("version").getValue() : 0;
             String label = hit.field("label") != null ? hit.field("label").getValue() : "";
             String type = hit.field("type") != null ? hit.field("type").getValue() : "";
             final Entity e = new Entity();
             e.setId(hit.field("id").getValue());
+            e.setVersion(version);
             e.setType(type);
             e.setLabel(label);
 

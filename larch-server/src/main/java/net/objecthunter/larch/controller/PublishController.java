@@ -16,9 +16,8 @@
 package net.objecthunter.larch.controller;
 
 import java.io.IOException;
-import java.util.List;
 
-import net.objecthunter.larch.model.AlternativeIdentifier;
+import net.objecthunter.larch.model.Entities;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.service.MessagingService;
 import net.objecthunter.larch.service.PublishService;
@@ -39,7 +38,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Web controller responsible for interactions on the published entity level
  */
 @Controller
-@RequestMapping("/entity/published")
+@RequestMapping("/entity")
 public class PublishController extends AbstractLarchController {
 
     @Autowired
@@ -60,10 +59,46 @@ public class PublishController extends AbstractLarchController {
      * @return An Entity object which gets transformed into a JSON response by Spring MVC
      * @throws IOException
      */
-    @RequestMapping("/{id}")
+    @RequestMapping("/published/{id}")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public List<Entity> retrieve(@PathVariable("id")
+    public Entity retrieve(@PathVariable("id")
+    final String id) throws IOException {
+        return publishedEntityService.retrieve(id);
+    }
+
+    /**
+     * Controller method for retrieval of a HTML view of the current published version of an
+     * {@link net.objecthunter.larch.model.Entity}
+     *
+     * @param id
+     *            The is of the {@link net.objecthunter.larch.model.Entity} to retrieve
+     * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} for rendering the HTML view
+     * @throws IOException
+     */
+    @RequestMapping(value = "/published/{id}", produces = "text/html")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public ModelAndView retrieveHtml(@PathVariable("id")
+    final String id) throws IOException {
+        final ModelMap model = new ModelMap();
+        model.addAttribute("entity", publishedEntityService.retrieve(id));
+        return new ModelAndView("publishedentity", model);
+    }
+
+    /**
+     * Controller method for retrieval of a JSON representation of the current published version of an
+     * {@link net.objecthunter .larch.model.Entity}
+     *
+     * @param id
+     *            the {@link net.objecthunter.larch.model.Entity}'s id
+     * @return An Entity object which gets transformed into a JSON response by Spring MVC
+     * @throws IOException
+     */
+    @RequestMapping("/{entityId}/published")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public Entities retrieveForEntityId(@PathVariable("entityId")
     final String entityId) throws IOException {
         return publishedEntityService.retrievePublishedEntities(entityId);
     }
@@ -77,15 +112,14 @@ public class PublishController extends AbstractLarchController {
      * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} for rendering the HTML view
      * @throws IOException
      */
-    @RequestMapping(value = "/{id}", produces = "text/html")
+    @RequestMapping(value = "/{entityId}/published", produces = "text/html")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public ModelAndView retrieveHtml(@PathVariable("id")
+    public ModelAndView retrieveHtmlForEntityId(@PathVariable("entityId")
     final String entityId) throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("entities", publishedEntityService.retrievePublishedEntities(entityId));
-        model.addAttribute("identifierTypes", AlternativeIdentifier.IdentifierType.values());
-        return new ModelAndView("published", model);
+        return new ModelAndView("publishedentities", model);
     }
 
 }

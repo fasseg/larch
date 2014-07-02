@@ -16,19 +16,19 @@
 package net.objecthunter.larch.service.backend;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
+import net.objecthunter.larch.model.Entities;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.SearchResult;
 import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchEntityService.EntitiesSearchField;
 
 public interface BackendPublishService {
-    void publish(Entity e) throws IOException;
+    String publish(Entity e) throws IOException;
 
     Entity retrievePublishedEntity(String publishId) throws IOException;
 
-    List<Entity> retrievePublishedEntities(String entityId) throws IOException;
+    Entities retrievePublishedEntities(String entityId) throws IOException;
 
     /**
      * Retrieve a {@link net.objecthunter.larch.model.SearchResult} containing all

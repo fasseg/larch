@@ -306,6 +306,17 @@ public class Entity {
     }
 
     /**
+     * Set the version number of an entity
+     * 
+     * @param version
+     *            the version number to set
+     */
+    public void setVersionWithStateReset(int version) {
+        this.version = version;
+        this.state = STATE_INGESTED;
+    }
+
+    /**
      * Get the state of the entity
      * 
      * @return the state

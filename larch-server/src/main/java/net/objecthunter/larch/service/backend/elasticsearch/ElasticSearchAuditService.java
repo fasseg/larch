@@ -34,6 +34,7 @@ import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -67,8 +68,8 @@ public class ElasticSearchAuditService extends AbstractElasticSearchService impl
                 .setQuery(
                     QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
                         FilterBuilders.termFilter("entityId", entityId)))
-                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(offset).setSize(numRecords).execute()
-                .actionGet();
+                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(offset).setSize(numRecords)
+                .addSort("timestamp", SortOrder.ASC).execute().actionGet();
 
         final List<AuditRecord> records = new ArrayList<>(numRecords);
         for (final SearchHit hit : resp.getHits()) {

@@ -16,11 +16,11 @@
 package net.objecthunter.larch.service.impl;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import net.objecthunter.larch.model.Entities;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.SearchResult;
 import net.objecthunter.larch.service.PublishService;
@@ -55,7 +55,12 @@ public class DefaultPublishService implements PublishService {
     }
 
     @Override
-    public List<Entity> retrievePublishedEntities(String entityId) throws IOException {
+    public Entity retrieve(String id) throws IOException {
+        return backendPublishService.retrievePublishedEntity(id);
+    }
+
+    @Override
+    public Entities retrievePublishedEntities(String entityId) throws IOException {
         return backendPublishService.retrievePublishedEntities(entityId);
     }
 

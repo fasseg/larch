@@ -62,7 +62,7 @@ public interface EntityService {
 
     void deleteIdentifier(String entityId, String type, String value) throws IOException;
 
-    void publish(String id) throws IOException;
+    String publish(String id) throws IOException;
 
     List<AuditRecord> retrieveAuditRecords(String entityId, int offset, int count) throws IOException;
 

@@ -76,7 +76,7 @@ public class ListController extends AbstractLarchController {
     public ModelAndView listPublishedHtml() {
         final ModelMap model = new ModelMap();
         model.addAttribute("result", this.listPublished());
-        return new ModelAndView("list", model);
+        return new ModelAndView("publishedlist", model);
     }
 
     /**

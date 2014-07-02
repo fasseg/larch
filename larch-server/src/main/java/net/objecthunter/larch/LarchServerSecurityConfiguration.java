@@ -36,9 +36,10 @@ public class LarchServerSecurityConfiguration extends WebSecurityConfigurerAdapt
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests().requestMatchers(new AntPathRequestMatcher("/", "GET"))
-            .hasAnyRole("USER", "ADMIN", "ANONYMOUS_USER")
-            .requestMatchers(new AntPathRequestMatcher("/entity", "POST")).hasAnyRole("USER", "ADMIN")
-            .requestMatchers(new AntPathRequestMatcher("/credentials", "GET")).hasAnyRole("USER", "ADMIN")
+            .hasAnyRole("USER", "ADMIN", "ANONYMOUS").requestMatchers(new AntPathRequestMatcher("/entity", "POST"))
+            .hasAnyRole("USER", "ADMIN").requestMatchers(new AntPathRequestMatcher("/credentials", "GET"))
+            .hasAnyRole("ADMIN").requestMatchers(new AntPathRequestMatcher("/login", "GET"))
+            .hasAnyRole("USER", "ADMIN")
             // TODO: add missing matchers for other endpoints
             .and().httpBasic();
         http.csrf().requireCsrfProtectionMatcher(new LarchCsrfRequestMatcher());

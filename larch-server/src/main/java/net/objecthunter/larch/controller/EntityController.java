@@ -245,11 +245,12 @@ public class EntityController extends AbstractLarchController {
 
     @RequestMapping(value = "/{id}/publish", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
-    public void publish(@PathVariable("id")
+    public String publish(@PathVariable("id")
     final String id) throws IOException {
-        this.entityService.publish(id);
+        String publishId = this.entityService.publish(id);
         this.entityService.createAuditRecord(AuditRecords.publishEntityRecord(id));
         this.messagingService.publishPublishEntity(id);
+        return publishId;
     }
 
     @RequestMapping(value = "/{id}/publish", method = RequestMethod.POST, produces = "text/html")

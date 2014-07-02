@@ -16,9 +16,9 @@
 package net.objecthunter.larch.service;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
+import net.objecthunter.larch.model.Entities;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.SearchResult;
 import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchEntityService.EntitiesSearchField;
@@ -27,7 +27,9 @@ import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchEntityS
  * Service definition for CRUD operations on {@link net.objecthunter.larch.model.Entity} objects
  */
 public interface PublishService {
-    List<Entity> retrievePublishedEntities(String entityId) throws IOException;
+    Entity retrieve(String id) throws IOException;
+
+    Entities retrievePublishedEntities(String entityId) throws IOException;
 
     /**
      * Retrieve a {@link net.objecthunter.larch.model.SearchResult} containing all

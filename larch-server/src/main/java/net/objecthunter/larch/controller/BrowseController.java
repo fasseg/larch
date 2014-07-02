@@ -19,6 +19,7 @@ import java.io.IOException;
 
 import net.objecthunter.larch.model.SearchResult;
 import net.objecthunter.larch.service.EntityService;
+import net.objecthunter.larch.service.PublishService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -33,10 +34,14 @@ import org.springframework.web.servlet.ModelAndView;
  * Web controller responsible for creating browse views
  */
 @Controller
+@RequestMapping("/browse")
 public class BrowseController extends AbstractLarchController {
 
     @Autowired
     private EntityService entityService;
+
+    @Autowired
+    private PublishService publishService;
 
     /**
      * Controller method for getting {@link net.objecthunter.larch.model.SearchResult} containing all stored
@@ -45,7 +50,7 @@ public class BrowseController extends AbstractLarchController {
      * @return A SearchResult containing {@link net.objecthunter.larch.model.Entity}'s identifiers
      * @throws IOException
      */
-    @RequestMapping(value = "/browse", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     public SearchResult browse() throws IOException {
         return this.entityService.scanIndex(0);
@@ -60,7 +65,7 @@ public class BrowseController extends AbstractLarchController {
      * @return A SearchResult containing {@link net.objecthunter.larch.model.Entity}'s identifiers
      * @throws IOException
      */
-    @RequestMapping(value = "/browse/{offset}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{offset}", method = RequestMethod.GET)
     @ResponseBody
     public SearchResult browse(@PathVariable("offset")
     final int offset) throws IOException {
@@ -78,7 +83,7 @@ public class BrowseController extends AbstractLarchController {
      * @return A SearchResult containing {@link net.objecthunter.larch.model.Entity}'s identifiers
      * @throws IOException
      */
-    @RequestMapping(value = "/browse/{offset}/{numrecords}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{offset}/{numrecords}", method = RequestMethod.GET)
     @ResponseBody
     public SearchResult browse(@PathVariable("offset")
     final int offset, @PathVariable("numrecords")
@@ -93,7 +98,7 @@ public class BrowseController extends AbstractLarchController {
      * @return A {@link org.springframework.web.servlet.ModelAndView} showing the browse result
      * @throws IOException
      */
-    @RequestMapping(value = "/browse", method = RequestMethod.GET, produces = "text/html")
+    @RequestMapping(method = RequestMethod.GET, produces = "text/html")
     @ResponseBody
     public ModelAndView browseHtml() throws IOException {
         final ModelMap model = new ModelMap();
@@ -110,7 +115,7 @@ public class BrowseController extends AbstractLarchController {
      * @return A {@link org.springframework.web.servlet.ModelAndView} showing the browse result
      * @throws IOException
      */
-    @RequestMapping(value = "/browse/{offset}", method = RequestMethod.GET, produces = "text/html")
+    @RequestMapping(value = "/{offset}", method = RequestMethod.GET, produces = "text/html")
     @ResponseBody
     public ModelAndView browseHtml(@PathVariable("offset")
     final int offset) throws IOException {
@@ -130,7 +135,7 @@ public class BrowseController extends AbstractLarchController {
      * @return A {@link org.springframework.web.servlet.ModelAndView} showing the browse result
      * @throws IOException
      */
-    @RequestMapping(value = "/browse/{offset}/{numrecords}", method = RequestMethod.GET, produces = "text/html")
+    @RequestMapping(value = "/{offset}/{numrecords}", method = RequestMethod.GET, produces = "text/html")
     @ResponseBody
     public ModelAndView browseHtml(@PathVariable("offset")
     final int offset, @PathVariable("numrecords")
@@ -138,5 +143,107 @@ public class BrowseController extends AbstractLarchController {
         final ModelMap model = new ModelMap();
         model.addAttribute("result", this.entityService.scanIndex(offset, numRecords));
         return new ModelAndView("browse", model);
+    }
+
+    /**
+     * Controller method for getting {@link net.objecthunter.larch.model.SearchResult} containing all stored
+     * {@link net.objecthunter.larch.model.Entity}s
+     *
+     * @return A SearchResult containing {@link net.objecthunter.larch.model.Entity}'s identifiers
+     * @throws IOException
+     */
+    @RequestMapping(value = "/published", method = RequestMethod.GET)
+    @ResponseBody
+    public SearchResult browsePublished() throws IOException {
+        return this.publishService.scanIndex(0);
+    }
+
+    /**
+     * Controller method for getting {@link net.objecthunter.larch.model.SearchResult} containing all stored
+     * {@link net.objecthunter.larch.model.Entity}s from a given offset.
+     *
+     * @param offset
+     *            The offset to use when creating the {@link net.objecthunter.larch.model.SearchResult}
+     * @return A SearchResult containing {@link net.objecthunter.larch.model.Entity}'s identifiers
+     * @throws IOException
+     */
+    @RequestMapping(value = "/published/{offset}", method = RequestMethod.GET)
+    @ResponseBody
+    public SearchResult browsePublished(@PathVariable("offset")
+    final int offset) throws IOException {
+        return this.publishService.scanIndex(offset);
+    }
+
+    /**
+     * Controller method for getting {@link net.objecthunter.larch.model.SearchResult} containing a given number of
+     * stored {@link net.objecthunter.larch.model.Entity}s from a given offset.
+     *
+     * @param offset
+     *            The offset to use when creating the {@link net.objecthunter.larch.model.SearchResult}
+     * @param numRecords
+     *            The maximal number of records to return
+     * @return A SearchResult containing {@link net.objecthunter.larch.model.Entity}'s identifiers
+     * @throws IOException
+     */
+    @RequestMapping(value = "/published/{offset}/{numrecords}", method = RequestMethod.GET)
+    @ResponseBody
+    public SearchResult browsePublished(@PathVariable("offset")
+    final int offset, @PathVariable("numrecords")
+    final int numRecords) throws IOException {
+        return this.publishService.scanIndex(offset, numRecords);
+    }
+
+    /**
+     * Controller method for getting a HTML View using Spring MVC templating mechanism containing stored
+     * {@link net.objecthunter.larch.model.Entity}s.
+     *
+     * @return A {@link org.springframework.web.servlet.ModelAndView} showing the browse result
+     * @throws IOException
+     */
+    @RequestMapping(value = "/published", method = RequestMethod.GET, produces = "text/html")
+    @ResponseBody
+    public ModelAndView browsePublishedHtml() throws IOException {
+        final ModelMap model = new ModelMap();
+        model.addAttribute("result", this.publishService.scanIndex(0));
+        return new ModelAndView("browsepublished", model);
+    }
+
+    /**
+     * Controller method for getting a HTML View using Spring MVC templating mechanism containing stored
+     * {@link net.objecthunter.larch.model.Entity}s from a given offset.
+     *
+     * @param offset
+     *            The offset to use when creating the {@link net.objecthunter.larch.model.SearchResult}
+     * @return A {@link org.springframework.web.servlet.ModelAndView} showing the browse result
+     * @throws IOException
+     */
+    @RequestMapping(value = "/published/{offset}", method = RequestMethod.GET, produces = "text/html")
+    @ResponseBody
+    public ModelAndView browsePublishedHtml(@PathVariable("offset")
+    final int offset) throws IOException {
+        final ModelMap model = new ModelMap();
+        model.addAttribute("result", this.publishService.scanIndex(offset));
+        return new ModelAndView("browsepublished", model);
+    }
+
+    /**
+     * Controller method for getting a HTML View using Spring MVC templating mechanism containing a given number of
+     * stored {@link net.objecthunter.larch.model.Entity}s from a given offset.
+     *
+     * @param offset
+     *            The offset to use when creating the {@link net.objecthunter.larch.model.SearchResult}
+     * @param numRecords
+     *            The maximal number of records to return
+     * @return A {@link org.springframework.web.servlet.ModelAndView} showing the browse result
+     * @throws IOException
+     */
+    @RequestMapping(value = "/published/{offset}/{numrecords}", method = RequestMethod.GET, produces = "text/html")
+    @ResponseBody
+    public ModelAndView browsePublishedHtml(@PathVariable("offset")
+    final int offset, @PathVariable("numrecords")
+    final int numRecords) throws IOException {
+        final ModelMap model = new ModelMap();
+        model.addAttribute("result", this.publishService.scanIndex(offset, numRecords));
+        return new ModelAndView("browsepublished", model);
     }
 }

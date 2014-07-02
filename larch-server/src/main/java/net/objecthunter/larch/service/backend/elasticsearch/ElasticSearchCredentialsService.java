@@ -40,7 +40,6 @@ import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -86,8 +85,8 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
     private void checkAndOrCreateDefaultUsers() throws IOException {
         long count = client.prepareCount(INDEX_USERS).execute().actionGet().getCount();
         if (count == 0) {
-            // create default user
-            final Group g =
+            // create default admin
+            final Group adminGroup =
                 mapper.readValue(
                     client
                         .prepareGet(INDEX_GROUPS, INDEX_GROUPS_TYPE, "ROLE_ADMIN").execute().actionGet()
@@ -97,10 +96,25 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
             admin.setName("admin");
             admin.setFirstName("Generic");
             admin.setLastName("Superuser");
-            admin.setGroups(Arrays.asList(g));
+            admin.setGroups(Arrays.asList(adminGroup));
             client
                 .prepareIndex(INDEX_USERS, "user", admin.getName()).setSource(mapper.writeValueAsBytes(admin))
                 .execute().actionGet();
+
+            // create default user
+            final Group g =
+                mapper.readValue(client
+                    .prepareGet(INDEX_GROUPS, INDEX_GROUPS_TYPE, "ROLE_USER").execute().actionGet().getSourceAsBytes(),
+                    Group.class);
+            final User user = new User();
+            user.setPwhash(DigestUtils.sha256Hex("user"));
+            user.setName("user");
+            user.setFirstName("Generic");
+            user.setLastName("User");
+            user.setGroups(Arrays.asList(g));
+            client
+                .prepareIndex(INDEX_USERS, "user", user.getName()).setSource(mapper.writeValueAsBytes(user)).execute()
+                .actionGet();
         }
     }
 
@@ -140,9 +154,7 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
                 throw new BadCredentialsException("Unable to authenticate");
             }
         }
-        return new AnonymousAuthenticationToken("anonymousUser", "anonymousPrincipal",
-            AuthorityUtils.createAuthorityList(new String[] { "ROLE_ANONYMOUS_USER" }));
-        // throw new BadCredentialsException("Unable to authenticate");
+        throw new BadCredentialsException("Unable to authenticate");
     }
 
     @Override
