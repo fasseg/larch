@@ -13,9 +13,9 @@
     <div class="main">
         <div th:include="fragments :: banner" class="title">
         </div>
-        <a th:each="entity : ${entities.entities}" th:href="@{~/entity/published/} + ${entity.id} + ':' + ${entity.version}">
+        <a th:each="entity : ${entities.entities}" th:href="@{~/entity/published/} + ${entity.publishId}">
             <div class="panel clickable">
-            <p class="panel_title" th:text="${entity.id} + ':' + ${entity.version}"></p>
+            <p class="panel_title" th:text="${entity.publishId}"></p>
             <p class="property">Label</p>
             <p class="value" th:text="${entity.label}"></p>
             <p class="property">Type</p>

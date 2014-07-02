@@ -16,9 +16,9 @@
         <div class="resultstats">
             <p th:text="'Search for &quot;' + ${result.term} + '&quot; yielded ' + ${result.totalHits} + ' records in ' + ${result.duration} + ' ms'"></p>
         </div>
-        <a th:each="record : ${result.data}" th:href="@{~/entity/published/} + ${record.id} + ':' + ${record.version}">
+        <a th:each="record : ${result.data}" th:href="@{~/entity/published/} + ${record.publishId}">
             <div class="panel clickable">
-                <p class="panel_title" th:text="${record.id} + ':' + ${record.version}"></p>
+                <p class="panel_title" th:text="${record.publishId}"></p>
                 <p class="property">Label</p><p class="value" th:text="${record.label}"></p>
                 <p class="property">Type</p>
                 <p class="value" th:if="${#strings.isEmpty(record.type)}" th:text="'No Type'"></p>

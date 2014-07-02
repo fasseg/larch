@@ -35,6 +35,8 @@ public class Entity {
 
     private String id;
 
+    private String publishId;
+
     private String label;
 
     private String type;
@@ -142,6 +144,21 @@ public class Entity {
      */
     public String getId() {
         return id;
+    }
+
+    /**
+     * @return the publishId
+     */
+    public String getPublishId() {
+        return publishId;
+    }
+
+    /**
+     * @param publishId
+     *            the publishId to set
+     */
+    public void setPublishId(String publishId) {
+        this.publishId = publishId;
     }
 
     /**

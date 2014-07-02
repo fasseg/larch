@@ -50,6 +50,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class EntityControllerIT extends AbstractLarchIT {
     private static final Logger log = LoggerFactory.getLogger(EntityControllerIT.class);
 
+    private static final String entityUrl = "http://localhost:8080/entity/";
+
     @Autowired
     private ObjectMapper mapper;
 
@@ -57,8 +59,8 @@ public class EntityControllerIT extends AbstractLarchIT {
     public void testCreateAndUpdateEntity() throws Exception {
         HttpResponse resp =
             this.execute(
-                Request.Post("http://localhost:8080/entity").bodyString(
-                    mapper.writeValueAsString(createFixtureEntity()), ContentType.APPLICATION_JSON)).returnResponse();
+                Request.Post(entityUrl).bodyString(mapper.writeValueAsString(createFixtureEntity()),
+                    ContentType.APPLICATION_JSON)).returnResponse();
         assertEquals(201, resp.getStatusLine().getStatusCode());
         final String id = EntityUtils.toString(resp.getEntity());
 
@@ -66,8 +68,8 @@ public class EntityControllerIT extends AbstractLarchIT {
         update.setLabel("My updated Label");
         resp =
             this.execute(
-                Request.Put("http://localhost:8080/entity/" + id).bodyString(mapper.writeValueAsString(update),
-                    ContentType.APPLICATION_JSON)).returnResponse();
+                Request.Put(entityUrl + id).bodyString(mapper.writeValueAsString(update), ContentType.APPLICATION_JSON))
+                .returnResponse();
         assertEquals(200, resp.getStatusLine().getStatusCode());
 
         resp = this.execute(Request.Get("http://localhost:8080/entity/" + id)).returnResponse();

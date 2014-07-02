@@ -4,7 +4,8 @@
 <head th:fragment="header">
     <meta charset="utf-8"/>
     <meta name="_csrf" th:content="${_csrf.token}"/>
-    <title>Larch repository</title>
+    <title sec:authorize="!hasRole('ROLE_ANONYMOUS')">Larch repository</title>
+    <title sec:authorize="hasRole('ROLE_ANONYMOUS')">Larch published repository</title>
     <script src='/js/jquery-1.11.0.min.js'></script>
     <script src='/js/jquery.watermark.min.js'></script>
     <script src='/js/larch.js'></script>
@@ -16,13 +17,16 @@
 
 <div th:fragment="banner">
     <span class="three_bars"></span>
-    <h1>Larch repository</h1>
+    <h1 sec:authorize="!hasRole('ROLE_ANONYMOUS')">Larch repository</h1>
+    <h1 sec:authorize="hasRole('ROLE_ANONYMOUS')">Larch published repository</h1>
     <script>
     $(document).ready(function() {
         $('#search').watermark('Search', {className: 'inactive'});
     });
     </script>
-    <form method="post" th:action="'/search?_csrf=' + ${_csrf.token}" enctype="multipart/form-data"><input
+    <form sec:authorize="!hasRole('ROLE_ANONYMOUS')" method="post" th:action="'/search?_csrf=' + ${_csrf.token}" enctype="multipart/form-data"><input
+            type="text" id="search" name="term"/></form>
+    <form sec:authorize="hasRole('ROLE_ANONYMOUS')" method="post" th:action="'/search/published?_csrf=' + ${_csrf.token}" enctype="multipart/form-data"><input
             type="text" id="search" name="term"/></form>
 </div>
 

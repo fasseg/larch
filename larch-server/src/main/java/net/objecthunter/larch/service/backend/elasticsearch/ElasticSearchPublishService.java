@@ -71,6 +71,7 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
     @Override
     public String publish(Entity e) throws IOException {
         String publishId = new StringBuilder(e.getId()).append(":").append(e.getVersion()).toString();
+        e.setPublishId(publishId);
         this.client
             .prepareIndex(INDEX_PUBLISHED, TYPE_PUBLISHED, publishId).setSource(this.mapper.writeValueAsBytes(e))
             .execute().actionGet();
@@ -79,10 +80,12 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
     }
 
     @Override
-    public Entity retrievePublishedEntity(String id) throws IOException {
-        final GetResponse resp = this.client.prepareGet(INDEX_PUBLISHED, TYPE_PUBLISHED, id).execute().actionGet();
+    public Entity retrievePublishedEntity(String publishId) throws IOException {
+        final GetResponse resp =
+            this.client.prepareGet(INDEX_PUBLISHED, TYPE_PUBLISHED, publishId).execute().actionGet();
         if (!resp.isExists()) {
-            throw new FileNotFoundException("The entity with the id " + id + " can not be found in the publish index");
+            throw new FileNotFoundException("The entity with the publishId " + publishId
+                + " can not be found in the publish index");
         }
         return this.mapper.readValue(resp.getSourceAsBytes(), Entity.class);
     }
@@ -116,7 +119,7 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
             this.client
                 .prepareSearch(INDEX_PUBLISHED).setQuery(QueryBuilders.matchAllQuery())
                 .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(offset).setSize(numRecords)
-                .addFields("id", "version", "label", "type", "tags").execute().actionGet();
+                .addFields("id", "publishId", "version", "label", "type", "tags").execute().actionGet();
 
         final SearchResult result = new SearchResult();
         result.setOffset(offset);
@@ -136,6 +139,7 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
             String type = hit.field("type") != null ? hit.field("type").getValue() : "";
             final Entity e = new Entity();
             e.setId(hit.field("id").getValue());
+            e.setPublishId(hit.field("publishId").getValue());
             e.setVersion(version);
             e.setLabel(label);
             e.setType(type);
@@ -178,7 +182,7 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
 
         final SearchResponse resp =
             this.client
-                .prepareSearch(INDEX_PUBLISHED).addFields("id", "version", "label", "type", "tags")
+                .prepareSearch(INDEX_PUBLISHED).addFields("id", "publishId", "version", "label", "type", "tags")
                 .setQuery(queryBuilder).setSearchType(SearchType.DFS_QUERY_THEN_FETCH).execute().actionGet();
         log.debug("ES returned {} results for '{}'", resp.getHits().getHits().length, new String(queryBuilder
             .buildAsBytes().toBytes()));
@@ -191,6 +195,7 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
             String type = hit.field("type") != null ? hit.field("type").getValue() : "";
             final Entity e = new Entity();
             e.setId(hit.field("id").getValue());
+            e.setPublishId(hit.field("publishId").getValue());
             e.setVersion(version);
             e.setType(type);
             e.setLabel(label);
