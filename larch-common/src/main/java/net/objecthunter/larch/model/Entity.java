@@ -323,12 +323,12 @@ public class Entity {
     }
 
     /**
-     * Set the version number of an entity
+     * Set the version number of an entity and set it's state to INGESTED
      * 
      * @param version
      *            the version number to set
      */
-    public void setVersionWithStateReset(int version) {
+    public void setVersionAndResetState(int version) {
         this.version = version;
         this.state = STATE_INGESTED;
     }
