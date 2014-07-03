@@ -25,6 +25,7 @@ import net.objecthunter.larch.service.PublishService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -94,6 +95,7 @@ public class PublishController extends AbstractLarchController {
     @RequestMapping("/{entityId}/published")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Entities retrieveForEntityId(@PathVariable("entityId") final String entityId) throws IOException {
         return publishedEntityService.retrievePublishedEntities(entityId);
     }
@@ -109,10 +111,11 @@ public class PublishController extends AbstractLarchController {
     @RequestMapping(value = "/{entityId}/published", produces = "text/html")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ModelAndView retrieveHtmlForEntityId(@PathVariable("entityId") final String entityId) throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("entities", publishedEntityService.retrievePublishedEntities(entityId));
+        // ModelAndView m = new ModelAndView("publishedentities", model);
         return new ModelAndView("publishedentities", model);
     }
-
 }

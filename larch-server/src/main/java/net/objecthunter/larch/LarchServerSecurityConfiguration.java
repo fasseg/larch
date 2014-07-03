@@ -21,8 +21,11 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -30,6 +33,9 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 /**
  * Spring-security JavaConfig class defining the security context of the larch repository
  */
+@Configuration
+@EnableWebSecurity
+@Order(10)
 public class LarchServerSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
