@@ -28,7 +28,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
@@ -55,14 +54,15 @@ public class OAuth2ServerConfig {
     private static final String SPARKLR_RESOURCE_ID = "sparklr";
 
     @Configuration
-    @EnableWebSecurity
-    @Order(1)
+    @Order(10)
     protected static class UiResourceConfiguration extends WebSecurityConfigurerAdapter {
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             // @formatter:off
-            http.authorizeRequests();
+            http.authorizeRequests()
+                    .antMatchers("/").permitAll()
+                    .anyRequest().authenticated();
             // @formatter:on
         }
     }
@@ -116,7 +116,7 @@ public class OAuth2ServerConfig {
         private UserApprovalHandler userApprovalHandler;
 
         @Autowired
-        @Qualifier("authenticationManagerBean")
+        @Qualifier("larchElasticSearchAuthenticationManager")
         private AuthenticationManager authenticationManager;
 
         @Value("${tonr.redirect:http://localhost:8080/tonr2/sparklr/redirect}")
