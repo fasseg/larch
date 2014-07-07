@@ -37,14 +37,19 @@ public class LarchServerSecurityConfiguration extends WebSecurityConfigurerAdapt
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().requestMatchers(new AntPathRequestMatcher("/", "GET"))
-                .hasAnyRole("USER", "ADMIN", "ANONYMOUS").requestMatchers(
-                        new AntPathRequestMatcher("/entity", "POST"))
-                .hasAnyRole("USER", "ADMIN").requestMatchers(new AntPathRequestMatcher("/credentials", "GET"))
-                .hasAnyRole("ADMIN").requestMatchers(new AntPathRequestMatcher("/login", "GET"))
-                .hasAnyRole("USER", "ADMIN")
-                // TODO: add missing matchers for other endpoints
+        http.authorizeRequests()
+                .requestMatchers(new AntPathRequestMatcher("/", "GET"))
+                    .hasAnyRole("USER", "ADMIN", "ANONYMOUS")
+                .requestMatchers(new AntPathRequestMatcher("/entity", "POST"))
+                    .hasAnyRole("USER", "ADMIN")
+                .requestMatchers(new AntPathRequestMatcher("/credentials", "GET"))
+                    .hasAnyRole("ADMIN")
+                .requestMatchers(new AntPathRequestMatcher("/settings", "GET"))
+                    .hasAnyRole("ADMIN")
+                .requestMatchers(new AntPathRequestMatcher("/login", "GET"))
+                    .hasAnyRole("USER", "ADMIN")
                 .and().httpBasic();
+        // TODO: add missing matchers for other endpoints
         http.csrf().requireCsrfProtectionMatcher(new LarchCsrfRequestMatcher());
         if (!Boolean.valueOf(env.getProperty("larch.security.csrf.enabled", "true"))) {
             http.csrf().disable();
