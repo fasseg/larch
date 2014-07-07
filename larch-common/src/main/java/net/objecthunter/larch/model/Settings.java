@@ -38,7 +38,7 @@ public class Settings {
 
     private String larchExportPath;
 
-    private boolean larchCsrfEnabled;
+    private boolean larchCsrfProtectionEnabled;
 
     private boolean larchMessagingEnabled;
 
@@ -74,7 +74,7 @@ public class Settings {
 
     private boolean elasticSearchHttpEnabled;
 
-    private String elasticSearchGatwayType;
+    private String elasticSearchGatewayType;
 
     private String elasticSearchConfigPath;
 
@@ -90,7 +90,7 @@ public class Settings {
 
     private boolean tomcatAccessLogEnabled;
 
-    private boolean jsonPrettyPrint;
+    private boolean jsonPrettyPrintEnabled;
 
     private String thymeleafPrefix;
 
@@ -172,12 +172,12 @@ public class Settings {
         this.larchExportPath = larchExportPath;
     }
 
-    public boolean isLarchCsrfEnabled() {
-        return larchCsrfEnabled;
+    public boolean isLarchCsrfProtectionEnabled() {
+        return larchCsrfProtectionEnabled;
     }
 
-    public void setLarchCsrfEnabled(boolean larchCsrfEnabled) {
-        this.larchCsrfEnabled = larchCsrfEnabled;
+    public void setLarchCsrfProtectionEnabled(boolean larchCsrfProtectionEnabled) {
+        this.larchCsrfProtectionEnabled = larchCsrfProtectionEnabled;
     }
 
     public boolean isLarchMessagingEnabled() {
@@ -308,12 +308,12 @@ public class Settings {
         this.elasticSearchHttpEnabled = elasticSearchHttpEnabled;
     }
 
-    public String getElasticSearchGatwayType() {
-        return elasticSearchGatwayType;
+    public String getElasticSearchGatewayType() {
+        return elasticSearchGatewayType;
     }
 
-    public void setElasticSearchGatwayType(String elasticSearchGatwayType) {
-        this.elasticSearchGatwayType = elasticSearchGatwayType;
+    public void setElasticSearchGatewayType(String elasticSearchGatewayType) {
+        this.elasticSearchGatewayType = elasticSearchGatewayType;
     }
 
     public String getElasticSearchConfigPath() {
@@ -372,12 +372,12 @@ public class Settings {
         this.tomcatAccessLogEnabled = tomcatAccessLogEnabled;
     }
 
-    public boolean isJsonPrettyPrint() {
-        return jsonPrettyPrint;
+    public boolean isJsonPrettyPrintEnabled() {
+        return jsonPrettyPrintEnabled;
     }
 
-    public void setJsonPrettyPrint(boolean jsonPrettyPrint) {
-        this.jsonPrettyPrint = jsonPrettyPrint;
+    public void setJsonPrettyPrintEnabled(boolean jsonPrettyPrintEnabled) {
+        this.jsonPrettyPrintEnabled = jsonPrettyPrintEnabled;
     }
 
     public String getThymeleafPrefix() {

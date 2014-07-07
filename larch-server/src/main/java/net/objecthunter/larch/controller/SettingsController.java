@@ -86,8 +86,8 @@ public class SettingsController {
         settings.setLarchExportEnabled(
                 Boolean.parseBoolean(environment.getProperty("larch.export.auto")));
         settings.setLarchExportPath(environment.getProperty("larch.export.path"));
-        settings.setLarchCsrfEnabled(
-                Boolean.parseBoolean(environment.getProperty("larch.security.csrf.enabled")));
+        settings.setLarchCsrfProtectionEnabled(
+            Boolean.parseBoolean(environment.getProperty("larch.security.csrf.enabled")));
         settings.setLarchMessagingEnabled(
                 Boolean.parseBoolean(environment.getProperty("larch.messaging.enabled")));
         settings.setLarchMessagingBrokerUri(environment.getProperty("larch.messaging.broker.uri"));
@@ -113,7 +113,7 @@ public class SettingsController {
                 Integer.parseInt(environment.getProperty("elasticsearch.http.port")));
         settings.setElasticSearchHttpEnabled(
                 Boolean.parseBoolean(environment.getProperty("elasticsearch.http.enabled")));
-        settings.setElasticSearchGatwayType(environment.getProperty("elasticsearch.gateway.type"));
+        settings.setElasticSearchGatewayType(environment.getProperty("elasticsearch.gateway.type"));
         settings.setElasticSearchConfigPath(environment.getProperty("elasticsearch.config.path"));
         settings.setSpringActiveProfile(environment.getProperty("spring.profiles.active"));
         settings.setSpringShowBanner(environment.getProperty("spring.main.show-banner"));
@@ -122,8 +122,8 @@ public class SettingsController {
         settings.setLarchServerPort(Integer.parseInt(environment.getProperty("server.port")));
         settings.setTomcatAccessLogEnabled(
                 Boolean.parseBoolean(environment.getProperty("server.tomcat.access-log-enabled")));
-        settings.setJsonPrettyPrint(
-                Boolean.parseBoolean(environment.getProperty("http.mappers.json-pretty-print")));
+        settings.setJsonPrettyPrintEnabled(
+            Boolean.parseBoolean(environment.getProperty("http.mappers.json-pretty-print")));
         settings.setThymeleafPrefix(environment.getProperty("spring.thymeleaf.prefix"));
         settings.setThymeleafSuffix(environment.getProperty("spring.thymeleaf.suffix"));
         settings.setThymeleafMode(environment.getProperty("spring.thymeleaf.mode"));
