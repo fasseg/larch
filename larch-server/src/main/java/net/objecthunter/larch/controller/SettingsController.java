@@ -21,6 +21,7 @@ import net.objecthunter.larch.service.backend.BackendBlobstoreService;
 import net.objecthunter.larch.service.backend.BackendEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,6 +35,7 @@ import java.io.IOException;
  * Web Controller responsible for Settings views
  */
 @RequestMapping("/settings")
+@Controller
 public class SettingsController {
     @Autowired
     private RepositoryService repositoryService;

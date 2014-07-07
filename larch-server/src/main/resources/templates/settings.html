@@ -14,6 +14,42 @@
         <div th:include="fragments :: banner" class="title">
         </div>
         <div class="panel clickable">
+            <p class="panel_title">ElasticSearch</p>
+
+            <p class="property">Master node name</p>
+
+            <p class="value" th:text="${settings.describe.esMasterNodeName}"></p>
+
+            <p class="property">Master node address</p>
+
+            <p class="value" th:text="${settings.describe.esMasterNodeAddress}"></p>
+
+            <p class="property">Local node name</p>
+
+            <p class="value" th:text="${settings.describe.esNodeName}"></p>
+
+            <p class="property">Number of data nodes</p>
+
+            <p class="value" th:text="${settings.describe.esNumDataNodes}"></p>
+
+            <p class="property">Number of indexed records</p>
+
+            <p class="value" th:text="${settings.describe.esNumIndexedRecords}"></p>
+        </div>
+        <div class="panel clickable">
+            <p class="panel_title">Blobstore</p>
+
+            <p class="property">Version</p>
+
+            <p class="value" th:text="${settings.describe.larchVersion}"></p>
+
+            <p class="property">Host</p>
+
+            <p class="value" th:text="${settings.describe.larchHost}"></p>
+
+            <p class="property">Cluster name</p>
+
+            <p class="value" th:text="${settings.describe.larchClusterName}"></p>
         </div>
     </div>
 </div>
