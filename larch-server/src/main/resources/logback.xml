@@ -23,7 +23,7 @@
         </encoder>
     </appender>
 
-    <logger name="net.objecthunter.larch" level="DEBUG" additivity="false">
+    <logger name="net.objecthunter.larch" level="INFO" additivity="false">
         <appender-ref ref="LARCH-STDOUT"/>
     </logger>
 

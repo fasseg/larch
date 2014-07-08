@@ -40,7 +40,6 @@ public class RandomInputStream extends InputStream {
     @Override
     public int read() throws IOException {
         if (bytesRead == size) {
-            log.info("random stream stopping after " + bytesRead + " bytes");
             return -1;
         }
         if (slicePos >= BenchTool.SLICE.length) {
