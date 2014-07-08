@@ -15,9 +15,11 @@ package net.objecthunter.larch.bench;/*
  * limitations under the License. 
  */
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.logging.LogManager;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,17 +36,16 @@ import org.uncommons.maths.random.XORShiftRNG;
 
 public class BenchTool {
 
-    private static final Logger log = LoggerFactory.getLogger(BenchTool.class);
-
     public static final XORShiftRNG RNG = new XORShiftRNG();
 
     public static final int[] SLICE = new int[1024];
-
     static {
         for (int i = 0; i < SLICE.length; i++) {
             SLICE[i] = RNG.nextInt();
         }
     }
+
+    private static final Logger log = LoggerFactory.getLogger(BenchTool.class);
 
     public static void main(String[] args) {
         final Options ops = createOptions();
@@ -87,6 +88,13 @@ public class BenchTool {
             if (cli.hasOption('p')) {
                 password = cli.getOptionValue('p');
             }
+            if (cli.hasOption('w')) {
+                try {
+                    enableHttpWireDebug();
+                } catch (IOException e) {
+                    log.error("Enabling wire debugging has failed.", e);
+                }
+            }
         } catch (ParseException e) {
             log.error("Unable to parse commandline.\n", e);
         }
@@ -101,6 +109,18 @@ public class BenchTool {
         } catch (IOException e) {
             log.error("Error while running bench\n", e);
         }
+    }
+
+    private static void enableHttpWireDebug() throws IOException {
+        final StringBuilder logPropsBuilder = new StringBuilder();
+        logPropsBuilder.append(".level = INFO\n");
+        logPropsBuilder.append("handlers=java.util.logging.ConsoleHandler\n");
+        logPropsBuilder.append("java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter\n");
+        logPropsBuilder.append("java.util.logging.ConsoleHandler.level = ALL\n");
+        logPropsBuilder.append("org.apache.http.level = FINEST\n");
+        logPropsBuilder.append("org.apache.http.wire.level = SEVERE\n");
+        LogManager.getLogManager().readConfiguration(
+                new ByteArrayInputStream(logPropsBuilder.toString().getBytes()));
     }
 
     @SuppressWarnings("static-access")
@@ -128,8 +148,10 @@ public class BenchTool {
                 .withLongOpt("num-actions")
                 .hasArg()
                 .create('n'));
-        ops.addOption(OptionBuilder.withArgName("size")
-                .withDescription("The size of the individual binaries created")
+        ops.addOption(OptionBuilder
+                .withArgName("size")
+                .withDescription(
+                        "The size of the individual binaries created. Suffixed by [k|m|g] to indicate kilo-, mega-, or gigabytes")
                 .withLongOpt("size")
                 .hasArg()
                 .create('s'));
@@ -152,6 +174,10 @@ public class BenchTool {
                 .withLongOpt("password")
                 .hasArg()
                 .create('p'));
+        ops.addOption(OptionBuilder.withArgName("wire-debug")
+                .withDescription("Enable HttpComponents wire debugging")
+                .withLongOpt("wire-debug")
+                .create('w'));
         return ops;
     }
 
@@ -197,7 +223,7 @@ public class BenchTool {
         System.out.println(" * Retrieve 20 files of 1gb using 5 threads\n   --------------------------------------");
         System.out
                 .println(
-                    "   java -jar larch-benchtool.jar -l http://localhost:8080 -n 20 -a retrieve -s 1g -t 5\n");
+                "   java -jar larch-benchtool.jar -l http://localhost:8080 -n 20 -a retrieve -s 1g -t 5\n");
     }
 
     public static enum Action {
