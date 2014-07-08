@@ -67,7 +67,6 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -80,7 +79,6 @@ import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
  */
 @EnableAutoConfiguration
 @ComponentScan(basePackages = "net.objecthunter.larch.controller")
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 @Configuration
 public class LarchServerConfiguration {
 
@@ -299,6 +297,17 @@ public class LarchServerConfiguration {
     @Bean
     public CommonsMultipartResolver multipartResolver() {
         return new CommonsMultipartResolver();
+    }
+
+    /**
+     * The Spring-security JavaConfig class containing the relevan AuthZ/AuthN definitions
+     * 
+     * @return the {@link LarchServerSecurityConfiguration} used
+     */
+    @Bean
+    @Order(Ordered.LOWEST_PRECEDENCE - 8)
+    public LarchServerSecurityConfiguration larchServerSecurityConfiguration() {
+        return new LarchServerSecurityConfiguration();
     }
 
     /**
