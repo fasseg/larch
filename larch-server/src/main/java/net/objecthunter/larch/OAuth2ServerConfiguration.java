@@ -16,16 +16,53 @@
 
 package net.objecthunter.larch;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
+import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
+import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 
 @Configuration
 public class OAuth2ServerConfiguration {
+
+    @Configuration
+    @EnableResourceServer
+    protected static class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
+
+        @Override
+        public void configure(ResourceServerSecurityConfigurer resources) {
+            resources.resourceId("larch");
+        }
+
+        @Override
+        public void configure(HttpSecurity http) throws Exception {
+            // @formatter:off
+            http
+                    .requestMatchers()
+                    .antMatchers("/entity/**", "/metadatatype/**", "/browse/**", "/list/**", "/describe/**",
+                            "/search/**", "/state/**", "/user/**", "/confirm/**", "/credentials/**", "/group/**")
+                    .and()
+                    .authorizeRequests()
+                    .regexMatchers(HttpMethod.DELETE, "/oauth/users/([^/].*?)/tokens/.*")
+                    .access("#oauth2.clientHasRole('ROLE_CLIENT') and (hasRole('ROLE_USER') or #oauth2.isClient()) and #oauth2.hasScope('write')")
+                    .regexMatchers(HttpMethod.GET, "/oauth/clients/([^/].*?)/users/.*")
+                    .access("#oauth2.clientHasRole('ROLE_CLIENT') and (hasRole('ROLE_USER') or #oauth2.isClient()) and #oauth2.hasScope('read')")
+                    .regexMatchers(HttpMethod.GET, "/oauth/clients/.*")
+                    .access("#oauth2.clientHasRole('ROLE_CLIENT') and #oauth2.isClient() and #oauth2.hasScope('read')");;
+            // @formatter:on
+        }
+
+    }
 
     @Configuration
     @EnableAuthorizationServer
@@ -34,12 +71,16 @@ public class OAuth2ServerConfiguration {
 
         private TokenStore tokenStore = new InMemoryTokenStore();
 
+        @Autowired
+        @Qualifier("larchElasticSearchAuthenticationManager")
+        private AuthenticationManager authenticationManager;
+
         @Override
         public void configure(AuthorizationServerEndpointsConfigurer endpoints)
                 throws Exception {
             // @formatter:off
             endpoints
-                    .tokenStore(tokenStore);
+                    .tokenStore(tokenStore).authenticationManager(authenticationManager);
             // @formatter:on
         }
 
@@ -48,17 +89,21 @@ public class OAuth2ServerConfiguration {
             // @formatter:off
             clients
                     .inMemory().withClient("larch_user")
-                    .authorizedGrantTypes("authorization_code")
+                    .resourceIds("larch")
+                    .authorizedGrantTypes("authorization_code", "implicit")
                     .secret("secret")
                     .scopes("read", "write")
-                    .redirectUris("http://localhost:8088/oauthclient/oauth?method=zwei")
+                    .autoApprove(true)
+                    .redirectUris("http://localhost:8088/oauthclient/oauth?method=token")
                     .and()
                     .withClient("larch_admin")
-                    .authorizedGrantTypes("authorization_code")
+                    .resourceIds("larch")
+                    .authorizedGrantTypes("authorization_code", "implicit")
                     .secret("secret")
                     .authorities("ROLE_ADMIN")
                     .scopes("read", "write")
-                    .redirectUris("http://localhost:8088/oauthclient/oauth?method=zwei");
+                    .autoApprove(true)
+                    .redirectUris("http://localhost:8088/oauthclient/oauth?method=token");
             // @formatter:on
         }
 
