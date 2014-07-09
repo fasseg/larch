@@ -32,8 +32,6 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.fluent.Request;
-import org.apache.http.client.fluent.Response;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -96,11 +94,15 @@ public class LarchClient {
      */
     public LarchState retrieveState() throws IOException {
         final HttpGet get = new HttpGet(this.larchUri + "/state");
-        final HttpResponse resp = this.httpClient.execute(targetHost, get, httpContext);
-        if (resp.getStatusLine().getStatusCode() != 200) {
-            throw new IOException("Unable to retrieve LarchState response from the repository");
+        try {
+            final HttpResponse resp = this.httpClient.execute(targetHost, get, httpContext);
+            if (resp.getStatusLine().getStatusCode() != 200) {
+                throw new IOException("Unable to retrieve LarchState response from the repository");
+            }
+            return mapper.readValue(resp.getEntity().getContent(), LarchState.class);
+        } finally {
+            get.releaseConnection();
         }
-        return mapper.readValue(resp.getEntity().getContent(), LarchState.class);
     }
 
     /**
@@ -112,11 +114,15 @@ public class LarchClient {
      */
     public Describe retrieveDescribe() throws IOException {
         final HttpGet get = new HttpGet(this.larchUri + "/describe");
-        final HttpResponse resp = this.httpClient.execute(targetHost, get, httpContext);
-        if (resp.getStatusLine().getStatusCode() != 200) {
-            throw new IOException("Unable to retrieve Describe response from the repository");
+        try {
+            final HttpResponse resp = this.httpClient.execute(targetHost, get, httpContext);
+            if (resp.getStatusLine().getStatusCode() != 200) {
+                throw new IOException("Unable to retrieve Describe response from the repository");
+            }
+            return mapper.readValue(resp.getEntity().getContent(), Describe.class);
+        } finally {
+            get.releaseConnection();
         }
-        return mapper.readValue(resp.getEntity().getContent(), Describe.class);
     }
 
     /**
@@ -129,12 +135,16 @@ public class LarchClient {
      */
     public Metadata retrieveMetadata(String entityId, String metadataName) throws IOException {
         final HttpGet get = new HttpGet(this.larchUri + "/entity/" + entityId + "/metadata/" + metadataName);
-        final HttpResponse resp = this.httpClient.execute(targetHost, get, httpContext);
-        if (resp.getStatusLine().getStatusCode() != 200) {
-            log.error("Unable to fetch meta data\n{}", EntityUtils.toString(resp.getEntity()));
-            throw new IOException("Unable to fetch meta data " + metadataName + " from entity " + entityId);
+        try {
+            final HttpResponse resp = this.httpClient.execute(targetHost, get, httpContext);
+            if (resp.getStatusLine().getStatusCode() != 200) {
+                log.error("Unable to fetch meta data\n{}", EntityUtils.toString(resp.getEntity()));
+                throw new IOException("Unable to fetch meta data " + metadataName + " from entity " + entityId);
+            }
+            return mapper.readValue(resp.getEntity().getContent(), Metadata.class);
+        } finally {
+            get.releaseConnection();
         }
-        return mapper.readValue(resp.getEntity().getContent(), Metadata.class);
     }
 
     /**
@@ -150,13 +160,17 @@ public class LarchClient {
         final HttpGet get =
                 new HttpGet(this.larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/metadata/" +
                         metadataName);
-        final HttpResponse resp = this.httpClient.execute(targetHost, get, httpContext);
-        if (resp.getStatusLine().getStatusCode() != 200) {
-            log.error("Unable to fetch meta data\n{}", EntityUtils.toString(resp.getEntity()));
-            throw new IOException("Unable to fetch meta data " + metadataName + " from binary " + binaryName +
-                    " of entity " + entityId);
+        try {
+            final HttpResponse resp = this.httpClient.execute(targetHost, get, httpContext);
+            if (resp.getStatusLine().getStatusCode() != 200) {
+                log.error("Unable to fetch meta data\n{}", EntityUtils.toString(resp.getEntity()));
+                throw new IOException("Unable to fetch meta data " + metadataName + " from binary " + binaryName +
+                        " of entity " + entityId);
+            }
+            return mapper.readValue(resp.getEntity().getContent(), Metadata.class);
+        } finally {
+            get.releaseConnection();
         }
-        return mapper.readValue(resp.getEntity().getContent(), Metadata.class);
     }
 
     /**
@@ -168,11 +182,15 @@ public class LarchClient {
      */
     public void postMetadata(String entityId, Metadata md) throws IOException {
         final HttpPost post = new HttpPost(this.larchUri + "/entity/" + entityId + "/metadata");
-        post.setEntity(new StringEntity(mapper.writeValueAsString(md), ContentType.APPLICATION_JSON));
-        final HttpResponse resp = this.httpClient.execute(targetHost, post, httpContext);
-        if (resp.getStatusLine().getStatusCode() != 201) {
-            log.error("Unable to add meta data\n{}", EntityUtils.toString(resp.getEntity()));
-            throw new IOException("Unable to add meta data " + md.getName() + " from entity " + entityId);
+        try {
+            post.setEntity(new StringEntity(mapper.writeValueAsString(md), ContentType.APPLICATION_JSON));
+            final HttpResponse resp = this.httpClient.execute(targetHost, post, httpContext);
+            if (resp.getStatusLine().getStatusCode() != 201) {
+                log.error("Unable to add meta data\n{}", EntityUtils.toString(resp.getEntity()));
+                throw new IOException("Unable to add meta data " + md.getName() + " from entity " + entityId);
+            }
+        } finally {
+            post.releaseConnection();
         }
     }
 
@@ -184,14 +202,20 @@ public class LarchClient {
      * @throws IOException
      */
     public void postBinaryMetadata(String entityId, String binaryName, Metadata md) throws IOException {
-        final HttpPost post = new HttpPost(this.larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/metadata");
-        post.setEntity(new StringEntity(mapper.writeValueAsString(md), ContentType.APPLICATION_JSON));
-        final HttpResponse resp = this.httpClient.execute(targetHost, post, httpContext);
-        if (resp.getStatusLine().getStatusCode() != 201) {
-            log.error("Unable to add meta data to binary\n{}", EntityUtils.toString(resp.getEntity()));
-            throw new IOException("Unable to add meta data " + md.getName() + " to binary " + binaryName +
-                    " of entity " + entityId);
+        final HttpPost post =
+                new HttpPost(this.larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/metadata");
+        try {
+            post.setEntity(new StringEntity(mapper.writeValueAsString(md), ContentType.APPLICATION_JSON));
+            final HttpResponse resp = this.httpClient.execute(targetHost, post, httpContext);
+            if (resp.getStatusLine().getStatusCode() != 201) {
+                log.error("Unable to add meta data to binary\n{}", EntityUtils.toString(resp.getEntity()));
+                throw new IOException("Unable to add meta data " + md.getName() + " to binary " + binaryName +
+                        " of entity " + entityId);
+            }
+        } finally {
+            post.releaseConnection();
         }
+
     }
 
     /**
@@ -203,12 +227,15 @@ public class LarchClient {
      */
     public void deleteMetadata(String entityId, String metadataName) throws IOException {
         final HttpDelete delete = new HttpDelete(this.larchUri + "/entity/" + entityId + "/metadata/" + metadataName);
-        final HttpResponse resp = this.httpClient.execute(targetHost, delete, httpContext);
-        if (resp.getStatusLine().getStatusCode() != 200) {
-            log.error("Unable to remove meta data from entity\n{}", EntityUtils.toString(resp.getEntity()));
-            throw new IOException("Unable to remove meta data " + metadataName + "  of entity " + entityId);
+        try {
+            final HttpResponse resp = this.httpClient.execute(targetHost, delete, httpContext);
+            if (resp.getStatusLine().getStatusCode() != 200) {
+                log.error("Unable to remove meta data from entity\n{}", EntityUtils.toString(resp.getEntity()));
+                throw new IOException("Unable to remove meta data " + metadataName + "  of entity " + entityId);
+            }
+        } finally {
+            delete.releaseConnection();
         }
-
     }
 
     /**
@@ -220,15 +247,19 @@ public class LarchClient {
      * @throws IOException
      */
     public void deleteBinaryMetadata(String entityId, String binaryName, String metadataName) throws IOException {
-        final HttpDelete delete = new HttpDelete(this.larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/metadata/" +
-                metadataName);
-        final HttpResponse resp = this.httpClient.execute(targetHost, delete, httpContext);
-        if (resp.getStatusLine().getStatusCode() != 200) {
-            log.error("Unable to remove meta data from binary\n{}", EntityUtils.toString(resp.getEntity()));
-            throw new IOException("Unable to remove meta data " + metadataName + " from binary " + binaryName +
-                    " of entity " + entityId);
+        final HttpDelete delete =
+                new HttpDelete(this.larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/metadata/" +
+                        metadataName);
+        try {
+            final HttpResponse resp = this.httpClient.execute(targetHost, delete, httpContext);
+            if (resp.getStatusLine().getStatusCode() != 200) {
+                log.error("Unable to remove meta data from binary\n{}", EntityUtils.toString(resp.getEntity()));
+                throw new IOException("Unable to remove meta data " + metadataName + " from binary " + binaryName +
+                        " of entity " + entityId);
+            }
+        } finally {
+            delete.releaseConnection();
         }
-
     }
 
     /**
@@ -241,12 +272,16 @@ public class LarchClient {
      */
     public Binary retrieveBinary(String entityId, String binaryName) throws IOException {
         final HttpGet get = new HttpGet(this.larchUri + "/entity/" + entityId + "/binary/" + binaryName);
-        final HttpResponse resp = this.httpClient.execute(targetHost, get, httpContext);
-        if (resp.getStatusLine().getStatusCode() != 200) {
-            log.error("Unable to fetch binary\n{}", EntityUtils.toString(resp.getEntity()));
-            throw new IOException("Unable to fetch binary" + binaryName + " from entity " + entityId);
+        try {
+            final HttpResponse resp = this.httpClient.execute(targetHost, get, httpContext);
+            if (resp.getStatusLine().getStatusCode() != 200) {
+                log.error("Unable to fetch binary\n{}", EntityUtils.toString(resp.getEntity()));
+                throw new IOException("Unable to fetch binary" + binaryName + " from entity " + entityId);
+            }
+            return mapper.readValue(resp.getEntity().getContent(), Binary.class);
+        } finally {
+            get.releaseConnection();
         }
-        return mapper.readValue(resp.getEntity().getContent(), Binary.class);
     }
 
     /**
@@ -257,24 +292,34 @@ public class LarchClient {
      * @throws IOException
      */
     public void postBinary(String entityId, Binary bin) throws IOException {
-        final HttpPost post = new HttpPost(this.larchUri +  "/entity/" + entityId + "/binary");
+        final HttpPost post = new HttpPost(this.larchUri + "/entity/" + entityId + "/binary");
         post.setEntity(new StringEntity(mapper.writeValueAsString(bin), ContentType.APPLICATION_JSON));
-        final HttpResponse resp = this.httpClient.execute(targetHost, post, httpContext);
-        if (resp.getStatusLine().getStatusCode() != 201) {
-            log.error("Unable to add binary. Server says:\n", EntityUtils.toString(resp.getEntity()));
-            throw new IOException("Unable to add binary " + bin.getName() + " to entity " + entityId);
+        try {
+            final HttpResponse resp = this.httpClient.execute(targetHost, post, httpContext);
+            if (resp.getStatusLine().getStatusCode() != 201) {
+                log.error("Unable to add binary. Server says:\n", EntityUtils.toString(resp.getEntity()));
+                throw new IOException("Unable to add binary " + bin.getName() + " to entity " + entityId);
+            }
+        } finally {
+            post.releaseConnection();
         }
+
     }
 
     public void postBinary(String entityId, String name, String mimeType, InputStream src) throws IOException {
-        final HttpPost post = new HttpPost(this.larchUri +  "/entity/" + entityId + "/binary?name=\" + name\n" +
-                "                + \"&mimetype=\" + mimeType");
+        final HttpPost post =
+                new HttpPost(this.larchUri + "/entity/" + entityId + "/binary?name=" + name + "&mimetype=" + mimeType);
         post.setEntity(new InputStreamEntity(src));
-        final HttpResponse resp = this.httpClient.execute(targetHost, post, httpContext);
-        if (resp.getStatusLine().getStatusCode() != 201) {
-            log.error("Unable to add binary. Server says:\n{}", EntityUtils.toString(resp.getEntity()));
-            throw new IOException("Unable to add binary " + name + " to entity " + entityId);
+        try {
+            final HttpResponse resp = this.httpClient.execute(targetHost, post, httpContext);
+            if (resp.getStatusLine().getStatusCode() != 201) {
+                log.error("Unable to add binary. Server says:\n{}", EntityUtils.toString(resp.getEntity()));
+                throw new IOException("Unable to add binary " + name + " to entity " + entityId);
+            }
+        } finally {
+            post.releaseConnection();
         }
+
     }
 
     /**
@@ -286,10 +331,14 @@ public class LarchClient {
      */
     public void deleteBinary(String entityId, String binaryName) throws IOException {
         final HttpDelete delete = new HttpDelete(this.larchUri + "/entity/" + entityId + "/binary/" + binaryName);
-        final HttpResponse resp = this.httpClient.execute(targetHost, delete, httpContext);
-        if (resp.getStatusLine().getStatusCode() != 200) {
-            log.error("Unable to delete binary. Server says:\n", EntityUtils.toString(resp.getEntity()));
-            throw new IOException("Unable to delete binary " + binaryName + " of entity " + entityId);
+        try {
+            final HttpResponse resp = this.httpClient.execute(targetHost, delete, httpContext);
+            if (resp.getStatusLine().getStatusCode() != 200) {
+                log.error("Unable to delete binary. Server says:\n", EntityUtils.toString(resp.getEntity()));
+                throw new IOException("Unable to delete binary " + binaryName + " of entity " + entityId);
+            }
+        } finally {
+            delete.releaseConnection();
         }
     }
 
@@ -303,12 +352,16 @@ public class LarchClient {
      */
     public InputStream retrieveBinaryContent(String entityId, String binaryName) throws IOException {
         final HttpGet get = new HttpGet(this.larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/content");
-        final HttpResponse resp = this.httpClient.execute(targetHost, get, httpContext);
-        if (resp.getStatusLine().getStatusCode() != 200) {
-            log.error("Unable to fetch binary data\n{}", EntityUtils.toString(resp.getEntity()));
-            throw new IOException("Unable to fetch binary data " + binaryName + " from entity " + entityId);
+        try {
+            final HttpResponse resp = this.httpClient.execute(targetHost, get, httpContext);
+            if (resp.getStatusLine().getStatusCode() != 200) {
+                log.error("Unable to fetch binary data\n{}", EntityUtils.toString(resp.getEntity()));
+                throw new IOException("Unable to fetch binary data " + binaryName + " from entity " + entityId);
+            }
+            return resp.getEntity().getContent();
+        } finally {
+            get.releaseConnection();
         }
-        return resp.getEntity().getContent();
     }
 
     /**
@@ -321,12 +374,16 @@ public class LarchClient {
         if (e.getId() == null || e.getId().isEmpty()) {
             throw new IOException("ID of the entity can not be empty when updating");
         }
-        final HttpPut put = new HttpPut(this.larchUri +  "/entity/" + e.getId());
-        put.setEntity(new StringEntity(mapper.writeValueAsString(e), ContentType.APPLICATION_JSON));
-        final HttpResponse resp = this.httpClient.execute(targetHost, put, httpContext);
-        if (resp.getStatusLine().getStatusCode() != 200) {
-            log.error("Unable to update entity\n{}", EntityUtils.toString(resp.getEntity()));
-            throw new IOException("Unable to update entity " + e.getId());
+        final HttpPut put = new HttpPut(this.larchUri + "/entity/" + e.getId());
+        try {
+            put.setEntity(new StringEntity(mapper.writeValueAsString(e), ContentType.APPLICATION_JSON));
+            final HttpResponse resp = this.httpClient.execute(targetHost, put, httpContext);
+            if (resp.getStatusLine().getStatusCode() != 200) {
+                log.error("Unable to update entity\n{}", EntityUtils.toString(resp.getEntity()));
+                throw new IOException("Unable to update entity " + e.getId());
+            }
+        } finally {
+            put.releaseConnection();
         }
     }
 
@@ -338,10 +395,14 @@ public class LarchClient {
      */
     public void deleteEntity(String id) throws IOException {
         final HttpDelete delete = new HttpDelete(this.larchUri + "/entity/" + id);
-        final HttpResponse resp = this.httpClient.execute(targetHost, delete, httpContext);
-        if (resp.getStatusLine().getStatusCode() != 200) {
-            log.error("Unable to delete Entity\n{}", EntityUtils.toString(resp.getEntity()));
-            throw new IOException("Unable to delete entity " + id);
+        try {
+            final HttpResponse resp = this.httpClient.execute(targetHost, delete, httpContext);
+            if (resp.getStatusLine().getStatusCode() != 200) {
+                log.error("Unable to delete Entity\n{}", EntityUtils.toString(resp.getEntity()));
+                throw new IOException("Unable to delete entity " + id);
+            }
+        } finally {
+            delete.releaseConnection();
         }
     }
 
@@ -353,14 +414,19 @@ public class LarchClient {
      * @throws IOException if an error occurred while ingesting
      */
     public String postEntity(Entity e) throws IOException {
-        final HttpPost post = new HttpPost(this.larchUri +  "/entity/");
+        final HttpPost post = new HttpPost(this.larchUri + "/entity/");
         post.setEntity(new StringEntity(mapper.writeValueAsString(e), ContentType.APPLICATION_JSON));
-        final HttpResponse resp = this.httpClient.execute(targetHost, post, httpContext);
-        if (resp.getStatusLine().getStatusCode() != 201) {
-            log.error("Unable to post entity to Larch at {}\n{}", larchUri, EntityUtils.toString(resp.getEntity()));
-            throw new IOException("Unable to create Entity " + e.getId());
+        try {
+            final HttpResponse resp = this.httpClient.execute(targetHost, post, httpContext);
+            if (resp.getStatusLine().getStatusCode() != 201) {
+                log.error("Unable to post entity to Larch at {}\n{}", larchUri, EntityUtils
+                        .toString(resp.getEntity()));
+                throw new IOException("Unable to create Entity " + e.getId());
+            }
+            return EntityUtils.toString(resp.getEntity());
+        } finally {
+            post.releaseConnection();
         }
-        return EntityUtils.toString(resp.getEntity());
     }
 
     /**
@@ -370,8 +436,12 @@ public class LarchClient {
      * @return An entity object
      */
     public Entity retrieveEntity(String id) throws IOException {
-        final HttpGet get = new HttpGet(this.larchUri + "/entity" + id);
-        final HttpResponse resp = this.httpClient.execute(targetHost, get, httpContext);
-        return mapper.readValue(resp.getEntity().getContent(), Entity.class);
+        final HttpGet get = new HttpGet(this.larchUri + "/entity/" + id);
+        try {
+            final HttpResponse resp = this.httpClient.execute(targetHost, get, httpContext);
+            return mapper.readValue(resp.getEntity().getContent(), Entity.class);
+        } finally {
+            get.releaseConnection();
+        }
     }
 }
