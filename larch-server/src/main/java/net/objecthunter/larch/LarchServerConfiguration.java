@@ -302,6 +302,17 @@ public class LarchServerConfiguration {
     }
 
     /**
+     * The Spring-security JavaConfig class containing the relevan AuthZ/AuthN definitions
+     * 
+     * @return the {@link LarchServerSecurityConfiguration} used
+     */
+    @Bean
+    @Order(Ordered.LOWEST_PRECEDENCE - 8)
+    public LarchServerSecurityConfiguration larchServerSecurityConfiguration() {
+        return new LarchServerSecurityConfiguration();
+    }
+
+    /**
      * Get a {@link net.objecthunter.larch.service.backend.BackendCredentialsService} implementation for use by the
      * repository
      * 

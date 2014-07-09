@@ -170,7 +170,6 @@ public class UserController extends AbstractLarchController {
     @RequestMapping(value = "/credentials", method = RequestMethod.GET, produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ModelAndView retrieveCredentials() throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("users", this.backendCredentialsService.retrieveUsers());

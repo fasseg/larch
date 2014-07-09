@@ -95,7 +95,6 @@ public class PublishController extends AbstractLarchController {
     @RequestMapping("/{entityId}/published")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Entities retrieveForEntityId(@PathVariable("entityId") final String entityId) throws IOException {
         return publishedEntityService.retrievePublishedEntities(entityId);
     }
@@ -111,7 +110,6 @@ public class PublishController extends AbstractLarchController {
     @RequestMapping(value = "/{entityId}/published", produces = "text/html")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ModelAndView retrieveHtmlForEntityId(@PathVariable("entityId") final String entityId) throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("entities", publishedEntityService.retrievePublishedEntities(entityId));
