@@ -25,8 +25,10 @@ import net.objecthunter.larch.bench.BenchToolResult;
 import net.objecthunter.larch.bench.BenchToolRunner;
 import net.objecthunter.larch.bench.ResultFormatter;
 
+import net.objecthunter.larch.model.Entity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
+import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -69,9 +71,14 @@ public class PerformanceIT {
             HttpResponse resp = Request.Get(weedUri + "/dir/status")
                     .execute()
                     .returnResponse();
-            JsonNode node = mapper.readTree(resp.getEntity().getContent());
-            if (node.get("Topology").get("DataCenters").get(0) != null) {
-                weedfsReady = true;
+            final String data = EntityUtils.toString(resp.getEntity());
+            if (!data.isEmpty()) {
+                JsonNode node = mapper.readTree(data);
+                if (node.get("Topology").get("DataCenters").get(0) != null) {
+                    weedfsReady = true;
+                } else {
+                    Thread.sleep(150);
+                }
             } else {
                 Thread.sleep(150);
             }
