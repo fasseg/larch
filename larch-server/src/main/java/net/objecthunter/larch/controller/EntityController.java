@@ -196,8 +196,8 @@ public class EntityController extends AbstractLarchController {
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces = "text/plain")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    @PreAuthorize("(#oauth2.isClient() and #oauth2.clientHasRole('ROLE_ADMIN')) or hasRole('ROLE_ADMIN')")
-    // @PreAuthorize("hasRole('ROLE_ADMIN')")
+    // @PreAuthorize("(#oauth2.isClient() and #oauth2.clientHasRole('ROLE_ADMIN')) or hasRole('ROLE_ADMIN')")
+            @PreAuthorize("hasRole('ROLE_ADMIN')")
             public
             String create(final InputStream src) throws IOException {
         final String id = this.entityService.create(mapper.readValue(src, Entity.class));
