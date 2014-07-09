@@ -93,8 +93,9 @@ public class PerformanceIT {
                 num,
                 threads,
                 size);
+        long time = System.currentTimeMillis();
         List<BenchToolResult> results = bench.run();
-        ResultFormatter.printResults(results, num, size, System.out, 30f);
+        ResultFormatter.printResults(results, System.currentTimeMillis() - time, num, size, threads, System.out, 30f);
     }
 
     @Test
@@ -109,7 +110,8 @@ public class PerformanceIT {
                 num,
                 threads,
                 size);
+        long time = System.currentTimeMillis();
         List<BenchToolResult> results = bench.run();
-        ResultFormatter.printResults(results, num, size, System.out, 30f);
+        ResultFormatter.printResults(results, System.currentTimeMillis() - time, num, size, threads, System.out, 30f);
     }
 }

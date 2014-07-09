@@ -125,9 +125,9 @@ public class ActionWorker implements Callable<BenchToolResult> {
     }
 
     private BenchToolResult doIngest() throws IOException {
-        long time = System.currentTimeMillis();
         final Entity e = BenchToolEntities.createRandomEmptyEntity();
 
+        long time = System.currentTimeMillis();
         /* create an entity */
         final String entityId = this.larchClient.postEntity(e);
 

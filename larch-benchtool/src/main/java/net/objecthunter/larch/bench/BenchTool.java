@@ -104,8 +104,9 @@ public class BenchTool {
         final BenchToolRunner runner =
                 new BenchToolRunner(action, URI.create(larchUri), user, password, numActions, numThreads, size);
         try {
+            final long time = System.currentTimeMillis();
             final List<BenchToolResult> results = runner.run();
-            ResultFormatter.printResults(results, numActions, size, System.out);
+            ResultFormatter.printResults(results, System.currentTimeMillis() - time, numActions, size,numThreads, System.out);
         } catch (IOException e) {
             log.error("Error while running bench\n", e);
         }

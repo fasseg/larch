@@ -49,14 +49,19 @@ public class LarchClient {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    private Executor executor;
+    private ThreadLocal<Executor> executor;
 
     public LarchClient(URI larchUri, String username, String password) {
         this.larchUri = larchUri;
         final HttpHost larch = new HttpHost(larchUri.getHost(), larchUri.getPort());
-        this.executor = Executor.newInstance()
-                .auth(larch, username, password)
-                .authPreemptive(larch);
+        this.executor = new ThreadLocal<Executor>() {
+            @Override
+            protected Executor initialValue() {
+                return Executor.newInstance()
+                        .auth(larch, username, password)
+                        .authPreemptive(larch);
+            }
+        };
     }
 
     /**
@@ -384,6 +389,6 @@ public class LarchClient {
      * @throws IOException
      */
     protected Response execute(Request req) throws IOException {
-        return this.executor.execute(req);
+        return this.executor.get().execute(req);
     }
 }

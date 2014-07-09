@@ -29,11 +29,11 @@ public class ResultFormatter {
 
     private static final DecimalFormat format = new DecimalFormat("###.##");
 
-    public static void printResults(List<BenchToolResult> results, int num, long size, OutputStream sink) {
-        ResultFormatter.printResults(results, num, size, sink, 0f);
+    public static void printResults(List<BenchToolResult> results,long overallDuration, int num, long size, int numThreads, OutputStream sink) {
+        ResultFormatter.printResults(results,overallDuration, num, size, numThreads, sink, 0f);
     }
 
-    public static void printResults(List<BenchToolResult> results, int num, long size, OutputStream sink,
+    public static void printResults(List<BenchToolResult> results,long overallDuration, int num, long size, int numThreads, OutputStream sink,
             float minTroughput) {
         long duration = 0;
         float throughput = 0f;
@@ -46,9 +46,12 @@ public class ResultFormatter {
         log.info("-----------------------------------------------------------------------");
         log.info("Number of results\t\t\t{}", results.size());
         log.info("Individual size\t\t\t{} mb", format.format((float) size / (1024f * 1024f)));
-        log.info("Overall Size\t\t{} mb", format.format((float) (size * num) / (1024f * 1024f)));
-        log.info("Aggregate duration of threads\t\t{} secs", format.format((float) duration / 1000f));
-        log.info("Avg. throughput per thread\t\t{} mb/sec", format.format(throughput));
+        log.info("Overall Size\t\t\t{} mb", format.format((float) (size * num) / (1024f * 1024f)));
+        log.info("Overall duration\t\t\t{} secs", format.format((float) overallDuration / 1000f));
+        log.info("Overall throughput\t\t\t{} mb/sec", format.format( ((float) size*num/(1024f*1024f)) / ((float) overallDuration / 1000f)));
+        log.info("Avg. duration of request\t\t{} secs", format.format((float) duration / 1000f / (float) results.size()));
+        log.info("Avg. throughput of request\t\t{} mb/sec", format.format(throughput / (float) results.size()));
+        log.info("Aggregate duration of requests\t{} secs", format.format((float) duration / 1000f));
         log.info("-----------------------------------------------------------------------");
         if (minTroughput > 0f) {
             if (throughput < minTroughput) {
