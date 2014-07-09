@@ -352,16 +352,12 @@ public class LarchClient {
      */
     public InputStream retrieveBinaryContent(String entityId, String binaryName) throws IOException {
         final HttpGet get = new HttpGet(this.larchUri + "/entity/" + entityId + "/binary/" + binaryName + "/content");
-        try {
-            final HttpResponse resp = this.httpClient.execute(targetHost, get, httpContext);
-            if (resp.getStatusLine().getStatusCode() != 200) {
-                log.error("Unable to fetch binary data\n{}", EntityUtils.toString(resp.getEntity()));
-                throw new IOException("Unable to fetch binary data " + binaryName + " from entity " + entityId);
-            }
-            return resp.getEntity().getContent();
-        } finally {
-            get.releaseConnection();
+        final HttpResponse resp = this.httpClient.execute(targetHost, get, httpContext);
+        if (resp.getStatusLine().getStatusCode() != 200) {
+            log.error("Unable to fetch binary data\n{}", EntityUtils.toString(resp.getEntity()));
+            throw new IOException("Unable to fetch binary data " + binaryName + " from entity " + entityId);
         }
+        return resp.getEntity().getContent();
     }
 
     /**
