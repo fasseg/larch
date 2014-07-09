@@ -39,7 +39,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @RequestMapping("/settings")
 @Controller
-public class SettingsController {
+public class SettingsController extends AbstractLarchController{
 
     @Autowired
     private RepositoryService repositoryService;
