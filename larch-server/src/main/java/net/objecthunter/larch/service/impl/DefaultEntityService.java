@@ -34,23 +34,11 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import net.objecthunter.larch.helpers.SizeCalculatingDigestInputStream;
-import net.objecthunter.larch.model.AlternativeIdentifier;
-import net.objecthunter.larch.model.AuditRecord;
-import net.objecthunter.larch.model.Binary;
-import net.objecthunter.larch.model.Entities;
-import net.objecthunter.larch.model.Entity;
-import net.objecthunter.larch.model.LarchConstants;
-import net.objecthunter.larch.model.Metadata;
-import net.objecthunter.larch.model.SearchResult;
+import net.objecthunter.larch.model.*;
 import net.objecthunter.larch.model.source.UrlSource;
 import net.objecthunter.larch.service.EntityService;
 import net.objecthunter.larch.service.ExportService;
-import net.objecthunter.larch.service.backend.BackendAuditService;
-import net.objecthunter.larch.service.backend.BackendBlobstoreService;
-import net.objecthunter.larch.service.backend.BackendEntityService;
-import net.objecthunter.larch.service.backend.BackendPublishService;
-import net.objecthunter.larch.service.backend.BackendSchemaService;
-import net.objecthunter.larch.service.backend.BackendVersionService;
+import net.objecthunter.larch.service.backend.*;
 import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchEntityService.EntitiesSearchField;
 
 import org.apache.commons.lang3.RandomStringUtils;
@@ -83,6 +71,9 @@ public class DefaultEntityService implements EntityService {
 
     @Autowired
     private BackendEntityService backendEntityService;
+
+    @Autowired
+    private BackendWorkspaceService backendWorkspaceService;
 
     @Autowired
     private ObjectMapper mapper;
@@ -498,5 +489,25 @@ public class DefaultEntityService implements EntityService {
     @Override
     public Entities getOldVersions(String id) throws IOException {
         return backendVersionService.getOldVersions(id);
+    }
+
+    @Override
+    public String createWorkspace(Workspace workspace) {
+        return this.backendWorkspaceService.createWorkspace(workspace);
+    }
+
+    @Override
+    public Workspace retrieveWorkspace(String id) {
+        return this.backendWorkspaceService.retrieveWorkspace(id);
+    }
+
+    @Override
+    public void updateWorkspace(Workspace workspace) {
+        this.backendWorkspaceService.updateWorkspace(workspace);
+    }
+
+    @Override
+    public void patchWorkspace(Workspace workspace) {
+        this.backendWorkspaceService.patchWorkSpace(workspace);
     }
 }

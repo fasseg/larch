@@ -28,6 +28,7 @@ import javax.annotation.PostConstruct;
 
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.SearchResult;
+import net.objecthunter.larch.model.Workspace;
 import net.objecthunter.larch.model.state.IndexState;
 import net.objecthunter.larch.service.backend.BackendEntityService;
 
@@ -290,6 +291,26 @@ public class ElasticSearchEntityService extends AbstractElasticSearchService imp
     @Override
     public SearchResult scanIndex(int offset) {
         return scanIndex(offset, maxRecords);
+    }
+
+    @Override
+    public String createWorkspace(Workspace workspace) {
+        return null;
+    }
+
+    @Override
+    public Workspace retrieveWorkspace(String id) {
+        return null;
+    }
+
+    @Override
+    public void updateWorkspace(Workspace workspace) {
+
+    }
+
+    @Override
+    public void patchWorkSpace(Workspace workspace) {
+
     }
 
     /**
