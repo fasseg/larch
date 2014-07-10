@@ -29,7 +29,6 @@ import net.objecthunter.larch.service.SchemaService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -196,10 +195,7 @@ public class EntityController extends AbstractLarchController {
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces = "text/plain")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    // @PreAuthorize("(#oauth2.isClient() and #oauth2.clientHasRole('ROLE_ADMIN')) or hasRole('ROLE_ADMIN')")
-            @PreAuthorize("hasRole('ROLE_ADMIN')")
-            public
-            String create(final InputStream src) throws IOException {
+    public String create(final InputStream src) throws IOException {
         final String id = this.entityService.create(mapper.readValue(src, Entity.class));
         this.entityService.createAuditRecord(AuditRecords.createEntityRecord(id));
         this.messagingService.publishCreateEntity(id);

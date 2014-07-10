@@ -20,12 +20,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -38,27 +36,6 @@ import org.springframework.security.oauth2.provider.token.store.InMemoryTokenSto
 
 @Configuration
 public class OAuth2ServerConfiguration {
-
-    @Configuration
-    @Order(10)
-    protected static class UiResourceConfiguration extends WebSecurityConfigurerAdapter {
-
-        @Autowired
-        private Environment env;
-
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
-            http
-                    .requestMatchers().antMatchers("/me")
-                    .and()
-                    .authorizeRequests()
-                    .antMatchers("/me").access("hasRole('ROLE_USER')");
-            http.csrf().requireCsrfProtectionMatcher(new LarchCsrfRequestMatcher());
-            if (!Boolean.valueOf(env.getProperty("larch.security.csrf.enabled", "true"))) {
-                http.csrf().disable();
-            }
-        }
-    }
 
     @Configuration
     @EnableResourceServer
@@ -75,10 +52,6 @@ public class OAuth2ServerConfiguration {
         @Override
         public void configure(HttpSecurity http) throws Exception {
             http
-                    .requestMatchers()
-                    .antMatchers("/entity/**", "/metadatatype/**", "/browse/**", "/list/**", "/describe/**",
-                            "/search/**", "/state/**", "/user/**", "/confirm/**", "/credentials/**", "/group/**")
-                    .and()
                     .authorizeRequests()
                     .regexMatchers(HttpMethod.DELETE, "/oauth/users/([^/].*?)/tokens/.*")
                     .access("#oauth2.clientHasRole('ROLE_CLIENT') and (hasRole('ROLE_USER') or #oauth2.isClient()) and #oauth2.hasScope('write')")
