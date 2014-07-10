@@ -52,13 +52,20 @@ public class OAuth2ServerConfiguration {
         @Override
         public void configure(HttpSecurity http) throws Exception {
             http
+                    .requestMatchers()
+                    .antMatchers("/entity/**", "/metadatatype/**", "/browse/**", "/list/**", "/describe/**",
+                            "/search/**", "/state/**", "/user/**", "/confirm/**", "/credentials/**", "/group/**")
+                    .and()
+                    .anonymous()
+                    .authorities("ROLE_ANONYMOUS")
+                    .and()
                     .authorizeRequests()
                     .regexMatchers(HttpMethod.DELETE, "/oauth/users/([^/].*?)/tokens/.*")
                     .access("#oauth2.clientHasRole('ROLE_CLIENT') and (hasRole('ROLE_USER') or #oauth2.isClient()) and #oauth2.hasScope('write')")
                     .regexMatchers(HttpMethod.GET, "/oauth/clients/([^/].*?)/users/.*")
                     .access("#oauth2.clientHasRole('ROLE_CLIENT') and (hasRole('ROLE_USER') or #oauth2.isClient()) and #oauth2.hasScope('read')")
                     .regexMatchers(HttpMethod.GET, "/oauth/clients/.*")
-                    .access("#oauth2.clientHasRole('ROLE_CLIENT') and #oauth2.isClient() and #oauth2.hasScope('read')");;
+                    .access("#oauth2.clientHasRole('ROLE_CLIENT') and #oauth2.isClient() and #oauth2.hasScope('read')");
 
             http.csrf().requireCsrfProtectionMatcher(new LarchCsrfRequestMatcher());
             if (!Boolean.valueOf(env.getProperty("larch.security.csrf.enabled", "true"))) {
