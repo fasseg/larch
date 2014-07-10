@@ -43,9 +43,6 @@ public class IdentifierControllerIT extends AbstractLarchIT {
 
     private static final String identifierUrl = entityUrl + "/{id}/identifier/";
 
-    @Autowired
-    private ObjectMapper mapper;
-
     @Test
     public void testCreateIdentifier() throws Exception {
         // create entity
