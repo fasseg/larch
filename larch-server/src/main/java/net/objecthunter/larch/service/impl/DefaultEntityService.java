@@ -25,11 +25,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.annotation.PostConstruct;
 
@@ -492,22 +488,22 @@ public class DefaultEntityService implements EntityService {
     }
 
     @Override
-    public String createWorkspace(Workspace workspace) {
+    public String createWorkspace(Workspace workspace) throws IOException {
         return this.backendWorkspaceService.createWorkspace(workspace);
     }
 
     @Override
-    public Workspace retrieveWorkspace(String id) {
+    public Workspace retrieveWorkspace(String id) throws IOException {
         return this.backendWorkspaceService.retrieveWorkspace(id);
     }
 
     @Override
-    public void updateWorkspace(Workspace workspace) {
+    public void updateWorkspace(Workspace workspace) throws IOException {
         this.backendWorkspaceService.updateWorkspace(workspace);
     }
 
     @Override
-    public void patchWorkspace(Workspace workspace) {
+    public void patchWorkspace(Workspace workspace) throws IOException {
         this.backendWorkspaceService.patchWorkSpace(workspace);
     }
 }
