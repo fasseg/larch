@@ -52,10 +52,6 @@ public class OAuth2ServerConfiguration {
         @Override
         public void configure(HttpSecurity http) throws Exception {
             http
-                    .requestMatchers()
-                    .antMatchers("/entity/**", "/metadatatype/**", "/browse/**", "/list/**", "/describe/**",
-                            "/search/**", "/state/**", "/user/**", "/confirm/**", "/credentials/**", "/group/**")
-                    .and()
                     .anonymous()
                     .authorities("ROLE_ANONYMOUS")
                     .and()
