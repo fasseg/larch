@@ -16,18 +16,15 @@
 
 package net.objecthunter.larch;
 
-import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 
 /**
  * Spring-security JavaConfig class defining the security context of the larch repository
@@ -39,32 +36,31 @@ public class LarchServerSecurityConfiguration extends WebSecurityConfigurerAdapt
     @Autowired
     private Environment env;
 
+    // @Override
+    // protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    // auth.inMemoryAuthentication().withUser("admin").password("admin").roles("ADMIN").and().withUser("user")
+    // .password("user").roles("USER");
+    // }
+    //
+    @Autowired
+    @Qualifier("larchElasticSearchAuthenticationManager")
+    private AuthenticationManager authenticationManager;
+
+    // @Override
+    // @Bean
+    // public AuthenticationManager authenticationManagerBean() throws Exception {
+    // return super.authenticationManagerBean();
+    // }
+    //
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests().requestMatchers(new AntPathRequestMatcher("/oauth/authorize"))
-                .hasAnyRole("USER", "ADMIN").and().httpBasic();
+                .hasAnyRole("USER", "ADMIN").and()
+                .httpBasic();
         http.csrf().requireCsrfProtectionMatcher(new LarchCsrfRequestMatcher());
         if (!Boolean.valueOf(env.getProperty("larch.security.csrf.enabled", "true"))) {
             http.csrf().disable();
         }
     }
 
-    private static class LarchCsrfRequestMatcher implements RequestMatcher {
-
-        private Pattern allowedMethods = Pattern.compile("^(GET|HEAD|TRACE|OPTIONS)$");
-
-        @Override
-        public boolean matches(HttpServletRequest request) {
-            if (request.getContentType() == null) {
-                return false;
-            }
-            // protect HTML forms from Cross Site forgeries using Sessions
-            if (request.getContentType().equalsIgnoreCase("multipart/form-data")
-                    || request.getContentType().equalsIgnoreCase("application/x-www-form-urlencoded")) {
-                return true;
-            }
-            // everything else must authenticate and does not need a CSRF protection
-            return false;
-        }
-    }
 }

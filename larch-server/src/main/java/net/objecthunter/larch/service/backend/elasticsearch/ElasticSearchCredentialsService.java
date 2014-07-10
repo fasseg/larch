@@ -333,9 +333,9 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
                 this.client
                         .prepareCount(INDEX_USERS)
                         .setQuery(
-                            QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
-                                                        FilterBuilders.termFilter("groups.name",
-                                                                                  "ROLE_ADMIN"))).execute()
+                                QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
+                                        FilterBuilders.termFilter("groups.name",
+                                                "ROLE_ADMIN"))).execute()
                         .actionGet();
         return resp.getCount() < 2; // at least one other admin must exist
     }
@@ -427,7 +427,7 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
                 this.client
                         .prepareSearch(INDEX_GROUPS)
                         .setQuery(QueryBuilders.idsQuery()
-                                      .ids(groupNames.toArray(new String[groupNames.size()])))
+                                .ids(groupNames.toArray(new String[groupNames.size()])))
                         .execute()
                         .actionGet();
         final List<Group> groups = new ArrayList<>(resp.getHits().getHits().length);

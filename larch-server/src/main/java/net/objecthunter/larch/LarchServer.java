@@ -32,7 +32,8 @@ public class LarchServer {
         new SpringApplicationBuilder()
                 .showBanner(false)
                 .web(true)
-                .sources(LarchServerConfiguration.class, OAuth2ServerConfiguration.class)
+                .sources(LarchServerConfiguration.class, LarchServerSecurityConfiguration.class,
+                        OAuth2ServerConfiguration.class)
                 .run(args);
     }
 }

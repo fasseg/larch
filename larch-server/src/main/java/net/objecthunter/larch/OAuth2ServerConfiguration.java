@@ -18,10 +18,14 @@ package net.objecthunter.larch;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -36,8 +40,32 @@ import org.springframework.security.oauth2.provider.token.store.InMemoryTokenSto
 public class OAuth2ServerConfiguration {
 
     @Configuration
+    @Order(10)
+    protected static class UiResourceConfiguration extends WebSecurityConfigurerAdapter {
+
+        @Autowired
+        private Environment env;
+
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            http
+                    .requestMatchers().antMatchers("/me")
+                    .and()
+                    .authorizeRequests()
+                    .antMatchers("/me").access("hasRole('ROLE_USER')");
+            http.csrf().requireCsrfProtectionMatcher(new LarchCsrfRequestMatcher());
+            if (!Boolean.valueOf(env.getProperty("larch.security.csrf.enabled", "true"))) {
+                http.csrf().disable();
+            }
+        }
+    }
+
+    @Configuration
     @EnableResourceServer
     protected static class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
+
+        @Autowired
+        private Environment env;
 
         @Override
         public void configure(ResourceServerSecurityConfigurer resources) {
@@ -46,7 +74,6 @@ public class OAuth2ServerConfiguration {
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
-            // @formatter:off
             http
                     .requestMatchers()
                     .antMatchers("/entity/**", "/metadatatype/**", "/browse/**", "/list/**", "/describe/**",
@@ -59,7 +86,11 @@ public class OAuth2ServerConfiguration {
                     .access("#oauth2.clientHasRole('ROLE_CLIENT') and (hasRole('ROLE_USER') or #oauth2.isClient()) and #oauth2.hasScope('read')")
                     .regexMatchers(HttpMethod.GET, "/oauth/clients/.*")
                     .access("#oauth2.clientHasRole('ROLE_CLIENT') and #oauth2.isClient() and #oauth2.hasScope('read')");;
-            // @formatter:on
+
+            http.csrf().requireCsrfProtectionMatcher(new LarchCsrfRequestMatcher());
+            if (!Boolean.valueOf(env.getProperty("larch.security.csrf.enabled", "true"))) {
+                http.csrf().disable();
+            }
         }
 
     }
@@ -69,24 +100,15 @@ public class OAuth2ServerConfiguration {
     protected static class AuthorizationServerConfiguration extends
             AuthorizationServerConfigurerAdapter {
 
-        private TokenStore tokenStore = new InMemoryTokenStore();
+        @Autowired
+        private TokenStore tokenStore;
 
         @Autowired
         @Qualifier("larchElasticSearchAuthenticationManager")
         private AuthenticationManager authenticationManager;
 
         @Override
-        public void configure(AuthorizationServerEndpointsConfigurer endpoints)
-                throws Exception {
-            // @formatter:off
-            endpoints
-                    .tokenStore(tokenStore).authenticationManager(authenticationManager);
-            // @formatter:on
-        }
-
-        @Override
         public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-            // @formatter:off
             clients
                     .inMemory().withClient("larch_user")
                     .resourceIds("larch")
@@ -104,6 +126,19 @@ public class OAuth2ServerConfiguration {
                     .scopes("read", "write")
                     .autoApprove(true)
                     .redirectUris("http://localhost:8088/oauthclient/oauth?method=token");
+        }
+
+        @Bean
+        public TokenStore tokenStore() {
+            return new InMemoryTokenStore();
+        }
+
+        @Override
+        public void configure(AuthorizationServerEndpointsConfigurer endpoints)
+                throws Exception {
+            // @formatter:off
+            endpoints
+                    .tokenStore(tokenStore).authenticationManager(authenticationManager);
             // @formatter:on
         }
 
