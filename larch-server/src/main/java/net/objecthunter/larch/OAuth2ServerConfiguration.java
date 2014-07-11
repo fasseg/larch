@@ -30,9 +30,12 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
+import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
+import org.springframework.security.web.AuthenticationEntryPoint;
 
 @Configuration
 public class OAuth2ServerConfiguration {
@@ -51,7 +54,12 @@ public class OAuth2ServerConfiguration {
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
-            http
+            http.requestMatchers()
+                    .regexMatchers("/((?!login-page).)*")
+                    // .antMatchers("/entity/**", "/metadatatype/**", "/browse/**", "/list/**",
+                    // "/describe/**",
+                    // "/search/**", "/state/**", "/user/**", "/confirm/**", "/credentials/**", "/group/**")
+                    .and()
                     .anonymous()
                     .authorities("ROLE_ANONYMOUS")
                     .and()
@@ -80,8 +88,24 @@ public class OAuth2ServerConfiguration {
         private TokenStore tokenStore;
 
         @Autowired
+        private AuthenticationEntryPoint authenticationEntryPoint;
+
+        @Autowired
         @Qualifier("larchElasticSearchAuthenticationManager")
         private AuthenticationManager authenticationManager;
+
+        // @Autowired
+        // @Qualifier("larchOAuth2AccessDeniedHandler")
+        // OAuth2AccessDeniedHandler oauthAccessDeniedHandler;
+
+        @Bean
+        AuthenticationEntryPoint getAuthenticationEntryPoint() {
+            OAuth2AuthenticationEntryPoint entryPoint = new OAuth2AuthenticationEntryPoint();
+            entryPoint.setRealmName("larch");
+            entryPoint.setTypeName("Bearer");
+            entryPoint.setExceptionRenderer(new LarchOAuth2ExceptionRenderer());
+            return entryPoint;
+        }
 
         @Override
         public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
@@ -116,6 +140,12 @@ public class OAuth2ServerConfiguration {
             endpoints
                     .tokenStore(tokenStore).authenticationManager(authenticationManager);
             // @formatter:on
+        }
+
+        @Override
+        public void configure(AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
+            oauthServer.realm("larch");
+            oauthServer.authenticationEntryPoint(authenticationEntryPoint);
         }
 
     }

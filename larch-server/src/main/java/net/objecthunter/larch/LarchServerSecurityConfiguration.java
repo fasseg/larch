@@ -42,9 +42,14 @@ public class LarchServerSecurityConfiguration extends WebSecurityConfigurerAdapt
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().requestMatchers(new AntPathRequestMatcher("/oauth/authorize")).hasAnyRole(
-                "USER",
-                "ADMIN")
+        http.requestMatchers()
+                .antMatchers("/**")
+                .and()
+                .anonymous()
+                .authorities("ROLE_ANONYMOUS")
+                .and().authorizeRequests().requestMatchers(new AntPathRequestMatcher("/oauth/authorize")).hasAnyRole(
+                        "USER",
+                        "ADMIN")
                 .and().httpBasic();
         http.csrf().requireCsrfProtectionMatcher(new LarchCsrfRequestMatcher());
         if (!Boolean.valueOf(env.getProperty("larch.security.csrf.enabled", "true"))) {

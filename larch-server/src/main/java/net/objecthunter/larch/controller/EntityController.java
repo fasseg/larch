@@ -90,6 +90,7 @@ public class EntityController extends AbstractLarchController {
     @RequestMapping("/{id}")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ROLE_USER')")
     public Entity retrieve(@PathVariable("id") final String id) throws IOException {
         return entityService.retrieve(id);
     }
@@ -105,6 +106,7 @@ public class EntityController extends AbstractLarchController {
     @RequestMapping(value = "/{id}", produces = "text/html")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ModelAndView retrieveHtml(@PathVariable("id") final String id) throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("entity", entityService.retrieve(id));
