@@ -303,7 +303,7 @@ public class LarchServerConfiguration {
 
     /**
      * The Spring-security JavaConfig class containing the relevan AuthZ/AuthN definitions
-     * 
+     *
      * @return the {@link LarchServerSecurityConfiguration} used
      */
     @Bean
