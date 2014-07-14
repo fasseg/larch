@@ -22,15 +22,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * Spring-security JavaConfig class defining the security context of the larch repository
  */
 @Configuration
-@EnableWebSecurity
+@EnableWebMvcSecurity
 public class LarchServerSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
