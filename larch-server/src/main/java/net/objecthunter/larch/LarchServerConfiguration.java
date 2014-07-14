@@ -324,17 +324,6 @@ public class LarchServerConfiguration {
         return new ElasticSearchCredentialsService();
     }
 
-    /**
-     * Get the OAuth2AccessDeniedHandler
-     * 
-     * @return a {@link org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler} implementation
-     */
-    @Bean
-    @Order(Ordered.LOWEST_PRECEDENCE - 10)
-    public LarchOAuth2AccessDeniedHandler larchOAuth2AccessDeniedHandler() {
-        return new LarchOAuth2AccessDeniedHandler();
-    }
-
     @Bean
     public JmsTemplate jmsTemplate() {
         final JmsTemplate templ = new JmsTemplate(activeMQConnectionFactory());
