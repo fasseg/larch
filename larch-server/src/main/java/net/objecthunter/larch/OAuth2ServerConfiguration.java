@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity;
@@ -66,7 +65,7 @@ public class OAuth2ServerConfiguration {
                     .authorities("ROLE_ANONYMOUS")
                     .and()
                     .authorizeRequests()
-                    .antMatchers("/none");
+                    .antMatchers("/none").hasRole("");
 
             http.csrf().requireCsrfProtectionMatcher(new LarchCsrfRequestMatcher());
             if (!Boolean.valueOf(env.getProperty("larch.security.csrf.enabled", "true"))) {
