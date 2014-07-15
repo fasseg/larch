@@ -46,7 +46,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Web controller responsible for interactions on the entity level
  */
 @Controller
-@RequestMapping(value = { "/entity", "/api/entity" })
+@RequestMapping(value = { "/entity" })
 public class EntityController extends AbstractLarchController {
 
     @Autowired

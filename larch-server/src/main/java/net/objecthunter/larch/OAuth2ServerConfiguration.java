@@ -51,7 +51,7 @@ public class OAuth2ServerConfiguration {
         @Override
         public void configure(HttpSecurity http) throws Exception {
             http.requestMatchers()
-                    .antMatchers("/api/**")
+                    .regexMatchers("/((?!login|oauth).)*")
                     .and()
                     .anonymous()
                     .authorities("ROLE_ANONYMOUS")
