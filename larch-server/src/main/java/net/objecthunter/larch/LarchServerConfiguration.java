@@ -204,6 +204,16 @@ public class LarchServerConfiguration {
     }
 
     /**
+     * Get a {@link net.objecthunter.larch.LarchOpenIdAuthenticationProvider} Spring bean
+     * 
+     * @return a AuthenticationProvider implementation
+     */
+    @Bean
+    public LarchOpenIdAuthenticationProvider larchOpenIdAuthenticationProvider() {
+        return new LarchOpenIdAuthenticationProvider();
+    }
+
+    /**
      * Get {@link net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchNode} Spring bean responsible for
      * starting and stopping the ElasticSearch services
      * 

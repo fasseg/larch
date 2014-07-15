@@ -14,7 +14,7 @@
     <div class="main">
         <div th:include="fragments :: banner" class="title">
         </div>
-        <div sec:authorize="!hasRole('ROLE_ANONYMOUS')" class="panel clickable">
+        <div sec:authorize="!hasAnyRole('ROLE_ANONYMOUS', 'ROLE_IDENTIFIED')" class="panel clickable">
             <p class="panel_title">Search</p>
             <script>
             $(document).ready(function() {
