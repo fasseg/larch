@@ -51,11 +51,12 @@ public class AuditRecordController extends AbstractLarchController {
      * @return A {@link java.util.List} of {@link net.objecthunter.larch.model.AuditRecord} objects.
      * @throws IOException
      */
-    @RequestMapping(value = "/entity/{entity-id}/audit", method = RequestMethod.GET)
-    public List<AuditRecord> retrieve(@PathVariable("entity-id") final String entityId, @RequestParam(
-            value = "offset", defaultValue = "0") final int offset, @RequestParam(value = "count",
-            defaultValue = "25") final int count) throws IOException {
-        return entityService.retrieveAuditRecords(entityId, offset, count);
+    @RequestMapping(value = "/workspace/{workspaceId}/entity/{entity-id}/audit", method = RequestMethod.GET)
+    public List<AuditRecord> retrieve(@PathVariable("workspaceId") final String workspaceId,
+            @PathVariable("entity-id") final String entityId, @RequestParam(
+                    value = "offset", defaultValue = "0") final int offset, @RequestParam(value = "count",
+                    defaultValue = "25") final int count) throws IOException {
+        return entityService.retrieveAuditRecords(workspaceId, entityId, offset, count);
     }
 
     /**
@@ -68,12 +69,14 @@ public class AuditRecordController extends AbstractLarchController {
      * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} object used to render the HTML view
      * @throws IOException
      */
-    @RequestMapping(value = "/entity/{entity-id}/audit", method = RequestMethod.GET, produces = "text/html")
-    public ModelAndView retrieveHtml(@PathVariable("entity-id") final String entityId, @RequestParam(
-            value = "offset", defaultValue = "0") final int offset, @RequestParam(value = "count",
-            defaultValue = "25") final int count) throws IOException {
+    @RequestMapping(value = "/workspace/{workspaceId}/entity/{entity-id}/audit", method = RequestMethod.GET,
+            produces = "text/html")
+    public ModelAndView retrieveHtml(@PathVariable("workspaceId") final String workspaceId,
+            @PathVariable("entity-id") final String entityId, @RequestParam(
+                    value = "offset", defaultValue = "0") final int offset, @RequestParam(value = "count",
+                    defaultValue = "25") final int count) throws IOException {
         final ModelMap model = new ModelMap();
-        model.addAttribute("auditRecords", this.retrieve(entityId, offset, count));
+        model.addAttribute("auditRecords", this.retrieve(workspaceId, entityId, offset, count));
         return new ModelAndView("audit", model);
     }
 }
