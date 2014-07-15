@@ -28,7 +28,6 @@ import javax.annotation.PostConstruct;
 
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.SearchResult;
-import net.objecthunter.larch.model.Workspace;
 import net.objecthunter.larch.model.state.IndexState;
 import net.objecthunter.larch.service.backend.BackendEntityService;
 
@@ -78,8 +77,15 @@ public class ElasticSearchEntityService extends AbstractElasticSearchService imp
         this.waitForIndex(INDEX_ENTITIES);
     }
 
+    private void verifyWorkspaceId(String workspaceId) throws IOException {
+        if (workspaceId == null || StringUtils.isAlphanumeric(workspaceId)) {
+            throw new IOException("Workspace id is not valid: " + workspaceId);
+        }
+    }
+
     @Override
     public String create(Entity e) throws IOException {
+        this.verifyWorkspaceId(e.getWorkspaceId());
         log.debug("creating new entity");
         final ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
         if (e.getId() != null) {
@@ -100,6 +106,7 @@ public class ElasticSearchEntityService extends AbstractElasticSearchService imp
 
     @Override
     public void update(Entity e) throws IOException {
+        this.verifyWorkspaceId(e.getWorkspaceId());
         log.debug("updating entity " + e.getId());
         /* and create the updated document */
         IndexResponse resp =
@@ -112,11 +119,12 @@ public class ElasticSearchEntityService extends AbstractElasticSearchService imp
     }
 
     @Override
-    public Entity retrieve(String id) throws IOException {
-        log.debug("fetching entity " + id);
-        final GetResponse resp = client.prepareGet(INDEX_ENTITIES, INDEX_ENTITY_TYPE, id).execute().actionGet();
+    public Entity retrieve(String workspaceId, String entityId) throws IOException {
+        this.verifyWorkspaceId(workspaceId);
+        log.debug("fetching entity " + entityId);
+        final GetResponse resp = client.prepareGet(INDEX_ENTITIES, INDEX_ENTITY_TYPE, entityId).execute().actionGet();
         final Entity parent = mapper.readValue(resp.getSourceAsBytes(), Entity.class);
-        parent.setChildren(fetchChildren(id));
+        parent.setChildren(fetchChildren(entityId));
         return parent;
     }
 
