@@ -78,14 +78,7 @@ public class OAuth2ServerConfiguration {
         @Override
         public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
             clients
-                    .inMemory().withClient("larch_user")
-                    .resourceIds("larch")
-                    .authorizedGrantTypes("authorization_code", "implicit")
-                    .secret("secret")
-                    .scopes("read", "write")
-                    .autoApprove(true)
-                    .redirectUris("http://localhost:8088/oauthclient/oauth?method=token")
-                    .and()
+                    .inMemory()
                     .withClient("larch_admin")
                     .resourceIds("larch")
                     .authorizedGrantTypes("authorization_code", "implicit")
