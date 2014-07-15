@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * Web controller responsible for interactions on the identifier level
  */
 @Controller
+@RequestMapping("/workspace/{workspaceId}/entity/{id}")
 public class IdentifierController extends AbstractLarchController {
 
     @Autowired
@@ -52,11 +53,11 @@ public class IdentifierController extends AbstractLarchController {
      * @param value the value of the identifier
      * @throws IOException
      */
-    @RequestMapping(value = "/entity/{id}/identifier", method = RequestMethod.POST)
+    @RequestMapping(value = "/identifier", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@PathVariable("id") final String entityId, @RequestParam("type") final String type,
+    public void create(@PathVariable("workspaceId") final String workspaceId, @PathVariable("id") final String entityId, @RequestParam("type") final String type,
             @RequestParam("value") final String value) throws IOException {
-        this.entityService.createIdentifier(entityId, type, value);
+        this.entityService.createIdentifier(workspaceId, entityId, type, value);
         this.entityService.createAuditRecord(AuditRecords.createIdentifier(entityId));
         this.messagingService.publishCreateIdentifier(entityId, type, value);
     }
@@ -70,11 +71,11 @@ public class IdentifierController extends AbstractLarchController {
      * @param value the value of the identifier
      * @throws IOException
      */
-    @RequestMapping(value = "/entity/{id}/identifier", method = RequestMethod.POST, produces = "text/html")
+    @RequestMapping(value = "/identifier", method = RequestMethod.POST, produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
-    public String createHtml(@PathVariable("id") final String entityId, @RequestParam("type") final String type,
+    public String createHtml(@PathVariable("workspaceId") final String workspaceId, @PathVariable("id") final String entityId, @RequestParam("type") final String type,
             @RequestParam("value") final String value) throws IOException {
-        this.entityService.createIdentifier(entityId, type, value);
+        this.entityService.createIdentifier(workspaceId, entityId, type, value);
         this.entityService.createAuditRecord(AuditRecords.createIdentifier(entityId));
         this.messagingService.publishCreateIdentifier(entityId, type, value);
         return "redirect:/entity/" + entityId;
@@ -88,12 +89,12 @@ public class IdentifierController extends AbstractLarchController {
      * @param value the value of the identifier
      * @throws IOException
      */
-    @RequestMapping(value = "/entity/{id}/identifier/{type}/{value}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/identifier/{type}/{value}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public void delete(@PathVariable("id") final String entityId, @PathVariable("type") final String type,
+    public void delete(@PathVariable("workspaceId") final String workspaceId, @PathVariable("id") final String entityId, @PathVariable("type") final String type,
             @PathVariable("value") final String value) throws IOException {
-        this.entityService.deleteIdentifier(entityId, type, value);
+        this.entityService.deleteIdentifier(workspaceId, entityId, type, value);
         this.entityService.createAuditRecord(AuditRecords.deleteEntityRecord(entityId));
         this.messagingService.publishDeleteIdentifier(entityId, type, value);
     }
@@ -106,13 +107,13 @@ public class IdentifierController extends AbstractLarchController {
      * @param value the value of the identifier
      * @throws IOException
      */
-    @RequestMapping(value = "/entity/{id}/identifier/{type}/{value}", method = RequestMethod.DELETE,
+    @RequestMapping(value = "/identifier/{type}/{value}", method = RequestMethod.DELETE,
             produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public String deleteHtml(@PathVariable("id") final String entityId, @PathVariable("type") final String type,
+    public String deleteHtml(@PathVariable("workspaceId") final String workspaceId, @PathVariable("id") final String entityId, @PathVariable("type") final String type,
             @PathVariable("value") final String value) throws IOException {
-        this.entityService.deleteIdentifier(entityId, type, value);
+        this.entityService.deleteIdentifier(workspaceId, entityId, type, value);
         this.entityService.createAuditRecord(AuditRecords.deleteEntityRecord(entityId));
         this.messagingService.publishDeleteIdentifier(entityId, type, value);
         return "redirect:/entity/" + entityId;

@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * Web controller responsible for interactions on the relation level
  */
 @Controller
+@RequestMapping("//workspace/{workspaceId}/entity/{id}/relation")
 public class RelationController extends AbstractLarchController {
 
     @Autowired
@@ -52,11 +53,11 @@ public class RelationController extends AbstractLarchController {
      * @param object the object of the relation
      * @throws IOException
      */
-    @RequestMapping(value = "/entity/{id}/relation", method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@PathVariable("id") final String id, @RequestParam("predicate") final String predicate,
+    public void create(@PathVariable("workspaceId") final String workspaceId, @PathVariable("id") final String id, @RequestParam("predicate") final String predicate,
             @RequestParam("object") final String object) throws IOException {
-        this.entityService.createRelation(id, predicate, object);
+        this.entityService.createRelation(workspaceId, id, predicate, object);
         this.entityService.createAuditRecord(AuditRecords.createRelationRecord(id));
         this.messagingService.publishCreateRelation(id, predicate, object);
     }
@@ -71,11 +72,11 @@ public class RelationController extends AbstractLarchController {
      * @param object the object of the relation
      * @throws IOException
      */
-    @RequestMapping(value = "/entity/{id}/relation", method = RequestMethod.POST, produces = "text/html")
+    @RequestMapping(method = RequestMethod.POST, produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
-    public String createHtml(@PathVariable("id") final String id, @RequestParam("predicate") final String predicate,
+    public String createHtml(@PathVariable("workspaceId") final String workspaceId, @PathVariable("id") final String id, @RequestParam("predicate") final String predicate,
             @RequestParam("object") final String object) throws IOException {
-        this.entityService.createRelation(id, predicate, object);
+        this.entityService.createRelation(workspaceId, id, predicate, object);
         this.messagingService.publishCreateRelation(id, predicate, object);
         return "redirect:/entity/" + id;
     }
