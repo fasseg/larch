@@ -39,7 +39,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Web controller responsible for interactions on the published entity level
  */
 @Controller
-@RequestMapping("/entity")
+@RequestMapping("/workspace/{workspaceId}/published")
 public class PublishController extends AbstractLarchController {
 
     @Autowired
@@ -59,7 +59,7 @@ public class PublishController extends AbstractLarchController {
      * @return An Entity object which gets transformed into a JSON response by Spring MVC
      * @throws IOException
      */
-    @RequestMapping("/published/{id}")
+    @RequestMapping("/{id}")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public Entity retrieve(@PathVariable("id") final String id) throws IOException {
@@ -74,7 +74,7 @@ public class PublishController extends AbstractLarchController {
      * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} for rendering the HTML view
      * @throws IOException
      */
-    @RequestMapping(value = "/published/{id}", produces = "text/html")
+    @RequestMapping(value = "/{id}", produces = "text/html")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public ModelAndView retrieveHtml(@PathVariable("id") final String id) throws IOException {
@@ -91,7 +91,7 @@ public class PublishController extends AbstractLarchController {
      * @return An Entity object which gets transformed into a JSON response by Spring MVC
      * @throws IOException
      */
-    @RequestMapping("/{entityId}/published")
+    @RequestMapping("/{entityId}/list")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public Entities retrieveForEntityId(@PathVariable("entityId") final String entityId) throws IOException {
@@ -106,7 +106,7 @@ public class PublishController extends AbstractLarchController {
      * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} for rendering the HTML view
      * @throws IOException
      */
-    @RequestMapping(value = "/{entityId}/published", produces = "text/html")
+    @RequestMapping(value = "/{entityId}/list", produces = "text/html")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public ModelAndView retrieveHtmlForEntityId(@PathVariable("entityId") final String entityId) throws IOException {

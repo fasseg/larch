@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import net.objecthunter.larch.model.Entity;
 
+import net.objecthunter.larch.model.Workspace;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
@@ -38,8 +39,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class IdentifierControllerIT extends AbstractLarchIT {
 
     private static final Logger log = LoggerFactory.getLogger(IdentifierControllerIT.class);
-
-    private static final String entityUrl = "http://localhost:8080/entity";
 
     private static final String identifierUrl = entityUrl + "/{id}/identifier/";
 
