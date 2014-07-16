@@ -23,6 +23,7 @@ import net.objecthunter.larch.model.AuditRecord;
 import net.objecthunter.larch.service.EntityService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -52,6 +53,7 @@ public class AuditRecordController extends AbstractLarchController {
      * @throws IOException
      */
     @RequestMapping(value = "/entity/{entity-id}/audit", method = RequestMethod.GET)
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public List<AuditRecord> retrieve(@PathVariable("entity-id") final String entityId, @RequestParam(
             value = "offset", defaultValue = "0") final int offset, @RequestParam(value = "count",
             defaultValue = "25") final int count) throws IOException {
@@ -69,6 +71,7 @@ public class AuditRecordController extends AbstractLarchController {
      * @throws IOException
      */
     @RequestMapping(value = "/entity/{entity-id}/audit", method = RequestMethod.GET, produces = "text/html")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public ModelAndView retrieveHtml(@PathVariable("entity-id") final String entityId, @RequestParam(
             value = "offset", defaultValue = "0") final int offset, @RequestParam(value = "count",
             defaultValue = "25") final int count) throws IOException {

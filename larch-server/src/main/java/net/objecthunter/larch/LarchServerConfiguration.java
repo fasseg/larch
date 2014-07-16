@@ -20,6 +20,7 @@ import java.io.File;
 
 import javax.jms.Queue;
 
+import net.objecthunter.larch.security.helpers.LarchOpenIdAuthenticationProvider;
 import net.objecthunter.larch.service.EntityService;
 import net.objecthunter.larch.service.ExportService;
 import net.objecthunter.larch.service.MailService;
@@ -67,6 +68,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -79,6 +81,7 @@ import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
  */
 @EnableAutoConfiguration
 @ComponentScan(basePackages = "net.objecthunter.larch.controller")
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @Configuration
 public class LarchServerConfiguration {
 
@@ -202,6 +205,16 @@ public class LarchServerConfiguration {
     }
 
     /**
+     * Get a {@link net.objecthunter.larch.security.helpers.LarchOpenIdAuthenticationProvider} Spring bean
+     * 
+     * @return a AuthenticationProvider implementation
+     */
+    @Bean
+    public LarchOpenIdAuthenticationProvider larchOpenIdAuthenticationProvider() {
+        return new LarchOpenIdAuthenticationProvider();
+    }
+
+    /**
      * Get {@link net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchNode} Spring bean responsible for
      * starting and stopping the ElasticSearch services
      * 
@@ -301,7 +314,7 @@ public class LarchServerConfiguration {
 
     /**
      * The Spring-security JavaConfig class containing the relevan AuthZ/AuthN definitions
-     * 
+     *
      * @return the {@link LarchServerSecurityConfiguration} used
      */
     @Bean

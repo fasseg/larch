@@ -29,7 +29,45 @@
 
             <p class="value" th:text="${describe.larchClusterName}"></p>
         </div>
-        <div sec:authorize="!hasRole('ROLE_ANONYMOUS')" class="right">
+        <div class="panel clickable">
+            <p class="panel_title">ElasticSearch</p>
+
+            <p class="property">Master node name</p>
+
+            <p class="value" th:text="${describe.esMasterNodeName}"></p>
+
+            <p class="property">Master node address</p>
+
+            <p class="value" th:text="${describe.esMasterNodeAddress}"></p>
+
+            <p class="property">Local node name</p>
+
+            <p class="value" th:text="${describe.esNodeName}"></p>
+
+            <p class="property">Number of data nodes</p>
+
+            <p class="value" th:text="${describe.esNumDataNodes}"></p>
+
+            <p class="property">Number of indexed records</p>
+
+            <p class="value" th:text="${describe.esNumIndexedRecords}"></p>
+        </div>
+        <div class="panel clickable">
+            <p class="panel_title">Blobstore</p>
+
+            <p class="property">Version</p>
+
+            <p class="value" th:text="${describe.larchVersion}"></p>
+
+            <p class="property">Host</p>
+
+            <p class="value" th:text="${describe.larchHost}"></p>
+
+            <p class="property">Cluster name</p>
+
+            <p class="value" th:text="${describe.larchClusterName}"></p>
+        </div>
+        <div sec:authorize="!hasAnyRole('ROLE_ANONYMOUS', 'ROLE_IDENTIFIED')" class="right">
             <div class="panel">
                 <script>
                 $(document).ready(function() {

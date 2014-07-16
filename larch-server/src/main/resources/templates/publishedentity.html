@@ -51,11 +51,11 @@
             <p class="property">Last modified</p>
 
             <p class="value" th:text="${entity.utcLastModified}"></p>
-            <a sec:authorize="!hasRole('ROLE_ANONYMOUS')" th:text="'Audit record'"
+            <a sec:authorize="!hasAnyRole('ROLE_ANONYMOUS', 'ROLE_IDENTIFIED')" th:text="'Audit record'"
                th:href="@{'/entity/'} + ${entity.id} + '/audit'"></a>
 
             <p/>
-            <a sec:authorize="!hasRole('ROLE_ANONYMOUS')" th:text="'Versions'"
+            <a sec:authorize="!hasAnyRole('ROLE_ANONYMOUS', 'ROLE_IDENTIFIED')" th:text="'Versions'"
                th:href="@{'/entity/'} + ${entity.id} + '/versions'"></a>
         </div>
         <div th:each="md : ${entity.metadata}" class="panel">

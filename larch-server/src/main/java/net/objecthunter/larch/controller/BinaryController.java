@@ -31,6 +31,7 @@ import net.objecthunter.larch.service.SchemaService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -75,6 +76,7 @@ public class BinaryController extends AbstractLarchController {
     @RequestMapping(value = "/entity/{id}/binary", method = RequestMethod.POST, consumes = { "multipart/form-data",
         "application/x-www-form-urlencoded" })
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public String create(@PathVariable("id") final String entityId, @RequestParam("name") final String name,
             @RequestParam("binary") final MultipartFile file) throws IOException {
         entityService.createBinary(entityId, name, file.getContentType(), file.getInputStream());
@@ -94,6 +96,7 @@ public class BinaryController extends AbstractLarchController {
      */
     @RequestMapping(value = "/entity/{id}/binary", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public void create(@PathVariable("id") final String entityId, @RequestParam("name") final String name,
             @RequestParam("mimetype") final String mimeType, final InputStream src) throws IOException {
         entityService.createBinary(entityId, name, mimeType, src);
@@ -111,6 +114,7 @@ public class BinaryController extends AbstractLarchController {
      */
     @RequestMapping(value = "/entity/{id}/binary", method = RequestMethod.POST, consumes = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public void create(@PathVariable("id") final String entityId, final InputStream src) throws IOException {
         final Binary b = this.mapper.readValue(src, Binary.class);
         this.entityService.createBinary(entityId, b.getName(), b.getMimetype(), b.getSource().getInputStream());
@@ -194,6 +198,7 @@ public class BinaryController extends AbstractLarchController {
     @RequestMapping(value = "/entity/{id}/binary/{name}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public void delete(@PathVariable("id") final String entityId, @PathVariable("name") final String name)
             throws IOException {
         this.entityService.deleteBinary(entityId, name);

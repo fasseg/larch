@@ -27,6 +27,7 @@ import net.objecthunter.larch.service.backend.BackendCredentialsService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -76,6 +77,7 @@ public class UserController extends AbstractLarchController {
      */
     @RequestMapping(value = "/user/{name}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     public void deleteUser(@PathVariable("name") final String name) throws IOException {
         this.backendCredentialsService.deleteUser(name);
     }
@@ -90,6 +92,7 @@ public class UserController extends AbstractLarchController {
     @RequestMapping(value = "/user", method = RequestMethod.GET, produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     public List<User> retrieveUsers() throws IOException {
         return backendCredentialsService.retrieveUsers();
     }
@@ -107,6 +110,7 @@ public class UserController extends AbstractLarchController {
     @RequestMapping(value = "/user", method = RequestMethod.POST, consumes = "multipart/form-data")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     public String createUser(@RequestParam("name") final String userName,
             @RequestParam("first_name") final String firstName,
             @RequestParam("last_name") final String lastName,
@@ -138,6 +142,7 @@ public class UserController extends AbstractLarchController {
     @RequestMapping(value = "/user/{name}", method = RequestMethod.GET, produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
+    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_USER') and #name == authentication.principal.name)")
     public User retrieveUser(@PathVariable("name") final String name) throws IOException {
         return backendCredentialsService.retrieveUser(name);
     }
@@ -153,6 +158,7 @@ public class UserController extends AbstractLarchController {
     @RequestMapping(value = "/user/{name}", method = RequestMethod.GET, produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
+    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_USER') and #name == authentication.principal.name)")
     public ModelAndView retrieveUserHtml(@PathVariable("name") final String name) throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("user", backendCredentialsService.retrieveUser(name));
@@ -169,6 +175,7 @@ public class UserController extends AbstractLarchController {
     @RequestMapping(value = "/credentials", method = RequestMethod.GET, produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     public ModelAndView retrieveCredentials() throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("users", this.backendCredentialsService.retrieveUsers());
@@ -186,6 +193,7 @@ public class UserController extends AbstractLarchController {
     @RequestMapping(value = "/group", method = RequestMethod.GET, produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     public List<Group> retrieveGroups() throws IOException {
         return backendCredentialsService.retrieveGroups();
     }
@@ -193,6 +201,7 @@ public class UserController extends AbstractLarchController {
     @RequestMapping(value = "/user/{name}", method = RequestMethod.POST, consumes = "multipart/form-data")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     public ModelAndView updateUserDetails(@PathVariable("name") final String username,
             @RequestParam("firstName") final String firstName,
             @RequestParam("lastName") final String lastName,

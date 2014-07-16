@@ -21,6 +21,7 @@ import net.objecthunter.larch.service.EntityService;
 import net.objecthunter.larch.service.PublishService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,6 +50,7 @@ public class ListController extends AbstractLarchController {
      */
     @RequestMapping(method = RequestMethod.GET, produces = { "text/html" })
     @ResponseBody
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public ModelAndView listHtml() {
         final ModelMap model = new ModelMap();
         model.addAttribute("result", this.list());
@@ -63,6 +65,7 @@ public class ListController extends AbstractLarchController {
      */
     @RequestMapping(method = RequestMethod.GET, produces = { "application/json", "application/xml", "text/xml" })
     @ResponseBody
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public SearchResult list() {
         return entityService.scanIndex(0);
     }

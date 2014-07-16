@@ -147,9 +147,14 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
             try {
                 final User u = mapper.readValue(get.getSourceAsBytes(), User.class);
                 if (u.getPwhash().equals(hash)) {
-                    final String[] roles = new String[u.getGroups().size()];
-                    for (int i = 0; i < roles.length; i++) {
-                        roles[i] = u.getGroups().get(i).getName();
+                    String[] roles = null;
+                    if (u.getGroups() != null && u.getGroups().size() > 0) {
+                        roles = new String[u.getGroups().size()];
+                        for (int i = 0; i < roles.length; i++) {
+                            roles[i] = u.getGroups().get(i).getName();
+                        }
+                    } else {
+                        roles = new String[] { "ROLE_IDENTIFIED" };
                     }
                     return new UsernamePasswordAuthenticationToken(u, auth.getCredentials(),
                             AuthorityUtils.createAuthorityList(roles));
@@ -333,9 +338,9 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
                 this.client
                         .prepareCount(INDEX_USERS)
                         .setQuery(
-                            QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
-                                                        FilterBuilders.termFilter("groups.name",
-                                                                                  "ROLE_ADMIN"))).execute()
+                                QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
+                                        FilterBuilders.termFilter("groups.name",
+                                                "ROLE_ADMIN"))).execute()
                         .actionGet();
         return resp.getCount() < 2; // at least one other admin must exist
     }
@@ -427,7 +432,7 @@ public class ElasticSearchCredentialsService extends AbstractElasticSearchServic
                 this.client
                         .prepareSearch(INDEX_GROUPS)
                         .setQuery(QueryBuilders.idsQuery()
-                                      .ids(groupNames.toArray(new String[groupNames.size()])))
+                                .ids(groupNames.toArray(new String[groupNames.size()])))
                         .execute()
                         .actionGet();
         final List<Group> groups = new ArrayList<>(resp.getHits().getHits().length);

@@ -4,9 +4,9 @@
 
 <head th:fragment="header">
     <meta charset="utf-8"/>
-    <meta name="_csrf" th:content="${_csrf.token}"/>
-    <title sec:authorize="!hasRole('ROLE_ANONYMOUS')">Larch repository</title>
-    <title sec:authorize="hasRole('ROLE_ANONYMOUS')">Larch published repository</title>
+    <!-- meta name="_csrf" th:content="${_csrf.token}"/ -->
+    <title sec:authorize="!hasAnyRole('ROLE_ANONYMOUS', 'ROLE_IDENTIFIED')">Larch repository</title>
+    <title sec:authorize="hasAnyRole('ROLE_ANONYMOUS', 'ROLE_IDENTIFIED')">Larch published repository</title>
     <script src='/js/jquery-1.11.0.min.js'></script>
     <script src='/js/jquery.watermark.min.js'></script>
     <script src='/js/larch.js'></script>
@@ -21,20 +21,25 @@
 <div th:fragment="banner">
     <span class="three_bars"></span>
 
-    <h1 sec:authorize="!hasRole('ROLE_ANONYMOUS')">Larch repository</h1>
+    <h1 sec:authorize="!hasAnyRole('ROLE_ANONYMOUS', 'ROLE_IDENTIFIED')">Larch repository</h1>
 
-    <h1 sec:authorize="hasRole('ROLE_ANONYMOUS')">Larch published repository</h1>
+    <h1 sec:authorize="hasAnyRole('ROLE_ANONYMOUS', 'ROLE_IDENTIFIED')">Larch published repository</h1>
     <script>
     $(document).ready(function() {
         $('#search').watermark('Search', {className: 'inactive'});
     });
 
     </script>
-    <form sec:authorize="!hasRole('ROLE_ANONYMOUS')" method="post"
+    <!-- form sec:authorize="!hasAnyRole('ROLE_ANONYMOUS', 'ROLE_IDENTIFIED')" method="post"
           th:action="'/search?_csrf=' + ${_csrf.token}" enctype="multipart/form-data"><input
             type="text" id="search" name="term"/></form>
-    <form sec:authorize="hasRole('ROLE_ANONYMOUS')" method="post"
-          th:action="'/search/published?_csrf=' + ${_csrf.token}" enctype="multipart/form-data">
+    <form sec:authorize="hasAnyRole('ROLE_ANONYMOUS', 'ROLE_IDENTIFIED')" method="post"
+          th:action="'/search/published?_csrf=' + ${_csrf.token}" enctype="multipart/form-data" -->
+    <form sec:authorize="!hasAnyRole('ROLE_ANONYMOUS', 'ROLE_IDENTIFIED')" method="post"
+          th:action="'/search'" enctype="multipart/form-data"><input
+            type="text" id="search" name="term"/></form>
+    <form sec:authorize="hasAnyRole('ROLE_ANONYMOUS', 'ROLE_IDENTIFIED')" method="post"
+          th:action="'/search/published'" enctype="multipart/form-data">
         <input
                 type="text" id="search" name="term"/></form>
 </div>
@@ -45,21 +50,32 @@
 
         <p><strong th:text="${user} ? ${user.firstName} + ' ' + ${user.lastName}"></strong></p>
 
-        <p sec:authorize="hasRole('ROLE_ANONYMOUS')"><a th:href="@{/login}"><strong
+        <p sec:authorize="hasRole('ROLE_ANONYMOUS')"><a th:href="@{/login-redirect}"><strong
                 th:text="LOGIN"></strong></a></p>
+        <form sec:authorize="!hasRole('ROLE_ANONYMOUS')" th:action="'/logout'" method="post" name="logoutForm">
+            <p>
+                <a href="#" onclick="logoutForm.submit()"><strong>LOGOUT</strong></a>
+            </p>
+        </form>
 
     </div>
     <ul class="left_menu">
         <li><p class="icon" id="icon_dashboard"></p><a th:href="@{/}" th:text="'DASHBOARD'"></a>
         </li>
-        <li sec:authorize="!hasRole('ROLE_ANONYMOUS')"><p class="icon" id="icon_browse"></p><a th:href="@{/browse}" th:text="'BROWSE'"></a></li>
-        <li sec:authorize="hasRole('ROLE_ANONYMOUS')"><p class="icon" id="icon_browse"></p><a th:href="@{/browse/published}" th:text="'BROWSE'"></a></li>
-        <li sec:authorize="!hasRole('ROLE_ANONYMOUS')"><p class="icon" id="icon_list"></p><a th:href="@{/list}" th:text="'LIST'"></a></li>
-        <li sec:authorize="hasRole('ROLE_ANONYMOUS')"><p class="icon" id="icon_list"></p><a th:href="@{/list/published}" th:text="'LIST'"></a></li>
-        <li><p class="icon" id="icon_search"></p><a th:href="@{/search}" th:text="'SEARCH'"></a></li>
-        <li sec:authorize="hasRole('ROLE_ADMIN')"><p class="icon" id="icon_users"></p><a th:href="@{/credentials}" th:text="'USERS'"></a></li>
-        <li sec:authorize="hasRole('ROLE_ADMIN')"><p class="icon" id="icon_settings"></p><a th:href="@{/settings}" th:text="'SETTINGS'"></a></li>
-        <li><p class="icon" id="icon_search"></p><a th:href="@{/metadatatype}" th:text="'METADATA TYPES'"></a></li>
+        <li sec:authorize="!hasAnyRole('ROLE_ANONYMOUS', 'ROLE_IDENTIFIED')"><p class="icon" id="icon_browse"></p><a
+                th:href="@{/browse}" th:text="'BROWSE'"></a></li>
+        <li sec:authorize="hasAnyRole('ROLE_ANONYMOUS', 'ROLE_IDENTIFIED')"><p class="icon" id="icon_browse"></p><a
+                th:href="@{/browse/published}" th:text="'BROWSE'"></a></li>
+        <li sec:authorize="!hasAnyRole('ROLE_ANONYMOUS', 'ROLE_IDENTIFIED')"><p class="icon" id="icon_list"></p><a
+                th:href="@{/list}" th:text="'LIST'"></a></li>
+        <li sec:authorize="hasAnyRole('ROLE_ANONYMOUS', 'ROLE_IDENTIFIED')"><p class="icon" id="icon_list"></p><a
+                th:href="@{/list/published}" th:text="'LIST'"></a></li>
+        <li><p class="icon" id="icon_search"></p><a th:href="@{/search}" th:text="'SEARCH'"></a>
+        </li>
+        <li sec:authorize="hasRole('ROLE_ADMIN')"><p class="icon" id="icon_users"></p><a
+                th:href="@{/credentials}" th:text="'USERS'"></a></li>
+        <li><p class="icon" id="icon_search"></p><a th:href="@{/metadatatype}"
+                                                    th:text="'METADATA TYPES'"></a></li>
     </ul>
 </div>
 

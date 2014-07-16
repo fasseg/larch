@@ -87,8 +87,10 @@
                 </script>
                 <p class="panel_title">Create new metadata</p>
 
+                <!--form enctype="multipart/form-data" method="post"
+                      th:action="${binary.name} + '/metadata?_csrf=' + ${_csrf.token}" -->
                 <form enctype="multipart/form-data" method="post"
-                      th:action="${binary.name} + '/metadata?_csrf=' + ${_csrf.token}">
+                      th:action="${binary.name} + '/metadata'">
                     <input id="mdName" type="text" name="name"
                            title="Set the name of the metadata"/>
                     <input id="mdFile" type="file" name="metadata"
