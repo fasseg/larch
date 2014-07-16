@@ -97,10 +97,6 @@ public class LarchOauthRegexRequestMatcher implements RequestMatcher {
             url = sb.toString();
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Checking match of request : '" + url + "'; against '" + pattern + "'");
-        }
-
         if (pattern.matcher(url).matches()) {
             if (request.getHeader("Authorization") != null && request.getHeader("Authorization").startsWith("Bearer")) {
                 return true;
