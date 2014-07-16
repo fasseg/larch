@@ -36,7 +36,7 @@ public class LoginController extends AbstractLarchController {
      */
     @RequestMapping(value = "/login-redirect", method = RequestMethod.GET, produces = { "text/html" })
     @PreAuthorize("!hasRole('ROLE_ANONYMOUS')")
-    public ModelAndView login() {
+    public ModelAndView loginRedirect() {
         final ModelMap model = new ModelMap();
         return new ModelAndView("login-redirect", model);
     }
@@ -47,9 +47,20 @@ public class LoginController extends AbstractLarchController {
      * @return a Spring MVC {@link org.springframework.web.servlet.ModelAndView} for rendering the HTML view
      */
     @RequestMapping(value = "/login-page", method = RequestMethod.GET, produces = { "text/html" })
-    public ModelAndView openIdlogin() {
+    public ModelAndView login() {
         final ModelMap model = new ModelMap();
         return new ModelAndView("login-page", model);
     }
+
+    // /**
+    // * Controller method for logging out
+    // *
+    // * @return a Spring MVC {@link org.springframework.web.servlet.ModelAndView} for rendering the HTML view
+    // */
+    // @RequestMapping(value = "/logout", method = RequestMethod.GET, produces = { "text/html" })
+    // public ModelAndView logout() {
+    // final ModelMap model = new ModelMap();
+    // return new ModelAndView("login-page", model);
+    // }
 
 }
