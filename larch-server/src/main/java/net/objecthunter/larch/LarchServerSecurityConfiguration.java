@@ -53,7 +53,7 @@ public class LarchServerSecurityConfiguration extends WebSecurityConfigurerAdapt
 
     @Autowired
     @Qualifier("larchOpenIdAuthenticationProvider")
-    private AuthenticationProvider authenticationProvider;
+    private AuthenticationProvider openIdAuthenticationProvider;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -67,8 +67,9 @@ public class LarchServerSecurityConfiguration extends WebSecurityConfigurerAdapt
                         "USER",
                         "ADMIN", "IDENTIFIED")
                 .and().formLogin()
+                .and().httpBasic()
                 .and()
-                .authenticationProvider(authenticationProvider)
+                .authenticationProvider(openIdAuthenticationProvider)
                 .openidLogin()
                 // .loginPage("/login")
                 // .permitAll()
