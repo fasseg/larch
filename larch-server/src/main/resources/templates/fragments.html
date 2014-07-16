@@ -50,7 +50,7 @@
 
         <p><strong th:text="${user} ? ${user.firstName} + ' ' + ${user.lastName}"></strong></p>
 
-        <p sec:authorize="hasRole('ROLE_ANONYMOUS')"><a th:href="@{/login-page}"><strong
+        <p sec:authorize="hasRole('ROLE_ANONYMOUS')"><a th:href="@{/login-redirect}"><strong
                 th:text="LOGIN"></strong></a></p>
 
     </div>
