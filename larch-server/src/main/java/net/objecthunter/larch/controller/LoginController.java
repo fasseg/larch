@@ -52,15 +52,4 @@ public class LoginController extends AbstractLarchController {
         return new ModelAndView("login-page", model);
     }
 
-    // /**
-    // * Controller method for logging out
-    // *
-    // * @return a Spring MVC {@link org.springframework.web.servlet.ModelAndView} for rendering the HTML view
-    // */
-    // @RequestMapping(value = "/logout", method = RequestMethod.GET, produces = { "text/html" })
-    // public ModelAndView logout() {
-    // final ModelMap model = new ModelMap();
-    // return new ModelAndView("login-page", model);
-    // }
-
 }

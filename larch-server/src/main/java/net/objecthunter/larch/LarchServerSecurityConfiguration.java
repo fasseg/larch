@@ -58,7 +58,8 @@ public class LarchServerSecurityConfiguration extends WebSecurityConfigurerAdapt
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         configureProxy();
-        http.requestMatchers()
+        http.logout().logoutSuccessUrl("/").and()
+                .requestMatchers()
                 .antMatchers("/**")
                 .and()
                 .anonymous()
