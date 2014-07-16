@@ -4,8 +4,12 @@
         <title>Login Page</title>
     </head>
     <body onload='document.f.username.focus();'>
-        <div th:if="${param.error}"><font color="red">Could not authenticate with given login/password</font></div>
-        <div th:if="${param.logout}"><font color="red">Successfiully Logged out</font></div>
+    
+        <div th:if="${param.error}" th:with="errorMsg=${session['SPRING_SECURITY_LAST_EXCEPTION'].message}">
+            <font color="red">Your login attempt was not successful, try again.<br />
+            Reason: <span th:text="${errorMsg}">Wrong input!</span> </font>
+        </div>
+        <div th:if="${param.logout}"><font color="red">Successfully Logged out</font></div>
         <h3>Login with Username and Password</h3>
         <form name='f' th:action="'/form-login'" method='POST'>
             <table>
