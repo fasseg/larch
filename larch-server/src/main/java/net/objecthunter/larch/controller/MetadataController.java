@@ -37,6 +37,7 @@ import net.objecthunter.larch.service.SchemaService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -82,6 +83,7 @@ public class MetadataController extends AbstractLarchController {
      */
     @RequestMapping(value = "/entity/{id}/metadata", method = RequestMethod.POST, consumes = "multipart/form-data")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public String addMetadata(@PathVariable("id") final String entityId, @RequestParam("name") final String mdName,
             @RequestParam("type") final String type, @RequestParam("metadata") final MultipartFile file)
             throws IOException {
@@ -116,6 +118,7 @@ public class MetadataController extends AbstractLarchController {
      */
     @RequestMapping(value = "/entity/{id}/metadata", method = RequestMethod.POST, consumes = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public void addMetadata(@PathVariable("id") final String entityId, final InputStream src) throws IOException {
         final Entity e = entityService.retrieve(entityId);
         final Metadata md = this.mapper.readValue(src, Metadata.class);
@@ -142,6 +145,7 @@ public class MetadataController extends AbstractLarchController {
     @RequestMapping(value = "/entity/{id}/binary/{binary-name}/metadata", method = RequestMethod.POST,
             consumes = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public void addBinaryMetadata(@PathVariable("id") final String entityId,
             @PathVariable("binary-name") final String binaryName, final InputStream src) throws IOException {
 
@@ -179,6 +183,7 @@ public class MetadataController extends AbstractLarchController {
     @RequestMapping(value = "/entity/{id}/binary/{binary-name}/metadata", method = RequestMethod.POST,
             consumes = "multipart/form-data")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public String addBinaryMetadataHtml(@PathVariable("id") final String entityId,
             @PathVariable("binary-name") final String binaryName, @RequestParam("name") final String mdName,
             @RequestParam("type") final String type, @RequestParam("metadata") final MultipartFile file)
@@ -320,6 +325,7 @@ public class MetadataController extends AbstractLarchController {
     @RequestMapping(method = RequestMethod.GET, value = "/metadatatype", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public List<MetadataType> retrieveTypes() throws IOException {
         return this.schemaService.getSchemaTypes();
     }
@@ -334,6 +340,7 @@ public class MetadataController extends AbstractLarchController {
     @RequestMapping(method = RequestMethod.GET, value = "/metadatatype", produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public ModelAndView retrieveTypesHtml() throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("types", this.schemaService.getSchemaTypes());
@@ -349,6 +356,7 @@ public class MetadataController extends AbstractLarchController {
      */
     @RequestMapping(method = RequestMethod.POST, value = "/metadatatype", consumes = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     public void addSchemaType(final InputStream src) throws IOException {
         final MetadataType newType = mapper.readValue(src, MetadataType.class);
         this.schemaService.createSchemaType(newType);
@@ -364,6 +372,7 @@ public class MetadataController extends AbstractLarchController {
     @RequestMapping(method = RequestMethod.POST, value = "/metadatatype", consumes = "multipart/form-data",
             produces = "text/html")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     public String addSchemaType(@RequestParam("name") final String name,
             @RequestParam("schemaUrl") final String schemUrl) throws IOException {
         final MetadataType newType = new MetadataType();
@@ -447,6 +456,7 @@ public class MetadataController extends AbstractLarchController {
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/entity/{id}/metadata/{metadata-name}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public void deleteMetadata(@PathVariable("id") final String entityId,
             @PathVariable("metadata-name") final String mdName) throws IOException {
         this.entityService.deleteMetadata(entityId, mdName);

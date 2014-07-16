@@ -72,6 +72,7 @@ public class EntityController extends AbstractLarchController {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public void patch(@PathVariable("id") final String id, final InputStream src) throws IOException {
         final JsonNode node = mapper.readTree(src);
         this.entityService.patch(id, node);
@@ -90,7 +91,6 @@ public class EntityController extends AbstractLarchController {
     @RequestMapping("/{id}")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasRole('ROLE_USER')")
     public Entity retrieve(@PathVariable("id") final String id) throws IOException {
         return entityService.retrieve(id);
     }
@@ -106,7 +106,6 @@ public class EntityController extends AbstractLarchController {
     @RequestMapping(value = "/{id}", produces = "text/html")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasRole('ROLE_USER')")
     public ModelAndView retrieveHtml(@PathVariable("id") final String id) throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("entity", entityService.retrieve(id));
@@ -162,6 +161,7 @@ public class EntityController extends AbstractLarchController {
     @RequestMapping("/{id}/versions")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public Entities retrieveVersions(@PathVariable("id") final String id) throws IOException {
         Entities entities = entityService.getOldVersions(id);
         entities.getEntities().add(0, entityService.retrieve(id));
@@ -179,6 +179,7 @@ public class EntityController extends AbstractLarchController {
     @RequestMapping(value = "/{id}/versions", produces = "text/html")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public ModelAndView retrieveVersionsHtml(@PathVariable("id") final String id) throws IOException {
         final ModelMap model = new ModelMap();
         Entities entities = entityService.getOldVersions(id);
@@ -198,7 +199,7 @@ public class EntityController extends AbstractLarchController {
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces = "text/plain")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public String create(final InputStream src) throws IOException {
         final String id = this.entityService.create(mapper.readValue(src, Entity.class));
         this.entityService.createAuditRecord(AuditRecords.createEntityRecord(id));
@@ -216,6 +217,7 @@ public class EntityController extends AbstractLarchController {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = "application/json")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public void update(@PathVariable("id") final String id, final InputStream src) throws IOException {
         final Entity e = mapper.readValue(src, Entity.class);
         if (e.getId() == null) {
@@ -232,6 +234,7 @@ public class EntityController extends AbstractLarchController {
     @RequestMapping(value = "/{id}/publish", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public String publish(@PathVariable("id") final String id) throws IOException {
         String publishId = this.entityService.publish(id);
         this.entityService.createAuditRecord(AuditRecords.publishEntityRecord(id));
@@ -241,6 +244,7 @@ public class EntityController extends AbstractLarchController {
 
     @RequestMapping(value = "/{id}/publish", method = RequestMethod.POST, produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public ModelAndView publishHtml(@PathVariable("id") final String id) throws IOException {
         this.publish(id);
         return this.retrieveHtml(id);

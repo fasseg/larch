@@ -24,6 +24,7 @@ import net.objecthunter.larch.service.MessagingService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,6 +55,7 @@ public class RelationController extends AbstractLarchController {
      */
     @RequestMapping(value = "/entity/{id}/relation", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public void create(@PathVariable("id") final String id, @RequestParam("predicate") final String predicate,
             @RequestParam("object") final String object) throws IOException {
         this.entityService.createRelation(id, predicate, object);
@@ -73,6 +75,7 @@ public class RelationController extends AbstractLarchController {
      */
     @RequestMapping(value = "/entity/{id}/relation", method = RequestMethod.POST, produces = "text/html")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public String createHtml(@PathVariable("id") final String id, @RequestParam("predicate") final String predicate,
             @RequestParam("object") final String object) throws IOException {
         this.entityService.createRelation(id, predicate, object);

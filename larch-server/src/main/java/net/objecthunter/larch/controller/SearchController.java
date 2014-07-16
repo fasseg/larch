@@ -31,6 +31,7 @@ import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchEntityS
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,6 +60,7 @@ public class SearchController extends AbstractLarchController {
      *         {@link net.objecthunter.larch .model.Entity}s as s JSON representation
      */
     @RequestMapping(method = RequestMethod.POST, produces = { "application/json" })
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public SearchResult searchMatchFields(final HttpServletRequest request) {
         return entityService.searchEntities(fillSearchFields(request));
     }
@@ -82,6 +84,7 @@ public class SearchController extends AbstractLarchController {
      * @return a Spring MVC {@link org.springframework.web.servlet.ModelAndView} used to render the HTML view
      */
     @RequestMapping(method = RequestMethod.GET, produces = "text/html")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public ModelAndView searchHtml() {
         final ModelMap model = new ModelMap();
         return new ModelAndView("search", model);
@@ -95,6 +98,7 @@ public class SearchController extends AbstractLarchController {
      * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} used to render the HTML view
      */
     @RequestMapping(method = RequestMethod.POST, produces = { "text/html" })
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public ModelAndView searchMatchFieldsHtml(final HttpServletRequest request) {
         final ModelMap model = new ModelMap();
         model.addAttribute("result", searchMatchFields(request));
