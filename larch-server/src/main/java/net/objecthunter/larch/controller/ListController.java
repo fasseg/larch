@@ -66,7 +66,7 @@ public class ListController extends AbstractLarchController {
     @RequestMapping(method = RequestMethod.GET, produces = { "application/json", "application/xml", "text/xml" })
     @ResponseBody
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
-s    public SearchResult list() {
+    public SearchResult list() {
         return entityService.scanIndex(0);
     }
 
