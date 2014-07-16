@@ -16,12 +16,12 @@
 
 package net.objecthunter.larch;
 
+import net.objecthunter.larch.security.helpers.LarchOauthRegexRequestMatcher;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
@@ -32,6 +32,7 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
+import org.springframework.security.openid.OpenIDAuthenticationFilter;
 
 @Configuration
 public class OAuth2ServerConfiguration {
@@ -50,15 +51,17 @@ public class OAuth2ServerConfiguration {
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
-            http.requestMatchers()
+            http
+                    .requestMatchers()
                     .regexMatchers("/((?!login|oauth).)*")
+                    .requestMatchers(new LarchOauthRegexRequestMatcher("/((?!login|oauth).)*", null))
                     .and()
                     .anonymous()
                     .authorities("ROLE_ANONYMOUS")
                     .and()
                     .authorizeRequests()
-                    .antMatchers("/none").hasRole("");
-
+                    .antMatchers("/none").hasRole("")
+                    .and().addFilter(new OpenIDAuthenticationFilter());
         }
 
     }
@@ -70,10 +73,6 @@ public class OAuth2ServerConfiguration {
 
         @Autowired
         private TokenStore tokenStore;
-
-        @Autowired
-        @Qualifier("larchElasticSearchAuthenticationManager")
-        private AuthenticationManager authenticationManager;
 
         @Override
         public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
@@ -98,8 +97,7 @@ public class OAuth2ServerConfiguration {
         public void configure(AuthorizationServerEndpointsConfigurer endpoints)
                 throws Exception {
             // @formatter:off
-            endpoints
-                    .tokenStore(tokenStore).authenticationManager(authenticationManager);
+            endpoints.tokenStore(tokenStore);
             // @formatter:on
         }
 

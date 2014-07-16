@@ -20,6 +20,7 @@ import java.io.File;
 
 import javax.jms.Queue;
 
+import net.objecthunter.larch.security.helpers.LarchOpenIdAuthenticationProvider;
 import net.objecthunter.larch.service.EntityService;
 import net.objecthunter.larch.service.ExportService;
 import net.objecthunter.larch.service.MailService;
@@ -204,7 +205,7 @@ public class LarchServerConfiguration {
     }
 
     /**
-     * Get a {@link net.objecthunter.larch.LarchOpenIdAuthenticationProvider} Spring bean
+     * Get a {@link net.objecthunter.larch.security.helpers.LarchOpenIdAuthenticationProvider} Spring bean
      * 
      * @return a AuthenticationProvider implementation
      */

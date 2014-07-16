@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.objecthunter.larch;
+package net.objecthunter.larch.security.helpers;
 
 import java.io.IOException;
 import java.security.MessageDigest;
