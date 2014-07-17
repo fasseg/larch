@@ -114,6 +114,9 @@ public class ElasticSearchEntityService extends AbstractElasticSearchService imp
     public Entity retrieve(String id) throws IOException {
         log.debug("fetching entity " + id);
         final GetResponse resp = client.prepareGet(INDEX_ENTITIES, INDEX_ENTITY_TYPE, id).execute().actionGet();
+        if (resp.isSourceEmpty()) {
+            throw new IOException("entity with id " + id + " not found");
+        }
         final Entity parent = mapper.readValue(resp.getSourceAsBytes(), Entity.class);
         parent.setChildren(fetchChildren(id));
         return parent;
@@ -130,9 +133,9 @@ public class ElasticSearchEntityService extends AbstractElasticSearchService imp
                             .prepareSearch(INDEX_ENTITIES)
                             .setTypes(INDEX_ENTITY_TYPE)
                             .setQuery(
-                                QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
-                                                            FilterBuilders
-                                                                .termFilter("parentId", id))).setFrom(offset).setSize(max)
+                                    QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
+                                            FilterBuilders
+                                                    .termFilter("parentId", id))).setFrom(offset).setSize(max)
                             .execute()
                             .actionGet();
             if (search.getHits().getHits().length > 0) {
