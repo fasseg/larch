@@ -69,9 +69,9 @@ public class ElasticSearchAuditService extends AbstractElasticSearchService impl
                 this.client
                         .prepareSearch(INDEX_AUDIT)
                         .setQuery(
-                            QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
-                                                        FilterBuilders
-                                                            .termFilter("entityId", entityId)))
+                                QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
+                                        FilterBuilders
+                                                .termFilter("entityId", entityId)))
                         .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(offset).setSize(numRecords)
                         .addSort("timestamp", SortOrder.ASC).execute().actionGet();
 

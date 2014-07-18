@@ -16,9 +16,9 @@
 
 package net.objecthunter.larch.service.backend.elasticsearch;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +32,7 @@ import net.objecthunter.larch.model.state.IndexState;
 import net.objecthunter.larch.service.backend.BackendEntityService;
 
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.admin.indices.refresh.RefreshResponse;
@@ -80,19 +81,21 @@ public class ElasticSearchEntityService extends AbstractElasticSearchService imp
     @Override
     public String create(Entity e) throws IOException {
         log.debug("creating new entity");
-        final ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
         if (e.getId() != null) {
             final GetResponse resp =
                     client.prepareGet(INDEX_ENTITIES, INDEX_ENTITY_TYPE, e.getId()).execute().actionGet();
             if (resp.isExists()) {
-                throw new IOException("Entity with id " + e.getId() + " already exists");
+                throw new SocketException("Entity with id " + e.getId() + " already exists");
             }
         }
-        final IndexResponse resp =
-                client
-                        .prepareIndex(INDEX_ENTITIES, INDEX_ENTITY_TYPE, e.getId()).setSource(
-                                mapper.writeValueAsBytes(e))
-                        .execute().actionGet();
+        try {
+            client
+                    .prepareIndex(INDEX_ENTITIES, INDEX_ENTITY_TYPE, e.getId()).setSource(
+                            mapper.writeValueAsBytes(e))
+                    .execute().actionGet();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
         refreshIndex(INDEX_ENTITIES);
         return e.getId();
     }
@@ -115,7 +118,7 @@ public class ElasticSearchEntityService extends AbstractElasticSearchService imp
         log.debug("fetching entity " + id);
         final GetResponse resp = client.prepareGet(INDEX_ENTITIES, INDEX_ENTITY_TYPE, id).execute().actionGet();
         if (resp.isSourceEmpty()) {
-            throw new IOException("entity with id " + id + " not found");
+            throw new FileNotFoundException("entity with id " + id + " not found");
         }
         final Entity parent = mapper.readValue(resp.getSourceAsBytes(), Entity.class);
         parent.setChildren(fetchChildren(id));

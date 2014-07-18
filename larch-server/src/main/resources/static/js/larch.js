@@ -45,6 +45,9 @@ function deleteUser(name) {
         type: "DELETE",
         success: function(createdId){
            location.reload(false);
+        },
+        error : function(request, msg, error) {
+            throwError(request);
         }
     });
 }
@@ -98,9 +101,8 @@ function patchEntity() {
         success : function() {
             document.location.href = document.location.href;
         },
-        error : function(jqXHR, msg, error) {
-            alert("Error while patching entity:\n" + msg + "\nServer returned: " + error);
-            console.log("Error while patching entity:\n" + msg, error);
+        error : function(request, msg, error) {
+            throwError(request);
         }
     });
 }
@@ -114,7 +116,7 @@ function throwError(request) {
     }
     var location = '/error-page';
     if (responseText != null) {
-        if (responseText.status != null && responseText.status.length > 0) {
+        if (responseText.status != null) {
             location += '?status=' + responseText.status;
         }
         if (responseText.message != null && responseText.message.length > 0) {
@@ -123,7 +125,7 @@ function throwError(request) {
             } else {
                 location += '&';
             }
-            location += '?message=' + responseText.message;
+            location += 'message=' + responseText.message;
         }
         if (responseText.path != null && responseText.path.length > 0) {
             if (location.length == 11) {
@@ -131,7 +133,7 @@ function throwError(request) {
             } else {
                 location += '&';
             }
-            location += '?path=' + responseText.path;
+            location += 'path=' + responseText.path;
         }
     }
     document.location.href = location;

@@ -16,7 +16,9 @@
 
 package net.objecthunter.larch.util;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.SocketException;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,12 +45,28 @@ public class LarchExceptionHandler {
 
     public static final String DEFAULT_ERROR_VIEW = "error";
 
-    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler({ IOException.class })
+    @ResponseBody
+    public Object ioRequestExceptionHandler(HttpServletRequest req, Exception e)
+            throws Exception {
+        return handleException(req, e, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    @ExceptionHandler({ FileNotFoundException.class })
     @ResponseBody
     public Object notFoundRequestExceptionHandler(HttpServletRequest req, Exception e)
             throws Exception {
         return handleException(req, e, HttpStatus.NOT_FOUND);
+    }
+
+    @ResponseStatus(value = HttpStatus.CONFLICT)
+    @ExceptionHandler({ SocketException.class })
+    @ResponseBody
+    public Object alreadyExistsRequestExceptionHandler(HttpServletRequest req, Exception e)
+            throws Exception {
+        return handleException(req, e, HttpStatus.CONFLICT);
     }
 
     /**
