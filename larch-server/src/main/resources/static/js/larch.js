@@ -26,6 +26,9 @@ function createEntity(id, type, label, tags, parentId) {
         contentType: "application/json; charset=utf-8",
         success: function(createdId){
             document.location.href = '/entity/' + createdId;
+        },
+        error : function(request, msg, error) {
+            throwError(request);
         }
     });
 }
@@ -100,4 +103,36 @@ function patchEntity() {
             console.log("Error while patching entity:\n" + msg, error);
         }
     });
+}
+    
+function throwError(request) {
+    var responseText = null;
+    if (request != null && request.responseText != null && request.responseText.length > 0) {
+        try {
+            responseText = JSON.parse(request.responseText);
+        } catch (e) {}
+    }
+    var location = '/error-page';
+    if (responseText != null) {
+        if (responseText.status != null && responseText.status.length > 0) {
+            location += '?status=' + responseText.status;
+        }
+        if (responseText.message != null && responseText.message.length > 0) {
+            if (location.length == 11) {
+                location += '?';
+            } else {
+                location += '&';
+            }
+            location += '?message=' + responseText.message;
+        }
+        if (responseText.path != null && responseText.path.length > 0) {
+            if (location.length == 11) {
+                location += '?';
+            } else {
+                location += '&';
+            }
+            location += '?path=' + responseText.path;
+        }
+    }
+    document.location.href = location;
 }
