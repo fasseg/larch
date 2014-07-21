@@ -52,6 +52,7 @@ import net.objecthunter.larch.service.impl.DefaultPublishService;
 import net.objecthunter.larch.service.impl.DefaultRepositoryService;
 import net.objecthunter.larch.service.impl.DefaultSchemaService;
 import net.objecthunter.larch.util.FileSystemUtil;
+import net.objecthunter.larch.util.LarchExceptionHandler;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
@@ -76,8 +77,7 @@ import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 
 /**
- * General JavaConfig class for the larch repository containing all the necessary beans for a larch repository except
- * the security context configuration
+ * General JavaConfig class for the larch repository containing all the necessary beans for a larch repository
  */
 @EnableAutoConfiguration
 @ComponentScan(basePackages = "net.objecthunter.larch.controller")
@@ -333,6 +333,17 @@ public class LarchServerConfiguration {
     @Order(Ordered.LOWEST_PRECEDENCE - 9)
     public ElasticSearchCredentialsService larchElasticSearchAuthenticationManager() {
         return new ElasticSearchCredentialsService();
+    }
+
+    /**
+     * Get a {@link net.objecthunter.larch.util.LarchExceptionHandler} implementation for use by the repository
+     *
+     * @return a {@link net.objecthunter.larch.util.LarchExceptionHandler} implementation
+     */
+    @Bean
+    @Order(Ordered.LOWEST_PRECEDENCE - 10)
+    public LarchExceptionHandler larchExceptionHandler() {
+        return new LarchExceptionHandler();
     }
 
     @Bean

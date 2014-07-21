@@ -173,6 +173,7 @@ public class ElasticSearchIndexServiceTest {
                 ElasticSearchEntityService.INDEX_ENTITY_TYPE, e.getId())).andReturn(mockGetRequestBuilder);
         expect(mockGetRequestBuilder.execute()).andReturn(mockFuture);
         expect(mockFuture.actionGet()).andReturn(mockGetResponse);
+        expect(mockGetResponse.isSourceEmpty()).andReturn(false);
         expect(mockGetResponse.getSourceAsBytes()).andReturn(mapper.writeValueAsBytes(e));
 
         /* retrieve children */

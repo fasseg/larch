@@ -66,17 +66,17 @@ public class DefaultPublishService implements PublishService {
     }
 
     @Override
-    public SearchResult scanIndex(int offset) {
+    public SearchResult scanIndex(int offset) throws IOException {
         return backendPublishService.scanIndex(offset);
     }
 
     @Override
-    public SearchResult scanIndex(int offset, int numRecords) {
+    public SearchResult scanIndex(int offset, int numRecords) throws IOException {
         return backendPublishService.scanIndex(offset, numRecords);
     }
 
     @Override
-    public SearchResult searchEntities(Map<EntitiesSearchField, String[]> searchFields) {
+    public SearchResult searchEntities(Map<EntitiesSearchField, String[]> searchFields) throws IOException {
         return backendPublishService.searchEntities(searchFields);
     }
 

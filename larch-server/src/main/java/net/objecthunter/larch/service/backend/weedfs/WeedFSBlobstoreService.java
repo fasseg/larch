@@ -16,12 +16,12 @@
 
 package net.objecthunter.larch.service.backend.weedfs;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.annotation.PostConstruct;
 
+import net.objecthunter.larch.exceptions.NotFoundException;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.state.WeedFsBlobstoreState;
 import net.objecthunter.larch.service.backend.BackendBlobstoreService;
@@ -93,7 +93,7 @@ public class WeedFSBlobstoreService implements BackendBlobstoreService {
     public InputStream retrieve(String fid) throws IOException {
         final HttpResponse resp = Request.Get(lookupVolumeUrl(fid)).execute().returnResponse();
         if (resp.getStatusLine().getStatusCode() == 404) {
-            throw new FileNotFoundException(fid + " could not be found in WeedFS");
+            throw new NotFoundException(fid + " could not be found in WeedFS");
         }
         if (resp.getStatusLine().getStatusCode() != 200) {
             throw new IOException("WeedFS returned HTTP " + resp.getStatusLine().getStatusCode() + "\n"
@@ -153,9 +153,9 @@ public class WeedFSBlobstoreService implements BackendBlobstoreService {
                 Request
                         .Post(volumeUrl + fid)
                         .body(
-                            MultipartEntityBuilder.create().addBinaryBody("data",
-                                                                          mapper.writeValueAsBytes(
-                                                                              oldVersion)).build())
+                                MultipartEntityBuilder.create().addBinaryBody("data",
+                                        mapper.writeValueAsBytes(
+                                                oldVersion)).build())
                         .execute().returnResponse();
         if (resp.getStatusLine().getStatusCode() != 201) {
             throw new IOException("WeedFS returned HTTP " + resp.getStatusLine().getStatusCode() + "\n"

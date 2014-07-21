@@ -27,6 +27,7 @@ import java.io.OutputStream;
 
 import javax.annotation.PostConstruct;
 
+import net.objecthunter.larch.exceptions.NotFoundException;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.state.FilesystemBlobstoreState;
 import net.objecthunter.larch.service.backend.BackendBlobstoreService;
@@ -98,7 +99,7 @@ public class FilesystemBlobstoreService implements BackendBlobstoreService {
     public void update(String path, InputStream src) throws IOException {
         final File data = new File(directory, path);
         if (!data.exists()) {
-            throw new IOException(data.getAbsolutePath() + " can not be updated sine it does not exist");
+            throw new NotFoundException(data.getAbsolutePath() + " can not be updated sine it does not exist");
         }
         IOUtils.copy(src, new FileOutputStream(data));
     }

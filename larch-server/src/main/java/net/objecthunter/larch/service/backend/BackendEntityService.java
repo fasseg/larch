@@ -50,7 +50,7 @@ public interface BackendEntityService {
      * @param numRecords the number of {@link net.objecthunter.larch.model.Entity}s to return
      * @return a list of {@link net.objecthunter.larch.model.Entity}s available in the repository
      */
-    SearchResult scanIndex(int offset, int numRecords);
+    SearchResult scanIndex(int offset, int numRecords) throws IOException;
 
     /**
      * Search {@link net.objecthunter.larch.model.Entity}s in the repository.
@@ -58,7 +58,7 @@ public interface BackendEntityService {
      * @param searchFields Map with key: EntitiesSearchField and value searchStrings as array.
      * @return A {@link net.objecthunter.larch.model.SearchResult} containig the search hits
      */
-    SearchResult searchEntities(Map<EntitiesSearchField, String[]> searchFields);
+    SearchResult searchEntities(Map<EntitiesSearchField, String[]> searchFields) throws IOException;
 
     /**
      * Retrieve a {@link net.objecthunter.larch.model.SearchResult} containing all
@@ -68,6 +68,6 @@ public interface BackendEntityService {
      * @param offset the offset from which to return {@link net.objecthunter.larch.model.Entity}s from
      * @return a list of {@link net.objecthunter.larch.model.Entity}s available in the repository
      */
-    SearchResult scanIndex(int offset);
+    SearchResult scanIndex(int offset) throws IOException;
 
 }

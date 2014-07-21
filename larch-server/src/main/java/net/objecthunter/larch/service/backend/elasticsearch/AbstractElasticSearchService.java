@@ -1,11 +1,13 @@
 
 package net.objecthunter.larch.service.backend.elasticsearch;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
@@ -29,48 +31,57 @@ public class AbstractElasticSearchService {
     @Autowired
     protected ObjectMapper mapper;
 
-    protected void refreshIndex(String... indices) {
-        client.admin().indices().refresh(new RefreshRequest(indices)).actionGet();
-    }
-
-    protected void checkAndOrCreateIndex(String indexName) {
-        if (!indexExists(indexName)) {
-            Map mappings = getMappings(indexName);
-            if (mappings != null && !mappings.isEmpty()) {
-                CreateIndexRequestBuilder requestBuilder = client.admin().indices().prepareCreate(indexName);
-                for (String key : ((Set<String>) mappings.keySet())) {
-                    try {
-                        requestBuilder.addMapping(key, mapper.writeValueAsString(mappings.get(key)));
-                    } catch (Exception e) {
-                    }
-                }
-                requestBuilder.execute().actionGet();
-            }
-            else {
-                client.admin().indices().prepareCreate(indexName).execute().actionGet();
-            }
+    protected void refreshIndex(String... indices) throws IOException {
+        try {
+            client.admin().indices().refresh(new RefreshRequest(indices)).actionGet();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
         }
     }
 
-    protected boolean indexExists(String indexName) {
-        return client.admin().indices().exists(new IndicesExistsRequest(indexName)).actionGet().isExists();
+    protected void checkAndOrCreateIndex(String indexName) throws IOException {
+        try {
+            if (!indexExists(indexName)) {
+                Map mappings = getMappings(indexName);
+                if (mappings != null && !mappings.isEmpty()) {
+                    CreateIndexRequestBuilder requestBuilder = client.admin().indices().prepareCreate(indexName);
+                    for (String key : ((Set<String>) mappings.keySet())) {
+                        requestBuilder.addMapping(key, mapper.writeValueAsString(mappings.get(key)));
+                    }
+                    requestBuilder.execute().actionGet();
+                }
+                else {
+                    client.admin().indices().prepareCreate(indexName).execute().actionGet();
+                }
+            }
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
     }
 
-    protected void waitForIndex(String indexName) {
-        this.client.admin().cluster().prepareHealth(indexName).setWaitForYellowStatus().execute().actionGet();
+    protected boolean indexExists(String indexName) throws IOException {
+        try {
+            return client.admin().indices().exists(new IndicesExistsRequest(indexName)).actionGet().isExists();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
     }
 
-    private Map getMappings(String indexName) {
+    protected void waitForIndex(String indexName) throws IOException {
+        try {
+            this.client.admin().cluster().prepareHealth(indexName).setWaitForYellowStatus().execute().actionGet();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
+    }
+
+    private Map getMappings(String indexName) throws IOException {
         InputStream in =
                 this.getClass().getResourceAsStream(
                         env.getProperty("elasticsearch.config.path") + indexName + "_mappings.json");
         if (in != null) {
-            try {
-                String mappings = IOUtils.toString(in);
-                return mapper.readValue(mappings, Map.class);
-            } catch (Exception e) {
-                return null;
-            }
+            String mappings = IOUtils.toString(in);
+            return mapper.readValue(mappings, Map.class);
         }
         return null;
     }

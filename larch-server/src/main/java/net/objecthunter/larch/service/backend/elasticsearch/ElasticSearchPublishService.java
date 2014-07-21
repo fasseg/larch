@@ -16,7 +16,6 @@
 
 package net.objecthunter.larch.service.backend.elasticsearch;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +24,7 @@ import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
 
+import net.objecthunter.larch.exceptions.NotFoundException;
 import net.objecthunter.larch.model.Entities;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.SearchResult;
@@ -32,6 +32,7 @@ import net.objecthunter.larch.service.backend.BackendPublishService;
 import net.objecthunter.larch.service.backend.elasticsearch.ElasticSearchEntityService.EntitiesSearchField;
 
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.admin.indices.refresh.RefreshResponse;
@@ -75,19 +76,29 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
     public String publish(Entity e) throws IOException {
         String publishId = new StringBuilder(e.getId()).append(":").append(e.getVersion()).toString();
         e.setPublishId(publishId);
-        this.client
-                .prepareIndex(INDEX_PUBLISHED, TYPE_PUBLISHED, publishId).setSource(this.mapper.writeValueAsBytes(e))
-                .execute().actionGet();
+        try {
+            this.client
+                    .prepareIndex(INDEX_PUBLISHED, TYPE_PUBLISHED, publishId).setSource(
+                            this.mapper.writeValueAsBytes(e))
+                    .execute().actionGet();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
         this.refreshIndex(INDEX_PUBLISHED);
         return publishId;
     }
 
     @Override
     public Entity retrievePublishedEntity(String publishId) throws IOException {
-        final GetResponse resp =
-                this.client.prepareGet(INDEX_PUBLISHED, TYPE_PUBLISHED, publishId).execute().actionGet();
+        final GetResponse resp;
+        try {
+            resp =
+                    this.client.prepareGet(INDEX_PUBLISHED, TYPE_PUBLISHED, publishId).execute().actionGet();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
         if (!resp.isExists()) {
-            throw new FileNotFoundException("The entity with the publishId " + publishId
+            throw new NotFoundException("The entity with the publishId " + publishId
                     + " can not be found in the publish index");
         }
         return this.mapper.readValue(resp.getSourceAsBytes(), Entity.class);
@@ -95,17 +106,22 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
 
     @Override
     public Entities retrievePublishedEntities(String entityId) throws IOException {
-        final SearchResponse search =
-                this.client
-                        .prepareSearch(INDEX_PUBLISHED)
-                        .setTypes(TYPE_PUBLISHED)
-                        .setQuery(
-                            QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
-                                                        FilterBuilders.termFilter("id", entityId))).addSort("publishId",
-                                SortOrder.ASC).execute()
-                        .actionGet();
+        final SearchResponse search;
+        try {
+            search =
+                    this.client
+                            .prepareSearch(INDEX_PUBLISHED)
+                            .setTypes(TYPE_PUBLISHED)
+                            .setQuery(
+                                    QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
+                                            FilterBuilders.termFilter("id", entityId))).addSort("publishId",
+                                    SortOrder.ASC).execute()
+                            .actionGet();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
         if (search.getHits().getTotalHits() == 0) {
-            throw new FileNotFoundException("There are no published versions of the entity " + entityId);
+            throw new NotFoundException("There are no published versions of the entity " + entityId);
         }
         final List<Entity> result = new ArrayList<>();
         for (SearchHit hit : search.getHits().getHits()) {
@@ -117,14 +133,19 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
     }
 
     @Override
-    public SearchResult scanIndex(int offset, int numRecords) {
+    public SearchResult scanIndex(int offset, int numRecords) throws IOException {
         final long time = System.currentTimeMillis();
         numRecords = numRecords > maxRecords ? maxRecords : numRecords;
-        final SearchResponse resp =
-                this.client
-                        .prepareSearch(INDEX_PUBLISHED).setQuery(QueryBuilders.matchAllQuery())
-                        .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(offset).setSize(numRecords)
-                        .addFields("id", "publishId", "version", "label", "type", "tags").execute().actionGet();
+        final SearchResponse resp;
+        try {
+            resp =
+                    this.client
+                            .prepareSearch(INDEX_PUBLISHED).setQuery(QueryBuilders.matchAllQuery())
+                            .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(offset).setSize(numRecords)
+                            .addFields("id", "publishId", "version", "label", "type", "tags").execute().actionGet();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
 
         final SearchResult result = new SearchResult();
         result.setOffset(offset);
@@ -164,7 +185,7 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
     }
 
     @Override
-    public SearchResult searchEntities(Map<EntitiesSearchField, String[]> searchFields) {
+    public SearchResult searchEntities(Map<EntitiesSearchField, String[]> searchFields) throws IOException {
         BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
         for (Entry<EntitiesSearchField, String[]> searchField : searchFields.entrySet()) {
             if (searchField.getValue() != null && searchField.getValue().length > 0) {
@@ -183,13 +204,18 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
         final long time = System.currentTimeMillis();
         final ActionFuture<RefreshResponse> refresh =
                 this.client.admin().indices().refresh(new RefreshRequest(INDEX_PUBLISHED));
-        refresh.actionGet();
-
-        final SearchResponse resp =
-                this.client
-                        .prepareSearch(INDEX_PUBLISHED).addFields("id", "publishId", "version", "label", "type",
-                                "tags")
-                        .setQuery(queryBuilder).setSearchType(SearchType.DFS_QUERY_THEN_FETCH).execute().actionGet();
+        final SearchResponse resp;
+        try {
+            refresh.actionGet();
+            resp =
+                    this.client
+                            .prepareSearch(INDEX_PUBLISHED).addFields("id", "publishId", "version", "label", "type",
+                                    "tags")
+                            .setQuery(queryBuilder).setSearchType(SearchType.DFS_QUERY_THEN_FETCH).execute()
+                            .actionGet();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
         log.debug("ES returned {} results for '{}'", resp.getHits().getHits().length, new String(queryBuilder
                 .buildAsBytes().toBytes()));
         final SearchResult result = new SearchResult();
@@ -230,7 +256,7 @@ public class ElasticSearchPublishService extends AbstractElasticSearchService im
     }
 
     @Override
-    public SearchResult scanIndex(int offset) {
+    public SearchResult scanIndex(int offset) throws IOException {
         return scanIndex(offset, maxRecords);
     }
 
