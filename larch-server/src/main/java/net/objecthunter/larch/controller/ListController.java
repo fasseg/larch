@@ -16,6 +16,8 @@
 
 package net.objecthunter.larch.controller;
 
+import java.io.IOException;
+
 import net.objecthunter.larch.model.SearchResult;
 import net.objecthunter.larch.service.EntityService;
 import net.objecthunter.larch.service.PublishService;
@@ -51,7 +53,7 @@ public class ListController extends AbstractLarchController {
     @RequestMapping(method = RequestMethod.GET, produces = { "text/html" })
     @ResponseBody
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
-    public ModelAndView listHtml() {
+    public ModelAndView listHtml() throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("result", this.list());
         return new ModelAndView("list", model);
@@ -66,7 +68,7 @@ public class ListController extends AbstractLarchController {
     @RequestMapping(method = RequestMethod.GET, produces = { "application/json", "application/xml", "text/xml" })
     @ResponseBody
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
-    public SearchResult list() {
+    public SearchResult list() throws IOException {
         return entityService.scanIndex(0);
     }
 
@@ -78,7 +80,7 @@ public class ListController extends AbstractLarchController {
      */
     @RequestMapping(value = "/published", method = RequestMethod.GET, produces = { "text/html" })
     @ResponseBody
-    public ModelAndView listPublishedHtml() {
+    public ModelAndView listPublishedHtml() throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("result", this.listPublished());
         return new ModelAndView("publishedlist", model);
@@ -93,7 +95,7 @@ public class ListController extends AbstractLarchController {
     @RequestMapping(value = "/published", method = RequestMethod.GET, produces = { "application/json",
         "application/xml", "text/xml" })
     @ResponseBody
-    public SearchResult listPublished() {
+    public SearchResult listPublished() throws IOException {
         return publishService.scanIndex(0);
     }
 

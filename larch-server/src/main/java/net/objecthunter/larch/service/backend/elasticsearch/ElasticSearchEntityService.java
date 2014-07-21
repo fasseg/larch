@@ -16,9 +16,7 @@
 
 package net.objecthunter.larch.service.backend.elasticsearch;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +24,8 @@ import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
 
+import net.objecthunter.larch.exceptions.AlreadyExistsException;
+import net.objecthunter.larch.exceptions.NotFoundException;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.SearchResult;
 import net.objecthunter.larch.model.state.IndexState;
@@ -39,9 +39,7 @@ import org.elasticsearch.action.admin.indices.refresh.RefreshResponse;
 import org.elasticsearch.action.admin.indices.status.IndexStatus;
 import org.elasticsearch.action.admin.indices.status.IndicesStatusRequest;
 import org.elasticsearch.action.admin.indices.status.IndicesStatusResponse;
-import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -72,7 +70,7 @@ public class ElasticSearchEntityService extends AbstractElasticSearchService imp
     private ObjectMapper mapper;
 
     @PostConstruct
-    public void init() {
+    public void init() throws IOException {
         log.debug("initialising ElasticSearchEntityService");
         this.checkAndOrCreateIndex(INDEX_ENTITIES);
         this.waitForIndex(INDEX_ENTITIES);
@@ -85,7 +83,7 @@ public class ElasticSearchEntityService extends AbstractElasticSearchService imp
             final GetResponse resp =
                     client.prepareGet(INDEX_ENTITIES, INDEX_ENTITY_TYPE, e.getId()).execute().actionGet();
             if (resp.isExists()) {
-                throw new SocketException("Entity with id " + e.getId() + " already exists");
+                throw new AlreadyExistsException("Entity with id " + e.getId() + " already exists");
             }
         }
         try {
@@ -104,11 +102,14 @@ public class ElasticSearchEntityService extends AbstractElasticSearchService imp
     public void update(Entity e) throws IOException {
         log.debug("updating entity " + e.getId());
         /* and create the updated document */
-        IndexResponse resp =
-                client
-                        .prepareIndex(INDEX_ENTITIES, INDEX_ENTITY_TYPE, e.getId()).setSource(
-                                mapper.writeValueAsBytes(e))
-                        .execute().actionGet();
+        try {
+            client
+                    .prepareIndex(INDEX_ENTITIES, INDEX_ENTITY_TYPE, e.getId()).setSource(
+                            mapper.writeValueAsBytes(e))
+                    .execute().actionGet();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
         /* refresh the index before returning */
         refreshIndex(INDEX_ENTITIES);
     }
@@ -116,9 +117,14 @@ public class ElasticSearchEntityService extends AbstractElasticSearchService imp
     @Override
     public Entity retrieve(String id) throws IOException {
         log.debug("fetching entity " + id);
-        final GetResponse resp = client.prepareGet(INDEX_ENTITIES, INDEX_ENTITY_TYPE, id).execute().actionGet();
+        final GetResponse resp;
+        try {
+            resp = client.prepareGet(INDEX_ENTITIES, INDEX_ENTITY_TYPE, id).execute().actionGet();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
         if (resp.isSourceEmpty()) {
-            throw new FileNotFoundException("entity with id " + id + " not found");
+            throw new NotFoundException("entity with id " + id + " not found");
         }
         final Entity parent = mapper.readValue(resp.getSourceAsBytes(), Entity.class);
         parent.setChildren(fetchChildren(id));
@@ -130,39 +136,53 @@ public class ElasticSearchEntityService extends AbstractElasticSearchService imp
         SearchResponse search;
         int offset = 0;
         int max = 64;
-        do {
-            search =
-                    client
-                            .prepareSearch(INDEX_ENTITIES)
-                            .setTypes(INDEX_ENTITY_TYPE)
-                            .setQuery(
-                                    QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
-                                            FilterBuilders
-                                                    .termFilter("parentId", id))).setFrom(offset).setSize(max)
-                            .execute()
-                            .actionGet();
-            if (search.getHits().getHits().length > 0) {
-                for (SearchHit hit : search.getHits().getHits()) {
-                    children.add(hit.getId());
+        try {
+            do {
+                search =
+                        client
+                                .prepareSearch(INDEX_ENTITIES)
+                                .setTypes(INDEX_ENTITY_TYPE)
+                                .setQuery(
+                                        QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
+                                                FilterBuilders
+                                                        .termFilter("parentId", id))).setFrom(offset).setSize(max)
+                                .execute()
+                                .actionGet();
+                if (search.getHits().getHits().length > 0) {
+                    for (SearchHit hit : search.getHits().getHits()) {
+                        children.add(hit.getId());
+                    }
                 }
-            }
-            offset = offset + max;
-        } while (offset < search.getHits().getTotalHits());
+                offset = offset + max;
+            } while (offset < search.getHits().getTotalHits());
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
         return children;
     }
 
     @Override
     public void delete(String id) throws IOException {
         log.debug("deleting entity " + id);
-        DeleteResponse resp = client.prepareDelete(INDEX_ENTITIES, INDEX_ENTITY_TYPE, id).execute().actionGet();
-        this.client.admin().indices().refresh(new RefreshRequest(("groven"))).actionGet();
+        try {
+            client.prepareDelete(INDEX_ENTITIES, INDEX_ENTITY_TYPE, id).execute().actionGet();
+            this.client.admin().indices().refresh(new RefreshRequest(("groven"))).actionGet();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
     }
 
     @Override
     public IndexState status() throws IOException {
-        final IndicesStatusResponse resp =
-                client.admin().indices().status(new IndicesStatusRequest(INDEX_ENTITIES)).actionGet();
-        final IndexStatus esState = resp.getIndices().get(INDEX_ENTITIES);
+        final IndicesStatusResponse resp;
+        final IndexStatus esState;
+        try {
+            resp =
+                    client.admin().indices().status(new IndicesStatusRequest(INDEX_ENTITIES)).actionGet();
+            esState = resp.getIndices().get(INDEX_ENTITIES);
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
 
         final IndexState state = new IndexState();
         state.setName(INDEX_ENTITIES);
@@ -180,19 +200,28 @@ public class ElasticSearchEntityService extends AbstractElasticSearchService imp
 
     @Override
     public boolean exists(String id) throws IOException {
-        return client.prepareGet(INDEX_ENTITIES, INDEX_ENTITY_TYPE, id).execute().actionGet().isExists();
+        try {
+            return client.prepareGet(INDEX_ENTITIES, INDEX_ENTITY_TYPE, id).execute().actionGet().isExists();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
     }
 
     @Override
-    public SearchResult scanIndex(int offset, int numRecords) {
+    public SearchResult scanIndex(int offset, int numRecords) throws IOException {
         final long time = System.currentTimeMillis();
         numRecords = numRecords > maxRecords ? maxRecords : numRecords;
-        final SearchResponse resp =
-                this.client
-                        .prepareSearch(ElasticSearchEntityService.INDEX_ENTITIES).setQuery(
-                                QueryBuilders.matchAllQuery())
-                        .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(offset).setSize(numRecords)
-                        .addFields("id", "label", "type", "tags", "state").execute().actionGet();
+        final SearchResponse resp;
+        try {
+            resp =
+                    this.client
+                            .prepareSearch(ElasticSearchEntityService.INDEX_ENTITIES).setQuery(
+                                    QueryBuilders.matchAllQuery())
+                            .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(offset).setSize(numRecords)
+                            .addFields("id", "label", "type", "tags", "state").execute().actionGet();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
 
         final SearchResult result = new SearchResult();
         result.setOffset(offset);
@@ -231,7 +260,7 @@ public class ElasticSearchEntityService extends AbstractElasticSearchService imp
     }
 
     @Override
-    public SearchResult searchEntities(Map<EntitiesSearchField, String[]> searchFields) {
+    public SearchResult searchEntities(Map<EntitiesSearchField, String[]> searchFields) throws IOException {
         BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
         for (Entry<EntitiesSearchField, String[]> searchField : searchFields.entrySet()) {
             if (searchField.getValue() != null && searchField.getValue().length > 0) {
@@ -250,13 +279,20 @@ public class ElasticSearchEntityService extends AbstractElasticSearchService imp
         final long time = System.currentTimeMillis();
         final ActionFuture<RefreshResponse> refresh =
                 this.client.admin().indices().refresh(new RefreshRequest(ElasticSearchEntityService.INDEX_ENTITIES));
-        refresh.actionGet();
+        final SearchResponse resp;
+        try {
+            refresh.actionGet();
 
-        final SearchResponse resp =
-                this.client
-                        .prepareSearch(ElasticSearchEntityService.INDEX_ENTITIES).addFields("id", "label", "type",
-                                "tags")
-                        .setQuery(queryBuilder).setSearchType(SearchType.DFS_QUERY_THEN_FETCH).execute().actionGet();
+            resp =
+                    this.client
+                            .prepareSearch(ElasticSearchEntityService.INDEX_ENTITIES).addFields("id", "label",
+                                    "type",
+                                    "tags")
+                            .setQuery(queryBuilder).setSearchType(SearchType.DFS_QUERY_THEN_FETCH).execute()
+                            .actionGet();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
         log.debug("ES returned {} results for '{}'", resp.getHits().getHits().length, new String(queryBuilder
                 .buildAsBytes().toBytes()));
         final SearchResult result = new SearchResult();
@@ -294,7 +330,7 @@ public class ElasticSearchEntityService extends AbstractElasticSearchService imp
     }
 
     @Override
-    public SearchResult scanIndex(int offset) {
+    public SearchResult scanIndex(int offset) throws IOException {
         return scanIndex(offset, maxRecords);
     }
 

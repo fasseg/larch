@@ -16,7 +16,6 @@
 
 package net.objecthunter.larch.service.impl;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
@@ -33,6 +32,9 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import net.objecthunter.larch.exceptions.AlreadyExistsException;
+import net.objecthunter.larch.exceptions.InvalidParameterException;
+import net.objecthunter.larch.exceptions.NotFoundException;
 import net.objecthunter.larch.helpers.SizeCalculatingDigestInputStream;
 import net.objecthunter.larch.model.AlternativeIdentifier;
 import net.objecthunter.larch.model.AuditRecord;
@@ -115,7 +117,7 @@ public class DefaultEntityService implements EntityService {
         }
         else {
             if (this.backendEntityService.exists(e.getId())) {
-                throw new IOException("Entity with id " + e.getId()
+                throw new AlreadyExistsException("Entity with id " + e.getId()
                         + " could not be created because it already exists in the index");
             }
         }
@@ -349,7 +351,7 @@ public class DefaultEntityService implements EntityService {
             // the object is an internal entity
             final String objId = object.substring(1 + LarchConstants.NAMESPACE_LARCH.length(), object.length() - 1);
             if (!this.backendEntityService.exists(objId)) {
-                throw new FileNotFoundException("The entity " + object
+                throw new NotFoundException("The entity " + object
                         + " referenced in the object of the relation does not exist in the repository");
             }
         }
@@ -373,7 +375,7 @@ public class DefaultEntityService implements EntityService {
     public void deleteBinary(String entityId, String name) throws IOException {
         final Entity e = this.backendEntityService.retrieve(entityId);
         if (e.getBinaries().get(name) == null) {
-            throw new FileNotFoundException("Binary " + name + " does not exist on entity " + entityId);
+            throw new NotFoundException("Binary " + name + " does not exist on entity " + entityId);
         }
         e.getBinaries().remove(name);
         this.update(e);
@@ -388,7 +390,7 @@ public class DefaultEntityService implements EntityService {
     public void deleteMetadata(String entityId, String mdName) throws IOException {
         final Entity e = this.backendEntityService.retrieve(entityId);
         if (e.getMetadata().get(mdName) == null) {
-            throw new FileNotFoundException("Meta data " + mdName + " does not exist on entity " + entityId);
+            throw new NotFoundException("Meta data " + mdName + " does not exist on entity " + entityId);
         }
         e.getMetadata().remove(mdName);
         this.update(e);
@@ -398,11 +400,11 @@ public class DefaultEntityService implements EntityService {
     public void deleteBinaryMetadata(String entityId, String binaryName, String mdName) throws IOException {
         final Entity e = this.backendEntityService.retrieve(entityId);
         if (e.getBinaries() == null || !e.getBinaries().containsKey(binaryName)) {
-            throw new FileNotFoundException("The binary " + binaryName + " does not exist in the entity " + entityId);
+            throw new NotFoundException("The binary " + binaryName + " does not exist in the entity " + entityId);
         }
         final Binary bin = e.getBinaries().get(binaryName);
         if (bin.getMetadata() == null || !bin.getMetadata().containsKey(mdName)) {
-            throw new FileNotFoundException("Meta data " + mdName + " does not exist on binary " + binaryName
+            throw new NotFoundException("Meta data " + mdName + " does not exist on binary " + binaryName
                     + " of entity " + entityId);
         }
         bin.getMetadata().remove(mdName);
@@ -412,11 +414,15 @@ public class DefaultEntityService implements EntityService {
     @Override
     public void createIdentifier(String entityId, String type, String value) throws IOException {
         if (!this.backendEntityService.exists(entityId)) {
-            throw new FileNotFoundException("The entity-id " + entityId + " does not exist in the repository");
+            throw new NotFoundException("The entity-id " + entityId + " does not exist in the repository");
         }
-        if (StringUtils.isBlank(type) || StringUtils.isBlank(value)
-                || AlternativeIdentifier.IdentifierType.valueOf(type) == null) {
-            throw new IOException("wrong or empty type or value given");
+        if (StringUtils.isBlank(type) || StringUtils.isBlank(value)) {
+            throw new InvalidParameterException("empty type or value given");
+        }
+        try {
+            AlternativeIdentifier.IdentifierType.valueOf(type);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidParameterException("wrong type given");
         }
         final Entity oldVersion = this.backendEntityService.retrieve(entityId);
         this.backendVersionService.addOldVersion(oldVersion);
@@ -432,11 +438,15 @@ public class DefaultEntityService implements EntityService {
     @Override
     public void deleteIdentifier(String entityId, String type, String value) throws IOException {
         if (!this.backendEntityService.exists(entityId)) {
-            throw new FileNotFoundException("The entity-id " + entityId + " does not exist in the repository");
+            throw new NotFoundException("The entity-id " + entityId + " does not exist in the repository");
         }
-        if (StringUtils.isBlank(type) || StringUtils.isBlank(value)
-                || AlternativeIdentifier.IdentifierType.valueOf(type) == null) {
-            throw new IOException("wrong or empty type or value given");
+        if (StringUtils.isBlank(type) || StringUtils.isBlank(value)) {
+            throw new InvalidParameterException("empty type or value given");
+        }
+        try {
+            AlternativeIdentifier.IdentifierType.valueOf(type);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidParameterException("wrong type given");
         }
         final Entity oldVersion = this.backendEntityService.retrieve(entityId);
         this.backendVersionService.addOldVersion(oldVersion);
@@ -453,7 +463,7 @@ public class DefaultEntityService implements EntityService {
             }
         }
         if (!found) {
-            throw new IOException("Identifier of type " + type + " with value " + value + " not found");
+            throw new NotFoundException("Identifier of type " + type + " with value " + value + " not found");
         }
 
         this.backendEntityService.update(newVersion);
@@ -481,17 +491,17 @@ public class DefaultEntityService implements EntityService {
     }
 
     @Override
-    public SearchResult scanIndex(int offset) {
+    public SearchResult scanIndex(int offset) throws IOException {
         return backendEntityService.scanIndex(offset);
     }
 
     @Override
-    public SearchResult scanIndex(int offset, int numRecords) {
+    public SearchResult scanIndex(int offset, int numRecords) throws IOException {
         return backendEntityService.scanIndex(offset, numRecords);
     }
 
     @Override
-    public SearchResult searchEntities(Map<EntitiesSearchField, String[]> searchFields) {
+    public SearchResult searchEntities(Map<EntitiesSearchField, String[]> searchFields) throws IOException {
         return backendEntityService.searchEntities(searchFields);
     }
 

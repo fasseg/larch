@@ -1,20 +1,20 @@
 
 package net.objecthunter.larch.service.backend.elasticsearch;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import net.objecthunter.larch.exceptions.NotFoundException;
 import net.objecthunter.larch.model.Entities;
 import net.objecthunter.larch.model.Entity;
 import net.objecthunter.larch.model.Version;
 import net.objecthunter.larch.service.backend.BackendBlobstoreService;
 import net.objecthunter.larch.service.backend.BackendVersionService;
 
-import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -57,28 +57,37 @@ public class ElasticSearchVersionService extends AbstractElasticSearchService im
         version.setEntityId(e.getId());
         version.setVersionNumber(e.getVersion());
         version.setPath(path);
-        final IndexResponse resp =
-                this.client
-                        .prepareIndex(INDEX_VERSIONS, TYPE_VERSIONS)
-                        .setSource(this.mapper.writeValueAsBytes(version))
-                        .execute().actionGet();
+        try {
+            this.client
+                    .prepareIndex(INDEX_VERSIONS, TYPE_VERSIONS)
+                    .setSource(this.mapper.writeValueAsBytes(version))
+                    .execute().actionGet();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
         this.refreshIndex(INDEX_VERSIONS);
         log.info("added entity {} version {}", version.getEntityId(), version.getVersionNumber());
     }
 
     @Override
     public Entity getOldVersion(String id, int versionNumber) throws IOException {
-        final SearchResponse resp =
-                client
-                        .prepareSearch(INDEX_VERSIONS)
-                        .setQuery(
-                            QueryBuilders
-                                .boolQuery().must(QueryBuilders.matchQuery("entityId", id))
-                                .must(QueryBuilders.matchQuery("versionNumber", versionNumber))).setFrom(0)
-                        .setSize(1)
-                        .execute().actionGet();
+        final SearchResponse resp;
+        try {
+            resp =
+                    client
+                            .prepareSearch(INDEX_VERSIONS)
+                            .setQuery(
+                                    QueryBuilders
+                                            .boolQuery().must(QueryBuilders.matchQuery("entityId", id))
+                                            .must(QueryBuilders.matchQuery("versionNumber", versionNumber))).setFrom(
+                                    0)
+                            .setSize(1)
+                            .execute().actionGet();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
         if (resp.getHits().getTotalHits() == 0) {
-            throw new FileNotFoundException("Entity " + id + " does not exists with version " + versionNumber);
+            throw new NotFoundException("Entity " + id + " does not exists with version " + versionNumber);
         }
         final Version v = this.mapper.readValue(resp.getHits().getAt(0).getSourceAsString(), Version.class);
         return this.mapper.readValue(this.backendBlobstoreService.retrieveOldVersionBlob(v.getPath()), Entity.class);
@@ -86,13 +95,18 @@ public class ElasticSearchVersionService extends AbstractElasticSearchService im
 
     @Override
     public Entities getOldVersions(String id) throws IOException {
-        final SearchResponse resp =
-                client
-                        .prepareSearch(INDEX_VERSIONS)
-                        .setQuery(
-                            QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
-                                                        FilterBuilders.termFilter("entityId", id))).setSize(1000)
-                        .addSort("versionNumber", SortOrder.DESC).execute().actionGet();
+        final SearchResponse resp;
+        try {
+            resp =
+                    client
+                            .prepareSearch(INDEX_VERSIONS)
+                            .setQuery(
+                                    QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
+                                            FilterBuilders.termFilter("entityId", id))).setSize(1000)
+                            .addSort("versionNumber", SortOrder.DESC).execute().actionGet();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
         final List<Entity> entities = new ArrayList<Entity>();
         for (final SearchHit hit : resp.getHits()) {
             final Version v = this.mapper.readValue(hit.getSourceAsString(), Version.class);

@@ -16,12 +16,14 @@
 
 package net.objecthunter.larch.util;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.SocketException;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
+
+import net.objecthunter.larch.exceptions.AlreadyExistsException;
+import net.objecthunter.larch.exceptions.InvalidParameterException;
+import net.objecthunter.larch.exceptions.NotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,6 +34,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -53,8 +57,16 @@ public class LarchExceptionHandler {
         return handleException(req, e, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({ JsonParseException.class, JsonMappingException.class, InvalidParameterException.class })
+    @ResponseBody
+    public Object badRequestExceptionHandler(HttpServletRequest req, Exception e)
+            throws Exception {
+        return handleException(req, e, HttpStatus.BAD_REQUEST);
+    }
+
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    @ExceptionHandler({ FileNotFoundException.class })
+    @ExceptionHandler({ NotFoundException.class })
     @ResponseBody
     public Object notFoundRequestExceptionHandler(HttpServletRequest req, Exception e)
             throws Exception {
@@ -62,7 +74,7 @@ public class LarchExceptionHandler {
     }
 
     @ResponseStatus(value = HttpStatus.CONFLICT)
-    @ExceptionHandler({ SocketException.class })
+    @ExceptionHandler({ AlreadyExistsException.class })
     @ResponseBody
     public Object alreadyExistsRequestExceptionHandler(HttpServletRequest req, Exception e)
             throws Exception {

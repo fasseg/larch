@@ -41,5 +41,5 @@ public interface RepositoryService {
      * 
      * @return A {@link net.objecthunter.larch.model.Describe} object containing the requested data
      */
-    Describe describe();
+    Describe describe() throws IOException;
 }

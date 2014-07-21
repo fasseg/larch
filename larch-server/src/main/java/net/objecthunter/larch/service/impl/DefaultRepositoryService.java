@@ -24,6 +24,7 @@ import net.objecthunter.larch.service.RepositoryService;
 import net.objecthunter.larch.service.backend.BackendBlobstoreService;
 import net.objecthunter.larch.service.backend.BackendEntityService;
 
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
 import org.elasticsearch.action.admin.cluster.stats.ClusterStatsResponse;
 import org.elasticsearch.client.Client;
@@ -60,26 +61,30 @@ public class DefaultRepositoryService implements RepositoryService {
     }
 
     @Override
-    public Describe describe() {
+    public Describe describe() throws IOException {
         final Describe desc = new Describe();
         desc.setLarchVersion(env.getProperty("larch.version"));
         desc.setLarchHost("localhost:" + env.getProperty("server.port"));
         desc.setLarchClusterName(env.getProperty("larch.cluster.name"));
-        final ClusterStateResponse state = client.admin().cluster().prepareState()
-                .setBlocks(false)
-                .setMetaData(true)
-                .setRoutingTable(false)
-                .setNodes(true)
-                .execute()
-                .actionGet();
-        desc.setEsMasterNodeName(state.getState().getNodes().getMasterNodeId());
-        desc.setEsNumDataNodes(state.getState().getNodes().getDataNodes().size());
-        desc.setEsMasterNodeAddress(state.getState().getNodes().getMasterNode().getAddress().toString());
-        desc.setEsNodeName(state.getState().getNodes().getLocalNodeId());
-        final ClusterStatsResponse stats = client.admin().cluster().prepareClusterStats()
-                .execute()
-                .actionGet();
-        desc.setEsNumIndexedRecords(stats.getIndicesStats().getDocs().getCount());
+        try {
+            final ClusterStateResponse state = client.admin().cluster().prepareState()
+                    .setBlocks(false)
+                    .setMetaData(true)
+                    .setRoutingTable(false)
+                    .setNodes(true)
+                    .execute()
+                    .actionGet();
+            desc.setEsMasterNodeName(state.getState().getNodes().getMasterNodeId());
+            desc.setEsNumDataNodes(state.getState().getNodes().getDataNodes().size());
+            desc.setEsMasterNodeAddress(state.getState().getNodes().getMasterNode().getAddress().toString());
+            desc.setEsNodeName(state.getState().getNodes().getLocalNodeId());
+            final ClusterStatsResponse stats = client.admin().cluster().prepareClusterStats()
+                    .execute()
+                    .actionGet();
+            desc.setEsNumIndexedRecords(stats.getIndicesStats().getDocs().getCount());
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
         return desc;
     }
 }

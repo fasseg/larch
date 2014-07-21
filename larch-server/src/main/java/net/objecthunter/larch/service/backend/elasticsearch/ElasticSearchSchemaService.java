@@ -33,6 +33,9 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import net.objecthunter.larch.exceptions.AlreadyExistsException;
+import net.objecthunter.larch.exceptions.InvalidParameterException;
+import net.objecthunter.larch.exceptions.NotFoundException;
 import net.objecthunter.larch.helpers.MetadataTypes;
 import net.objecthunter.larch.model.Binary;
 import net.objecthunter.larch.model.Entity;
@@ -41,8 +44,8 @@ import net.objecthunter.larch.model.MetadataType;
 import net.objecthunter.larch.model.MetadataValidationResult;
 import net.objecthunter.larch.service.backend.BackendSchemaService;
 
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.count.CountResponse;
-import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
@@ -77,21 +80,31 @@ public class ElasticSearchSchemaService extends AbstractElasticSearchService imp
     }
 
     private void checkAndOrCreateDefaultMdTypes() throws IOException {
-        for (MetadataType type : MetadataTypes.getDefaultMetadataTypes()) {
-            final IndexResponse resp = this.client.prepareIndex(INDEX_MD_SCHEMATA, INDEX_MD_SCHEMATA_TYPE,
-                    type.getName())
-                    .setSource(mapper.writeValueAsBytes(type))
-                    .execute()
-                    .actionGet();
+        try {
+            for (MetadataType type : MetadataTypes.getDefaultMetadataTypes()) {
+                this.client.prepareIndex(INDEX_MD_SCHEMATA, INDEX_MD_SCHEMATA_TYPE,
+                        type.getName())
+                        .setSource(mapper.writeValueAsBytes(type))
+                        .execute()
+                        .actionGet();
+            }
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
         }
     }
 
+    @Override
     public String getSchemUrlForType(String type) throws IOException {
-        final GetResponse get = this.client.prepareGet(INDEX_MD_SCHEMATA, INDEX_MD_SCHEMATA_TYPE, type)
-                .execute()
-                .actionGet();
+        final GetResponse get;
+        try {
+            get = this.client.prepareGet(INDEX_MD_SCHEMATA, INDEX_MD_SCHEMATA_TYPE, type)
+                    .execute()
+                    .actionGet();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
         if (!get.isExists()) {
-            throw new IOException("Metadata type '" + type + "' does not exist");
+            throw new NotFoundException("Metadata type '" + type + "' does not exist");
         }
         final MetadataType mdType = mapper.readValue(get.getSourceAsBytes(), MetadataType.class);
         return mdType.getSchemaUrl();
@@ -99,11 +112,16 @@ public class ElasticSearchSchemaService extends AbstractElasticSearchService imp
 
     @Override
     public List<MetadataType> getSchemaTypes() throws IOException {
-        final SearchResponse search = this.client.prepareSearch(INDEX_MD_SCHEMATA)
-                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-                .setQuery(QueryBuilders.matchAllQuery())
-                .execute()
-                .actionGet();
+        final SearchResponse search;
+        try {
+            search = this.client.prepareSearch(INDEX_MD_SCHEMATA)
+                    .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+                    .setQuery(QueryBuilders.matchAllQuery())
+                    .execute()
+                    .actionGet();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
         final List<MetadataType> mdTypes = new ArrayList<>(search.getHits().getHits().length);
         for (SearchHit h : search.getHits()) {
             mdTypes.add(mapper.readValue(h.getSourceAsString(), MetadataType.class));
@@ -114,19 +132,25 @@ public class ElasticSearchSchemaService extends AbstractElasticSearchService imp
     @Override
     public String createSchemaType(MetadataType newType) throws IOException {
         /* check if the metadata type already exists */
-        final boolean exists = this.client.prepareGet(INDEX_MD_SCHEMATA, INDEX_MD_SCHEMATA_TYPE, newType.getName())
-                .execute()
-                .actionGet()
-                .isExists();
-        if (exists) {
-            throw new IOException("Metadata type " + newType.getName() + " already exists");
+        final IndexResponse resp;
+        try {
+            final boolean exists =
+                    this.client.prepareGet(INDEX_MD_SCHEMATA, INDEX_MD_SCHEMATA_TYPE, newType.getName())
+                            .execute()
+                            .actionGet()
+                            .isExists();
+            if (exists) {
+                throw new AlreadyExistsException("Metadata type " + newType.getName() + " already exists");
+            }
+            /* add the new type to the index */
+            resp =
+                    this.client.prepareIndex(INDEX_MD_SCHEMATA, INDEX_MD_SCHEMATA_TYPE, newType.getName())
+                            .setSource(mapper.writeValueAsBytes(newType))
+                            .execute()
+                            .actionGet();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
         }
-        /* add the new type to the index */
-        final IndexResponse resp =
-                this.client.prepareIndex(INDEX_MD_SCHEMATA, INDEX_MD_SCHEMATA_TYPE, newType.getName())
-                        .setSource(mapper.writeValueAsBytes(newType))
-                        .execute()
-                        .actionGet();
         this.refreshIndex(INDEX_MD_SCHEMATA);
         return resp.getId();
     }
@@ -134,32 +158,42 @@ public class ElasticSearchSchemaService extends AbstractElasticSearchService imp
     @Override
     public void deleteMetadataType(String name) throws IOException {
         /* first check if the type is still used by Entities or Binaries */
-        final CountResponse count = this.client.prepareCount(ElasticSearchEntityService.INDEX_ENTITIES)
-                .setQuery(QueryBuilders.nestedQuery("metadata", QueryBuilders.matchQuery("type", name)))
-                .execute()
-                .actionGet();
-        if (count.getCount() > 0) {
-            throw new IOException("Unable to delete metadata type ' " + name + "' since it's still in use");
+        try {
+            final CountResponse count = this.client.prepareCount(ElasticSearchEntityService.INDEX_ENTITIES)
+                    .setQuery(QueryBuilders.nestedQuery("metadata", QueryBuilders.matchQuery("type", name)))
+                    .execute()
+                    .actionGet();
+            if (count.getCount() > 0) {
+                throw new InvalidParameterException("Unable to delete metadata type ' " + name +
+                        "' since it's still in use");
+            }
+            /* the metadata type is safe to delete, since it's no longer used */
+            log.debug("deleting meta data type {} ", name);
+            this.client.prepareDelete(ElasticSearchSchemaService.INDEX_MD_SCHEMATA,
+                    INDEX_MD_SCHEMATA_TYPE, name)
+                    .execute()
+                    .actionGet();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
         }
-        /* the metadata type is safe to delete, since it's no longer used */
-        log.debug("deleting meta data type {} ", name);
-        final DeleteResponse delete = this.client.prepareDelete(ElasticSearchSchemaService.INDEX_MD_SCHEMATA,
-                INDEX_MD_SCHEMATA_TYPE, name)
-                .execute()
-                .actionGet();
     }
 
     @Override
     public MetadataValidationResult validate(String id, String metadataName) throws IOException {
         /* fetch the entity first */
-        final GetResponse resp = this.client.prepareGet(ElasticSearchEntityService
-                .INDEX_ENTITIES,
-                ElasticSearchEntityService.INDEX_ENTITY_TYPE, id
-                )
-                .execute()
-                .actionGet();
+        final GetResponse resp;
+        try {
+            resp = this.client.prepareGet(ElasticSearchEntityService
+                    .INDEX_ENTITIES,
+                    ElasticSearchEntityService.INDEX_ENTITY_TYPE, id
+                    )
+                    .execute()
+                    .actionGet();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
         if (!resp.isExists()) {
-            throw new IOException("The entity '" + id + "' does not exist");
+            throw new NotFoundException("The entity '" + id + "' does not exist");
         }
         /* fetch the named metadata which will be validatet */
         final Entity e = mapper.readValue(resp.getSourceAsBytes(), Entity.class);
@@ -174,6 +208,10 @@ public class ElasticSearchSchemaService extends AbstractElasticSearchService imp
     @Override
     public MetadataValidationResult validate(String id, String binaryName, String metadataName) throws IOException {
         /* fetch the entity first */
+        try {
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
         final GetResponse resp = this.client.prepareGet(ElasticSearchEntityService
                 .INDEX_ENTITIES,
                 ElasticSearchEntityService.INDEX_ENTITY_TYPE, id
@@ -181,7 +219,7 @@ public class ElasticSearchSchemaService extends AbstractElasticSearchService imp
                 .execute()
                 .actionGet();
         if (!resp.isExists()) {
-            throw new IOException("The entity '" + id + "' does not exist");
+            throw new NotFoundException("The entity '" + id + "' does not exist");
         }
         /* fetch the named metadata which will be validated */
         final Entity e = mapper.readValue(resp.getSourceAsBytes(), Entity.class);
@@ -190,7 +228,7 @@ public class ElasticSearchSchemaService extends AbstractElasticSearchService imp
         }
         final Binary bin = e.getBinaries().get(binaryName);
         if (bin.getMetadata() == null || !bin.getMetadata().containsKey(metadataName)) {
-            throw new IOException("The binary " + binaryName + " of the entity '" + id +
+            throw new NotFoundException("The binary " + binaryName + " of the entity '" + id +
                     "' has no meta data record " +
                     "named '" + metadataName);
         }
@@ -222,7 +260,7 @@ public class ElasticSearchSchemaService extends AbstractElasticSearchService imp
                 return result;
             }
         } catch (SAXException se) {
-            throw new IOException(se);
+            throw new InvalidParameterException(se);
         }
     }
 

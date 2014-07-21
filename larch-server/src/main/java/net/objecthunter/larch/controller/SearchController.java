@@ -16,6 +16,7 @@
 
 package net.objecthunter.larch.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,7 +62,7 @@ public class SearchController extends AbstractLarchController {
      */
     @RequestMapping(method = RequestMethod.POST, produces = { "application/json" })
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
-    public SearchResult searchMatchFields(final HttpServletRequest request) {
+    public SearchResult searchMatchFields(final HttpServletRequest request) throws IOException {
         return entityService.searchEntities(fillSearchFields(request));
     }
 
@@ -74,7 +75,7 @@ public class SearchController extends AbstractLarchController {
      *         {@link net.objecthunter.larch .model.Entity}s as s JSON representation
      */
     @RequestMapping(value = "/published", method = RequestMethod.POST, produces = { "application/json" })
-    public SearchResult searchPublishedMatchFields(final HttpServletRequest request) {
+    public SearchResult searchPublishedMatchFields(final HttpServletRequest request) throws IOException {
         return publishService.searchEntities(fillSearchFields(request));
     }
 
@@ -99,7 +100,7 @@ public class SearchController extends AbstractLarchController {
      */
     @RequestMapping(method = RequestMethod.POST, produces = { "text/html" })
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
-    public ModelAndView searchMatchFieldsHtml(final HttpServletRequest request) {
+    public ModelAndView searchMatchFieldsHtml(final HttpServletRequest request) throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("result", searchMatchFields(request));
         return new ModelAndView("searchresult", model);
@@ -113,7 +114,7 @@ public class SearchController extends AbstractLarchController {
      * @return A Spring MVC {@link org.springframework.web.servlet.ModelAndView} used to render the HTML view
      */
     @RequestMapping(value = "/published", method = RequestMethod.POST, produces = { "text/html" })
-    public ModelAndView searchPublishedMatchFieldsHtml(final HttpServletRequest request) {
+    public ModelAndView searchPublishedMatchFieldsHtml(final HttpServletRequest request) throws IOException {
         final ModelMap model = new ModelMap();
         model.addAttribute("result", searchPublishedMatchFields(request));
         return new ModelAndView("searchresultpublished", model);

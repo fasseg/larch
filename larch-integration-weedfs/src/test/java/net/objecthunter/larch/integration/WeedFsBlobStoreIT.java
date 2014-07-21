@@ -20,10 +20,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import net.objecthunter.larch.LarchServerConfiguration;
+import net.objecthunter.larch.exceptions.NotFoundException;
 import net.objecthunter.larch.model.state.WeedFsBlobstoreState;
 import net.objecthunter.larch.service.backend.weedfs.WeedFSBlobstoreService;
 
@@ -64,7 +64,7 @@ public class WeedFsBlobStoreIT extends AbstractWeedFsLarchIT {
         }
     }
 
-    @Test(expected = FileNotFoundException.class)
+    @Test(expected = NotFoundException.class)
     public void testCreateAndDelete() throws Exception {
         String data = "mysimpledatawithÄ";
         String path = blobstoreService.create(new ByteArrayInputStream(data.getBytes()));

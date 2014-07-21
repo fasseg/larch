@@ -29,7 +29,7 @@ import net.objecthunter.larch.service.backend.BackendAuditService;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.log4j.Logger;
-import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.index.query.FilterBuilders;
@@ -56,7 +56,7 @@ public class ElasticSearchAuditService extends AbstractElasticSearchService impl
     private ObjectMapper mapper;
 
     @PostConstruct
-    public void init() {
+    public void init() throws IOException {
         log.debug("initialising ElasticSearchAuditService");
         this.checkAndOrCreateIndex(INDEX_AUDIT);
         this.waitForIndex(INDEX_AUDIT);
@@ -65,15 +65,20 @@ public class ElasticSearchAuditService extends AbstractElasticSearchService impl
     @Override
     public List<AuditRecord> retrieve(String entityId, int offset, int numRecords) throws IOException {
         numRecords = numRecords > maxRecords ? maxRecords : numRecords;
-        final SearchResponse resp =
-                this.client
-                        .prepareSearch(INDEX_AUDIT)
-                        .setQuery(
-                                QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
-                                        FilterBuilders
-                                                .termFilter("entityId", entityId)))
-                        .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(offset).setSize(numRecords)
-                        .addSort("timestamp", SortOrder.ASC).execute().actionGet();
+        final SearchResponse resp;
+        try {
+            resp =
+                    this.client
+                            .prepareSearch(INDEX_AUDIT)
+                            .setQuery(
+                                    QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
+                                            FilterBuilders
+                                                    .termFilter("entityId", entityId)))
+                            .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(offset).setSize(numRecords)
+                            .addSort("timestamp", SortOrder.ASC).execute().actionGet();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
 
         final List<AuditRecord> records = new ArrayList<>(numRecords);
         for (final SearchHit hit : resp.getHits()) {
@@ -91,14 +96,21 @@ public class ElasticSearchAuditService extends AbstractElasticSearchService impl
         } while (this.exists(id));
         rec.setId(id);
         rec.setTimestamp(ZonedDateTime.now(ZoneOffset.UTC).toString());
-        final IndexResponse resp =
-                this.client
-                        .prepareIndex(INDEX_AUDIT, "audit", id).setSource(mapper.writeValueAsBytes(rec)).execute()
-                        .actionGet();
+        try {
+            this.client
+                    .prepareIndex(INDEX_AUDIT, "audit", id).setSource(mapper.writeValueAsBytes(rec)).execute()
+                    .actionGet();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
         return id;
     }
 
-    private boolean exists(String id) {
-        return this.client.prepareGet(INDEX_AUDIT, null, id).execute().actionGet().isExists();
+    private boolean exists(String id) throws IOException {
+        try {
+            return this.client.prepareGet(INDEX_AUDIT, null, id).execute().actionGet().isExists();
+        } catch (ElasticsearchException ex) {
+            throw new IOException(ex.getMostSpecificCause().getMessage());
+        }
     }
 }

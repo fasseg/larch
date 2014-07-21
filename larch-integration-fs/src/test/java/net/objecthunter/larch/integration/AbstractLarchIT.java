@@ -75,7 +75,7 @@ public abstract class AbstractLarchIT {
         JsonNode error = mapper.readTree(response.getEntity().getContent());
         assertEquals(statusCode, response.getStatusLine().getStatusCode());
         assertEquals(statusCode, error.get("status").asInt());
-        assertEquals(expectedException.getName(), error.get("exception").asText());
+        assertEquals(expectedException.getName(), error.get("error").asText());
         assertEquals(message, error.get("message").asText());
     }
 

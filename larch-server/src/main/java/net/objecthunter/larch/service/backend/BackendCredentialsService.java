@@ -159,7 +159,7 @@ public interface BackendCredentialsService {
      * 
      * @param token the token value of the {@link net.objecthunter.larch.model.security.UserRequest}
      */
-    void deleteUserRequest(String token);
+    void deleteUserRequest(String token) throws IOException;
 
     /**
      * Check if a user name is already existing in the index
@@ -167,7 +167,7 @@ public interface BackendCredentialsService {
      * @param name the name to check
      * @return true if the user does exist, otherwise false
      */
-    boolean isExistingUser(String name);
+    boolean isExistingUser(String name) throws IOException;
 
     /**
      * Retrieve a list of groups from the repo

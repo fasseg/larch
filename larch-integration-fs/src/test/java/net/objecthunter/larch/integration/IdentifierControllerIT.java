@@ -19,9 +19,8 @@ package net.objecthunter.larch.integration;
 import static net.objecthunter.larch.test.util.Fixtures.createSimpleFixtureEntity;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
-import java.io.IOException;
-
+import net.objecthunter.larch.exceptions.InvalidParameterException;
+import net.objecthunter.larch.exceptions.NotFoundException;
 import net.objecthunter.larch.model.Entity;
 
 import org.apache.http.HttpResponse;
@@ -92,7 +91,7 @@ public class IdentifierControllerIT extends AbstractLarchIT {
                         Request.Post(identifierUrl.replaceFirst("\\{id\\}", entityId)).bodyString("type=&value=123",
                                 ContentType.APPLICATION_FORM_URLENCODED)).returnResponse();
         this.showLog();
-        checkResponseError(resp, 500, IOException.class, "wrong or empty type or value given");
+        checkResponseError(resp, 400, InvalidParameterException.class, "empty type or value given");
 
         // retrieve entity
         resp = this.execute(Request.Get(entityUrl + "/" + entityId)).returnResponse();
@@ -120,7 +119,7 @@ public class IdentifierControllerIT extends AbstractLarchIT {
                         Request.Post(identifierUrl.replaceFirst("\\{id\\}", entityId)).bodyString("type=DOI&value=",
                                 ContentType.APPLICATION_FORM_URLENCODED)).returnResponse();
         this.showLog();
-        checkResponseError(resp, 500, IOException.class, "wrong or empty type or value given");
+        checkResponseError(resp, 400, InvalidParameterException.class, "empty type or value given");
 
         // retrieve entity
         resp = this.execute(Request.Get(entityUrl + "/" + entityId)).returnResponse();
@@ -149,8 +148,7 @@ public class IdentifierControllerIT extends AbstractLarchIT {
                                 "type=DDOI&value=123",
                                 ContentType.APPLICATION_FORM_URLENCODED)).returnResponse();
         this.showLog();
-        checkResponseError(resp, 500, IllegalArgumentException.class,
-                "No enum constant net.objecthunter.larch.model.AlternativeIdentifier.IdentifierType.DDOI");
+        checkResponseError(resp, 400, InvalidParameterException.class, "wrong type given");
 
         // retrieve entity
         resp = this.execute(Request.Get(entityUrl + "/" + entityId)).returnResponse();
@@ -238,8 +236,7 @@ public class IdentifierControllerIT extends AbstractLarchIT {
                 this.execute(Request.Delete(identifierUrl.replaceFirst("\\{id\\}", entityId) + "/DDOI/123"))
                         .returnResponse();
         this.showLog();
-        checkResponseError(resp, 500, IllegalArgumentException.class,
-                "No enum constant net.objecthunter.larch.model.AlternativeIdentifier.IdentifierType.DDOI");
+        checkResponseError(resp, 400, InvalidParameterException.class, "wrong type given");
 
         // retrieve entity
         resp = this.execute(Request.Get(entityUrl + "/" + entityId)).returnResponse();
@@ -269,7 +266,7 @@ public class IdentifierControllerIT extends AbstractLarchIT {
                 this.execute(
                         Request.Post(identifierUrl.replaceFirst("\\{id\\}", entityId))
                                 .bodyString("type=DOI&value=123",
-                                            ContentType.APPLICATION_FORM_URLENCODED))
+                                        ContentType.APPLICATION_FORM_URLENCODED))
                         .returnResponse();
         assertEquals(201, resp.getStatusLine().getStatusCode());
 
@@ -289,7 +286,7 @@ public class IdentifierControllerIT extends AbstractLarchIT {
                 this.execute(Request.Delete(identifierUrl.replaceFirst("\\{id\\}", entityId) + "/DOI/1234"))
                         .returnResponse();
         this.showLog();
-        checkResponseError(resp, 500, IOException.class, "Identifier of type DOI with value 1234 not found");
+        checkResponseError(resp, 404, NotFoundException.class, "Identifier of type DOI with value 1234 not found");
 
         // retrieve entity
         resp = this.execute(Request.Get(entityUrl + "/" + entityId)).returnResponse();
