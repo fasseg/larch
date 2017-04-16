@@ -1,7 +1,5 @@
 [![Build Status](https://travis-ci.org/fasseg/larch.svg?branch=master)](https://travis-ci.org/fasseg/larch)
 
-# Larch repository
-
 This project integrates ElasticSearch and WeedFs into a large scale distributed repository system modeled after Fedora 3
 
 ## Links
